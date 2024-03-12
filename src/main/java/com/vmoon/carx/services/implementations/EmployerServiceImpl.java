@@ -9,6 +9,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,12 +22,13 @@ public class EmployerServiceImpl implements EmployerService {
 
 
     @Override
-    public Employer saveEmployer(EmployerDto employee) {
+    public void saveEmployer(EmployerDto employee) {
         if (employee != null) {
-            return employerRepository.save(EmployerMapper.mapToEmployer(employee));
+            employerRepository.save(EmployerMapper.mapToEmployer(employee));
         }
-        return null;
     }
+
+
 
     @Override
     public @NonNull Page<EmployerDto> allEmployers(@NonNull Pageable pageable) {
@@ -36,6 +38,31 @@ public class EmployerServiceImpl implements EmployerService {
     @Override
     public long count() {
         return employerRepository.count();
+    }
+
+    @Override
+    public Page<EmployerDto> searchEmployers(String searchText, Pageable pageable) {
+        Specification<Employer> spec = textInAllColumns(searchText);
+        Page<Employer> page = employerRepository.findAll(spec, pageable);
+        return page.map(EmployerMapper::mapToEmployerDto);
+    }
+
+    @Override
+    public long countSearchResults(String text) {
+        return employerRepository.count(textInAllColumns(text));
+    }
+
+    public static Specification<Employer> textInAllColumns(String text) {
+        if (text == null || text.isEmpty()) {
+            return null;
+        }
+
+        final String finalText = "%" + text.toLowerCase() + "%";
+        return (root, query, cb) -> cb.or(
+                cb.like(cb.lower(root.get("fullName")), finalText),
+                cb.like(cb.lower(root.get("email")), finalText),
+                cb.like(cb.lower(root.get("address")), finalText),
+                cb.like(cb.lower(root.get("phone")), finalText));
     }
 
 }

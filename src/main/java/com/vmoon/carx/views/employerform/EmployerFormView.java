@@ -31,6 +31,8 @@ import com.vmoon.carx.dto.RoleDto;
 import com.vmoon.carx.services.EmployerService;
 import com.vmoon.carx.services.RoleService;
 import com.vmoon.carx.views.MainLayout;
+import lombok.Getter;
+import lombok.Setter;
 
 @PageTitle("Employer Form")
 @Route(value = "employer-form", layout = MainLayout.class)
@@ -42,9 +44,22 @@ public class EmployerFormView extends Composite<VerticalLayout> {
     Select<RoleDto> roleSelect;
     EmailField emailField;
     TextArea address;
+
+    @Getter
     Button saveButton;
+
+    @Getter
     Button cancelButton;
+
+    @Getter
+    H3 h3;
     BeanValidationBinder<EmployerDto> validationBinder;
+
+    @Getter
+    EmployerDto employerDto;
+
+    @Setter
+    boolean updateFlag;
 
     private final RoleService roleService;
     private final EmployerService employerService;
@@ -72,6 +87,18 @@ public class EmployerFormView extends Composite<VerticalLayout> {
                 .withValidator(new BeanValidator(EmployerDto.class,"email"))
                 .bind(EmployerDto::getEmail,EmployerDto::setEmail);
 
+        validationBinder.forField(address)
+                .withValidator(new BeanValidator(EmployerDto.class,"address"))
+                .bind(EmployerDto::getAddress,EmployerDto::setAddress);
+
+        validationBinder.forField(roleSelect)
+                .withValidator(new BeanValidator(EmployerDto.class,"role"))
+                .bind(EmployerDto::getRole,EmployerDto::setRole);
+
+        validationBinder.forField(dateOfBirthPicker)
+                .withValidator(new BeanValidator(EmployerDto.class,"dateOfBirth"))
+                .bind(EmployerDto::getDateOfBirth,EmployerDto::setDateOfBirth);
+
         validationBinder.forField(phoneNumber)
                 .withValidator( new RegexpValidator("Enter an valid phone number","^(\\+\\d{1,2}\\s?)?1?\\-?\\.?\\s?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"))
                 .bind(EmployerDto::getPhone,EmployerDto::setPhone);
@@ -80,7 +107,8 @@ public class EmployerFormView extends Composite<VerticalLayout> {
 
     public void vaadinUI() {
         VerticalLayout layoutColumn2 = new VerticalLayout();
-        H3 h3 = new H3();
+
+        h3 = new H3();
         fullName = new TextField();
         fullName.setLabel("Full Name");
         fullName.setWidth("100%");
@@ -151,9 +179,14 @@ public class EmployerFormView extends Composite<VerticalLayout> {
     public void saveEmployer() {
         if (validationBinder.validate().isOk()) {
             try {
+                if (!updateFlag) {
                     employerService.saveEmployer(getEmployerToSave());
                     Notification.show("Employer successfully saved");
                     UI.getCurrent().navigate("employers-view");
+                } else {
+                    employerService.saveEmployer(getEmployerToUpdate());
+                    Notification.show("Employer successfully updated");
+                }
 
             } catch (Exception e) {
                 Notification.show("Error saving employer: " + e.getMessage());
@@ -166,6 +199,29 @@ public class EmployerFormView extends Composite<VerticalLayout> {
 
     public EmployerDto getEmployerToSave() {
         return EmployerDto.builder()
+                .fullName(fullName.getValue())
+                .email(emailField.getValue())
+                .phone(phoneNumber.getValue())
+                .address(address.getValue())
+                .dateOfBirth(dateOfBirthPicker.getValue())
+                .role(roleSelect.getValue())
+                .build();
+    }
+
+
+    public void setUpdateEmployer(EmployerDto employerDto) {
+        fullName.setValue(employerDto.getFullName());
+        address.setValue(employerDto.getAddress());
+        emailField.setValue(employerDto.getEmail());
+        phoneNumber.setValue(employerDto.getPhone());
+        dateOfBirthPicker.setValue(employerDto.getDateOfBirth());
+        roleSelect.setValue(employerDto.getRole());
+        this.employerDto = employerDto;
+    }
+
+    public EmployerDto getEmployerToUpdate() {
+        return EmployerDto.builder()
+                .id(employerDto.getId())
                 .fullName(fullName.getValue())
                 .email(emailField.getValue())
                 .phone(phoneNumber.getValue())

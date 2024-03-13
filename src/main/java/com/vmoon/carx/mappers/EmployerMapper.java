@@ -2,9 +2,9 @@ package com.vmoon.carx.mappers;
 
 import com.vmoon.carx.dto.EmployerDto;
 import com.vmoon.carx.entities.Employer;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class EmployerMapper {
 
     public static EmployerDto mapToEmployerDto(Employer employer) {

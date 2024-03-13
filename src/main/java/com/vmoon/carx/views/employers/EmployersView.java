@@ -64,10 +64,12 @@ public class EmployersView extends Composite<VerticalLayout> {
         addButton.setText("Add Employer");
         addButton.setWidth("min-content");
         addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        addButton.setPrefixComponent(new Icon(VaadinIcon.PLUS));
         addButton.addClickListener(e -> UI.getCurrent().navigate("employer-form"));
 
         HorizontalLayout layoutRow2 = new HorizontalLayout();
         Button exportButton = new Button();
+        exportButton.setPrefixComponent(new Icon(VaadinIcon.FILE_TEXT));
         exportButton.setText("Export Employers");
         exportButton.setWidth("min-content");
         exportButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

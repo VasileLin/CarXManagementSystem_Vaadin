@@ -15,7 +15,6 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import com.vmoon.carx.views.MainLayout;
 
@@ -43,7 +42,8 @@ public class ServiceFormView extends Composite<VerticalLayout> {
         layoutColumn2.setHeight("min-content");
         h3.setText("Service Registration");
         h3.setWidth("100%");
-        textField.setLabel("First Name");
+        textField.setLabel("Service Name");
+        textField.setWidth("100%");
         numberField.setLabel("Price");
         numberField.setWidth("100%");
         layoutRow.addClassName(Gap.MEDIUM);

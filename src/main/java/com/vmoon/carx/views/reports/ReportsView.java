@@ -18,6 +18,8 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import com.vmoon.carx.entities.Employer;
 import com.vmoon.carx.views.MainLayout;
 
+import java.time.LocalDate;
+
 @PageTitle("Reports")
 @Route(value = "report-view", layout = MainLayout.class)
 @Uses(Icon.class)
@@ -27,7 +29,9 @@ public class ReportsView extends Composite<VerticalLayout> {
         Tabs tabs = new Tabs();
         HorizontalLayout layoutRow = new HorizontalLayout();
         DatePicker datePicker = new DatePicker();
+        datePicker.setValue(LocalDate.now());
         DatePicker datePicker2 = new DatePicker();
+        datePicker2.setValue(LocalDate.now());
         VerticalLayout layoutColumn2 = new VerticalLayout();
         Button buttonPrimary = new Button();
         Grid basicGrid = new Grid(Employer.class);

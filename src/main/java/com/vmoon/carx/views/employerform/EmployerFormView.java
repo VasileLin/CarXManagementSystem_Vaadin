@@ -10,6 +10,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
@@ -31,6 +32,8 @@ import com.vmoon.carx.dto.RoleDto;
 import com.vmoon.carx.services.EmployerService;
 import com.vmoon.carx.services.RoleService;
 import com.vmoon.carx.views.MainLayout;
+import lombok.Getter;
+import lombok.Setter;
 
 @PageTitle("Employer Form")
 @Route(value = "employer-form", layout = MainLayout.class)
@@ -42,9 +45,22 @@ public class EmployerFormView extends Composite<VerticalLayout> {
     Select<RoleDto> roleSelect;
     EmailField emailField;
     TextArea address;
+
+    @Getter
     Button saveButton;
+
+    @Getter
     Button cancelButton;
+
+    @Getter
+    H3 h3;
     BeanValidationBinder<EmployerDto> validationBinder;
+
+    @Getter
+    EmployerDto employerDto;
+
+    @Setter
+    boolean updateFlag;
 
     private final RoleService roleService;
     private final EmployerService employerService;
@@ -72,6 +88,18 @@ public class EmployerFormView extends Composite<VerticalLayout> {
                 .withValidator(new BeanValidator(EmployerDto.class,"email"))
                 .bind(EmployerDto::getEmail,EmployerDto::setEmail);
 
+        validationBinder.forField(address)
+                .withValidator(new BeanValidator(EmployerDto.class,"address"))
+                .bind(EmployerDto::getAddress,EmployerDto::setAddress);
+
+        validationBinder.forField(roleSelect)
+                .withValidator(new BeanValidator(EmployerDto.class,"role"))
+                .bind(EmployerDto::getRole,EmployerDto::setRole);
+
+        validationBinder.forField(dateOfBirthPicker)
+                .withValidator(new BeanValidator(EmployerDto.class,"dateOfBirth"))
+                .bind(EmployerDto::getDateOfBirth,EmployerDto::setDateOfBirth);
+
         validationBinder.forField(phoneNumber)
                 .withValidator( new RegexpValidator("Enter an valid phone number","^(\\+\\d{1,2}\\s?)?1?\\-?\\.?\\s?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"))
                 .bind(EmployerDto::getPhone,EmployerDto::setPhone);
@@ -80,26 +108,34 @@ public class EmployerFormView extends Composite<VerticalLayout> {
 
     public void vaadinUI() {
         VerticalLayout layoutColumn2 = new VerticalLayout();
-        H3 h3 = new H3();
+
+        h3 = new H3();
         fullName = new TextField();
         fullName.setLabel("Full Name");
         fullName.setWidth("100%");
+        fullName.setPrefixComponent(new Icon(VaadinIcon.CLIPBOARD_USER));
 
         dateOfBirthPicker = new DatePicker();
         dateOfBirthPicker.setLabel("Date of Birth");
+        dateOfBirthPicker.setPrefixComponent(new Icon(VaadinIcon.CALENDAR));
 
         phoneNumber = new TextField();
         phoneNumber.setLabel("Phone Number");
+        phoneNumber.setPrefixComponent(new Icon(VaadinIcon.PHONE));
 
         roleSelect = new Select<>();
         roleSelect.setLabel("Role");
         roleSelect.setWidth("min-content");
         setSelectSampleData(roleSelect);
+        roleSelect.setPrefixComponent(new Icon(VaadinIcon.USER_CHECK));
+
 
         emailField = new EmailField();
         emailField.setLabel("Email");
+        emailField.setPrefixComponent(new Icon(VaadinIcon.MAILBOX));
 
         address = new TextArea();
+        address.setPrefixComponent(new Icon(VaadinIcon.USER_CARD));
 
 
         FormLayout formLayout2Col = new FormLayout();
@@ -108,7 +144,11 @@ public class EmployerFormView extends Composite<VerticalLayout> {
 
         saveButton = new Button();
         saveButton.addClickListener(e -> saveEmployer());
+        saveButton.setPrefixComponent(new Icon(VaadinIcon.CHECK));
+
         cancelButton = new Button();
+        cancelButton.setPrefixComponent(new Icon(VaadinIcon.CLOSE_SMALL));
+
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         getContent().setJustifyContentMode(JustifyContentMode.START);
@@ -133,6 +173,8 @@ public class EmployerFormView extends Composite<VerticalLayout> {
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         cancelButton.setText("Cancel");
         cancelButton.setWidth("min-content");
+        cancelButton.addClickListener(e -> UI.getCurrent().navigate("employers-view"));
+
         getContent().add(layoutColumn2);
         layoutColumn2.add(h3);
         layoutColumn2.add(fullName);
@@ -151,9 +193,14 @@ public class EmployerFormView extends Composite<VerticalLayout> {
     public void saveEmployer() {
         if (validationBinder.validate().isOk()) {
             try {
+                if (!updateFlag) {
                     employerService.saveEmployer(getEmployerToSave());
                     Notification.show("Employer successfully saved");
                     UI.getCurrent().navigate("employers-view");
+                } else {
+                    employerService.saveEmployer(getEmployerToUpdate());
+                    Notification.show("Employer successfully updated");
+                }
 
             } catch (Exception e) {
                 Notification.show("Error saving employer: " + e.getMessage());
@@ -166,6 +213,29 @@ public class EmployerFormView extends Composite<VerticalLayout> {
 
     public EmployerDto getEmployerToSave() {
         return EmployerDto.builder()
+                .fullName(fullName.getValue())
+                .email(emailField.getValue())
+                .phone(phoneNumber.getValue())
+                .address(address.getValue())
+                .dateOfBirth(dateOfBirthPicker.getValue())
+                .role(roleSelect.getValue())
+                .build();
+    }
+
+
+    public void setUpdateEmployer(EmployerDto employerDto) {
+        fullName.setValue(employerDto.getFullName());
+        address.setValue(employerDto.getAddress());
+        emailField.setValue(employerDto.getEmail());
+        phoneNumber.setValue(employerDto.getPhone());
+        dateOfBirthPicker.setValue(employerDto.getDateOfBirth());
+        roleSelect.setValue(employerDto.getRole());
+        this.employerDto = employerDto;
+    }
+
+    public EmployerDto getEmployerToUpdate() {
+        return EmployerDto.builder()
+                .id(employerDto.getId())
                 .fullName(fullName.getValue())
                 .email(emailField.getValue())
                 .phone(phoneNumber.getValue())

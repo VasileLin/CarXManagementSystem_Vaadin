@@ -13,7 +13,6 @@ import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import com.vmoon.carx.views.cash.CashView;
-import com.vmoon.carx.views.customerform.CustomerFormView;
 import com.vmoon.carx.views.customers.CustomersView;
 import com.vmoon.carx.views.employers.EmployersView;
 import com.vmoon.carx.views.reports.ReportsView;
@@ -69,8 +68,6 @@ public class MainLayout extends AppLayout {
             nav.addItem(new SideNavItem("Reports", ReportsView.class, LineAwesomeIcon.CHART_BAR_SOLID.create()));
 
             nav.addItem(new SideNavItem("Settings", SettingsView.class, LineAwesomeIcon.ICONS_SOLID.create()));
-
-            nav.addItem(new SideNavItem("Customer Form", CustomerFormView.class, LineAwesomeIcon.USER.create()));
 
             nav.addItem(new SideNavItem("Service Form", ServiceFormView.class, LineAwesomeIcon.KEY_SOLID.create()));
 

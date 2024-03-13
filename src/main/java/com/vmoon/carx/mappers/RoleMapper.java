@@ -2,9 +2,9 @@ package com.vmoon.carx.mappers;
 
 import com.vmoon.carx.dto.RoleDto;
 import com.vmoon.carx.entities.Role;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class RoleMapper {
     public static RoleDto mapToRoleDto(Role role) {
         return RoleDto.builder()

@@ -10,8 +10,6 @@ public interface EmployerService {
     @NonNull Page<EmployerDto> allEmployers(@NonNull Pageable pageable);
     void saveEmployer(EmployerDto employee);
     long count();
-
     Page<EmployerDto> searchEmployers(String value, Pageable pageable);
-
     long countSearchResults(String text);
 }

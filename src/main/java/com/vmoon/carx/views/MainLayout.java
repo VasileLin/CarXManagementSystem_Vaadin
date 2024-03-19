@@ -69,8 +69,6 @@ public class MainLayout extends AppLayout {
 
             nav.addItem(new SideNavItem("Settings", SettingsView.class, LineAwesomeIcon.ICONS_SOLID.create()));
 
-            nav.addItem(new SideNavItem("Service Form", ServiceFormView.class, LineAwesomeIcon.KEY_SOLID.create()));
-
         return nav;
     }
 

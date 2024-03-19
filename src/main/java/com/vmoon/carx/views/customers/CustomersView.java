@@ -112,6 +112,7 @@ public class CustomersView extends Composite<VerticalLayout> {
 
 
         getContent().add(layoutColumn2);
+        getContent().add(layoutColumn4);
         layoutColumn2.add(searchCustomersField);
         layoutColumn2.add(customersGrid);
         layoutColumn4.add(hr);

@@ -13,6 +13,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -23,6 +25,11 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public @NonNull Page<CustomerDto> allCustomers(@NonNull Pageable pageable) {
         return customerRepository.findAll(pageable).map(CustomerMapper::mapToCustomerDto);
+    }
+
+    @Override
+    public List<CustomerDto> listCustomers() {
+        return customerRepository.findAll().stream().map(CustomerMapper::mapToCustomerDto).toList();
     }
 
     @Override

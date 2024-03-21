@@ -1,9 +1,8 @@
 package com.vmoon.carx.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.*;
 
 import java.time.LocalDate;
 @Data
@@ -12,10 +11,14 @@ import java.time.LocalDate;
 @Builder
 public class GoodsDto {
     private long id;
+    @NotEmpty(message = "cost name must not be empty")
     private String costName;
     private Double cost;
     private LocalDate date;
     private int stock;
     private int quantity;
+
 }
+
+
 

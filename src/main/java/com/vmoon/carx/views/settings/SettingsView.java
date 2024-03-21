@@ -15,20 +15,23 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import com.vmoon.carx.dto.CompanyDto;
 import com.vmoon.carx.dto.GoodsDto;
+import com.vmoon.carx.services.CompanyService;
 import com.vmoon.carx.services.GoodsService;
 import com.vmoon.carx.views.MainLayout;
 import com.vmoon.carx.views.goods.GoodsRegistrationView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+
+import java.util.List;
 
 @PageTitle("Settings")
 @Route(value = "settings-view", layout = MainLayout.class)
@@ -40,9 +43,14 @@ public class SettingsView extends Composite<VerticalLayout> {
     private VerticalLayout companyDataContent;
     Dialog dialog;
     private final GoodsService goodsService;
+    private final CompanyService companyService;
+    TextField nameTextField;
+    TextField addressField;
+    TextField ibanField;
 
-    public SettingsView( GoodsService goodsService) {
+    public SettingsView(GoodsService goodsService, CompanyService companyService) {
         this.goodsService = goodsService;
+        this.companyService = companyService;
 
         Tabs tabs = new Tabs();
         Tab tabCostOfGoods = new Tab("Cost of goods");
@@ -51,6 +59,7 @@ public class SettingsView extends Composite<VerticalLayout> {
 
         initializeCostOfGoodsContent();
         initializeCompanyDataContent();
+        initializeCompanyData();
 
         tabs.addSelectedChangeListener(event -> updateVisibleContent(tabs.getSelectedTab()));
 
@@ -75,22 +84,19 @@ public class SettingsView extends Composite<VerticalLayout> {
         VerticalLayout layoutColumn2 = new VerticalLayout();
         layoutColumn2.setAlignItems(FlexComponent.Alignment.CENTER);
         Button saveButton;
-        TextField nameTextField;
-        NumberField costTextField;
-        NumberField stockField;
         H3 h3;
-
         h3 = new H3();
         FormLayout formLayout2Col = new FormLayout();
         nameTextField = new TextField();
-        costTextField = new NumberField();
-        stockField = new NumberField();
+        addressField = new TextField();
+        ibanField = new TextField();
         HorizontalLayout layoutRow = new HorizontalLayout();
 
         saveButton = new Button();
         saveButton.setText("Save");
         saveButton.setWidth("min-content");
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.addClickListener(e -> saveCompanyData());
 
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
@@ -103,10 +109,10 @@ public class SettingsView extends Composite<VerticalLayout> {
         h3.setWidth("100%");
         formLayout2Col.setWidth("100%");
         nameTextField.setLabel("Name");
-        costTextField.setLabel("Address");
-        costTextField.setWidth("min-content");
-        stockField.setLabel("IBAN");
-        stockField.setWidth("min-content");
+        addressField.setLabel("Address");
+        addressField.setWidth("min-content");
+        ibanField.setLabel("IBAN");
+        ibanField.setWidth("min-content");
         layoutRow.addClassName(LumoUtility.Gap.MEDIUM);
         layoutRow.setWidth("100%");
         layoutRow.getStyle().set("flex-grow", "1");
@@ -114,13 +120,34 @@ public class SettingsView extends Composite<VerticalLayout> {
         layoutColumn2.add(h3);
         layoutColumn2.add(formLayout2Col);
         formLayout2Col.add(nameTextField);
-        formLayout2Col.add(costTextField);
-        formLayout2Col.add(stockField);
+        formLayout2Col.add(addressField);
+        formLayout2Col.add(ibanField);
         layoutColumn2.add(layoutRow);
         layoutRow.add(saveButton);
 
         companyDataContent = new VerticalLayout(layoutColumn2);
         companyDataContent.setVisible(false);
+    }
+
+    private void initializeCompanyData() {
+        List<CompanyDto> companyDto = companyService.getAllCompanies();
+
+        if (!companyDto.isEmpty()) {
+            nameTextField.setValue(companyDto.get(0).getName());
+            addressField.setValue(companyDto.get(0).getAddress());
+            ibanField.setValue(companyDto.get(0).getIban());
+        }
+    }
+
+    private void saveCompanyData() {
+        CompanyDto companyDto = CompanyDto.builder()
+                .name(nameTextField.getValue())
+                .address(addressField.getValue())
+                .iban(ibanField.getValue())
+                .build();
+
+        companyService.saveCompany(companyDto);
+        Notification.show("Company data updated");
     }
 
     private void initializeCostOfGoodsContent() {

@@ -48,9 +48,7 @@ public class ServiceFormView extends Composite<VerticalLayout> {
 
     @Setter
     boolean updateFlag;
-
     BeanValidationBinder<ServiceDto> validationBinder;
-
     private final ServicesService servicesService;
 
     public ServiceFormView(ServicesService servicesService) {

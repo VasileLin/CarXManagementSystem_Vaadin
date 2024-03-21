@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -21,7 +21,7 @@ public class CashDto {
     private String status;
     private String details;
 
-    private List<ServiceDto> services;
-    private List<GoodsDto> goods;
+    private Set<ServiceDto> services;
+    private Set<GoodsDto> goods;
     private CustomerDto customer;
 }

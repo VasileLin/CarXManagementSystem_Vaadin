@@ -38,7 +38,6 @@ import org.springframework.data.domain.Sort;
 public class EmployersView extends Composite<VerticalLayout> {
     @Getter
     Grid<EmployerDto> employersGrid;
-
     TextField searchEmployersField;
 
     @Getter
@@ -96,7 +95,6 @@ public class EmployersView extends Composite<VerticalLayout> {
         searchEmployersField.addValueChangeListener(e -> searchEmployers(e.getValue().trim()));
 
         getContent().add(searchEmployersField);
-
         getContent().add(employersGrid);
         getContent().add(hr);
         getContent().add(layoutRow);

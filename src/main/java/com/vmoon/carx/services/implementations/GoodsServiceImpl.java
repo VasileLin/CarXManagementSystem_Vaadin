@@ -8,9 +8,11 @@ import com.vmoon.carx.services.GoodsService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,5 +61,15 @@ public class GoodsServiceImpl implements GoodsService {
             goods.setStock(newStock);
             goodsRepository.save(goods);
         });
+    }
+
+    @Override
+    public Page<GoodsDto> allGoodsDate(PageRequest pageRequest, LocalDate fromValue, LocalDate toValue) {
+        return goodsRepository.findAllByDate(pageRequest,fromValue,toValue).map(GoodsMapper::toGoodsDto);
+    }
+
+    @Override
+    public long countDateResult(LocalDate fromValue, LocalDate toValue) {
+        return goodsRepository.countAllByDate(fromValue,toValue);
     }
 }

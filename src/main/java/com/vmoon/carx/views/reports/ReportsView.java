@@ -5,18 +5,22 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.Uses;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
+import com.vmoon.carx.dto.CashDto;
 import com.vmoon.carx.dto.CashGridDto;
 import com.vmoon.carx.dto.GoodsDto;
 import com.vmoon.carx.services.CashService;
@@ -43,6 +47,9 @@ public class ReportsView extends Composite<VerticalLayout> {
     DatePicker toGoodsDatePicker;
     Grid<GoodsDto> goodsGrid;
     Grid<CashGridDto> cashGrid;
+    TextField searchCustomersField;
+    Dialog dialog;
+    DataProvider<CashGridDto, Void> dataProvider;
 
     public ReportsView(CashService cashService, GoodsService goodsService) {
         this.cashService = cashService;
@@ -67,6 +74,7 @@ public class ReportsView extends Composite<VerticalLayout> {
         HorizontalLayout layoutRow = new HorizontalLayout();
         goodsGrid = new Grid<>(GoodsDto.class,false);
 
+        cashGrid.addItemDoubleClickListener(item -> openInfoDialog(cashService.getCashByTransactionNo(item.getItem().getTransactionNo())));
         fromGoodsDatePicker = new DatePicker();
         fromGoodsDatePicker.addValueChangeListener(e -> goodsGrid.getDataProvider().refreshAll());
         fromGoodsDatePicker.setValue(LocalDate.now());
@@ -106,6 +114,19 @@ public class ReportsView extends Composite<VerticalLayout> {
 
         costsContent = new VerticalLayout(layoutRow,goodsGrid);
         costsContent.setVisible(false);
+    }
+
+    private void openInfoDialog(CashDto item) {
+        InfoCashView infoCashView = new InfoCashView();
+        infoCashView.setCashDto(item);
+        infoCashView.setInfoData();
+
+        dialog = new Dialog(infoCashView);
+        dialog.setWidth("70%");
+        dialog.setHeight("auto");
+        dialog.setDraggable(true);
+        dialog.open();
+
     }
 
     private void setGoodsGridSampleData(Grid<GoodsDto> goodsGrid) {
@@ -172,12 +193,21 @@ public class ReportsView extends Composite<VerticalLayout> {
         HorizontalLayout layoutRow = new HorizontalLayout();
         cashGrid = new Grid<>(CashGridDto.class,false);
 
+
         fromDatePicker = new DatePicker();
         fromDatePicker.addValueChangeListener(e -> cashGrid.getDataProvider().refreshAll());
         fromDatePicker.setValue(LocalDate.now());
         toDatePicker = new DatePicker();
         toDatePicker.setValue(LocalDate.now());
         toDatePicker.addValueChangeListener(e -> cashGrid.getDataProvider().refreshAll());
+
+        searchCustomersField = new TextField();
+        searchCustomersField.setLabel("Search by transaction number");
+        searchCustomersField.setPlaceholder("Enter transaction number ...");
+        searchCustomersField.setWidth("80%");
+        searchCustomersField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
+        searchCustomersField.addValueChangeListener(e -> searchCash(e.getValue().trim()));
+
         VerticalLayout layoutColumn2 = new VerticalLayout();
         Button exportButton = new Button();
         getContent().setWidth("100%");
@@ -206,8 +236,10 @@ public class ReportsView extends Composite<VerticalLayout> {
         getContent().add(layoutRow);
         layoutRow.add(fromDatePicker);
         layoutRow.add(toDatePicker);
+        layoutRow.add(searchCustomersField);
         layoutRow.add(layoutColumn2);
         layoutRow.add(exportButton);
+
 
         revenuesContent = new VerticalLayout(layoutRow,cashGrid);
         revenuesContent.setVisible(false);
@@ -236,7 +268,7 @@ public class ReportsView extends Composite<VerticalLayout> {
                 .setSortProperty("price");
 
         Grid.Column<CashGridDto> statusColumn = grid.addColumn(CashGridDto::getStatus)
-                .setHeader("Final Price")
+                .setHeader("Status")
                 .setResizable(true)
                 .setAutoWidth(true)
                 .setSortable(true)
@@ -244,7 +276,8 @@ public class ReportsView extends Composite<VerticalLayout> {
 
         grid.setColumnOrder(transactionColumn,dateColumn,priceColumn,statusColumn);
 
-        DataProvider<CashGridDto, Void> dataProvider = DataProvider.fromCallbacks(
+
+        dataProvider = DataProvider.fromCallbacks(
                 query -> {
                     PageRequest pageRequest = PageRequest.of(
                             query.getPage(),
@@ -259,6 +292,24 @@ public class ReportsView extends Composite<VerticalLayout> {
         );
 
         grid.setDataProvider(dataProvider);
+    }
+
+    private void searchCash(String value) {
+        DataProvider<CashGridDto, Void> dataProvider = DataProvider.fromCallbacks(
+                query -> {
+                    PageRequest pageRequest = PageRequest.of(
+                            query.getPage(),
+                            query.getPageSize(),
+                            query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
+                    );
+
+                    Page<CashGridDto> page = cashService.searchCash(value, pageRequest);
+                    return page.stream();
+                },
+                query -> (int) cashService.countSearchResults(value)
+        );
+
+        cashGrid.setDataProvider(dataProvider);
     }
 
 }

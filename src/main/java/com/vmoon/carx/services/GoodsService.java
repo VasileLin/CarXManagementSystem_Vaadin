@@ -3,8 +3,10 @@ package com.vmoon.carx.services;
 import com.vmoon.carx.dto.GoodsDto;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface GoodsService {
@@ -14,6 +16,7 @@ public interface GoodsService {
     long count();
     Page<GoodsDto> searchGoods(String value, Pageable pageable);
     long countSearchResults(String text);
-
     void updateStock(long id, int newStock);
+    Page<GoodsDto> allGoodsDate(PageRequest pageRequest, LocalDate value, LocalDate value1);
+    long countDateResult(LocalDate value, LocalDate value1);
 }

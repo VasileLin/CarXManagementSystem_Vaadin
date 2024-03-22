@@ -38,7 +38,10 @@ import com.vmoon.carx.utils.Status;
 import com.vmoon.carx.views.MainLayout;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
 
 @PageTitle("Cash")
 @Route(value = "cash-view", layout = MainLayout.class)
@@ -140,9 +143,7 @@ public class CashView extends Composite<VerticalLayout> {
                 quantityDialog.close();
             });
 
-            savingButton.addClickListener( e -> {
-                quantityDialog.open();
-            });
+            savingButton.addClickListener( e -> quantityDialog.open());
             return savingButton;
         })).setHeader("Actions");
 
@@ -247,9 +248,9 @@ public class CashView extends Composite<VerticalLayout> {
               .details(infoTextArea.getValue())
               .build();
 
-      cashDto.setServices(multiSelectComboBox.getValue().stream().toList());
+        cashDto.setServices(multiSelectComboBox.getValue());
 
-      cashDto.setGoods(multiSelectGoodsComboBox.getValue().stream().toList());
+        cashDto.setGoods(multiSelectGoodsComboBox.getValue());
 
       cashDto.setCustomer(customerComboBox.getValue());
 

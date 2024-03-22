@@ -14,6 +14,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.validator.BeanValidator;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
@@ -34,7 +36,7 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
 
     @Getter
     private final Button cancelButton;
-
+    BeanValidationBinder<GoodsDto> validationBinder;
     private final TextField nameTextField;
     private final NumberField costTextField;
     private final DatePicker purchaseDate;
@@ -97,20 +99,51 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
         layoutColumn2.add(layoutRow);
         layoutRow.add(saveButton);
         layoutRow.add(cancelButton);
+
+        fieldsValidation();
     }
 
-    public void saveGood() {
-      GoodsDto saveGood =  GoodsDto.builder()
-                .costName(nameTextField.getValue())
-                .cost(costTextField.getValue())
-                .date(purchaseDate.getValue())
-                .stock(stockField.getValue().intValue())
-                .build();
+    private void fieldsValidation() {
+        validationBinder = new BeanValidationBinder<>(GoodsDto.class);
 
-        try {
-            goodsService.saveGood(saveGood);
-        } catch (Exception e) {
-            Notification.show("Error saving good :"+ e);
+        validationBinder.forField(nameTextField)
+                .withValidator(new BeanValidator(GoodsDto.class,"costName"))
+                .bind(GoodsDto::getCostName,GoodsDto::setCostName);
+
+        validationBinder.forField(costTextField)
+                .withValidator(new BeanValidator(GoodsDto.class,"cost"))
+                .asRequired("Enter a good cost")
+                .bind(GoodsDto::getCost,GoodsDto::setCost);
+
+        validationBinder.forField(purchaseDate)
+                .withValidator(new BeanValidator(GoodsDto.class,"date"))
+                .bind(GoodsDto::getDate,GoodsDto::setDate);
+
+        validationBinder.forField(stockField)
+                .withValidator(new BeanValidator(GoodsDto.class,"stock"))
+                .bind(
+                        goodsDto -> (double) goodsDto.getStock(),
+                        (goodsDto, fieldValue) -> goodsDto.setStock(fieldValue.intValue())
+                );
+
+    }
+
+
+    public void saveGood() {
+        if (validationBinder.validate().isOk()) {
+            GoodsDto saveGood =  GoodsDto.builder()
+                    .costName(nameTextField.getValue())
+                    .cost(costTextField.getValue())
+                    .date(purchaseDate.getValue())
+                    .stock(stockField.getValue().intValue())
+                    .build();
+            try {
+                goodsService.saveGood(saveGood);
+            } catch (Exception e) {
+                Notification.show("Error saving good :"+ e);
+            }
+        } else {
+            Notification.show("Invalid data!");
         }
     }
 

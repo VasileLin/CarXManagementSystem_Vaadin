@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "cash")
@@ -33,7 +33,7 @@ public class Cash {
             joinColumns = {@JoinColumn(name = "cash_id",referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "service_id", referencedColumnName = "id")}
     )
-    private List<Service> services;
+    private Set<Service> services;
 
     @ManyToMany
     @JoinTable(
@@ -41,7 +41,7 @@ public class Cash {
             joinColumns = {@JoinColumn(name = "cash_id",referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "good_id", referencedColumnName = "id")}
     )
-    private List<Goods> goods;
+    private Set<Goods> goods;
 
     @OneToOne
     @JoinColumn(name = "customer_id",nullable = false)

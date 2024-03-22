@@ -7,7 +7,9 @@ import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.Scroller;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.PageTitle;
@@ -17,7 +19,6 @@ import com.vmoon.carx.views.customers.CustomersView;
 import com.vmoon.carx.views.employers.EmployersView;
 import com.vmoon.carx.views.reports.ReportsView;
 import com.vmoon.carx.views.service.ServiceView;
-import com.vmoon.carx.views.serviceform.ServiceFormView;
 import com.vmoon.carx.views.settings.SettingsView;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
@@ -45,9 +46,19 @@ public class MainLayout extends AppLayout {
     }
 
     private void addDrawerContent() {
+
+        Image logo = new Image("logo/logo.png", "Logo");
+        logo.setWidth("100px");
+
         H1 appName = new H1("CarX Management System");
         appName.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
-        Header header = new Header(appName);
+
+        VerticalLayout headerLayout = new VerticalLayout(logo, appName);
+        headerLayout.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
+        headerLayout.setPadding(false);
+        headerLayout.setSpacing(true);
+
+        Header header = new Header(headerLayout);
 
         Scroller scroller = new Scroller(createNavigation());
 

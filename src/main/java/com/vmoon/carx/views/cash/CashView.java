@@ -34,7 +34,9 @@ import com.vmoon.carx.utils.jasper.ReceiptGenerator;
 import com.vmoon.carx.views.MainLayout;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import java.io.File;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @PageTitle("Cash")
@@ -59,6 +61,7 @@ public class CashView extends Composite<VerticalLayout> {
     Grid<ServiceDto> serviceGrid;
     Grid<GoodsDto> costOfGoodsGrid;
     Paragraph priceText;
+    File directory;
 
     public CashView(CustomerService customerService, ServicesService servicesService, CashService cashService, GoodsService goodsService, CompanyService companyService) {
         this.customerService = customerService;
@@ -242,7 +245,12 @@ public class CashView extends Composite<VerticalLayout> {
         try {
 
             if (cashDto.getGoods().stream().anyMatch(goodsDto -> goodsDto.getQuantity() != 0)) {
+
+                String today = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMyyyy"));
+                directory = new File("reports/"+today);
+                cashDto.setReceiptPath(directory.getPath()+"\\"+transactionNo+ ".pdf");
                 cashService.saveCash(cashDto);
+
                 for (GoodsDto goodsDto : cashDto.getGoods()) {
                     int newStock = goodsDto.getStock() - goodsDto.getQuantity();
                     goodsService.updateStock(goodsDto.getId(), newStock);
@@ -265,7 +273,6 @@ public class CashView extends Composite<VerticalLayout> {
             } else {
                 Notification.show("Quantity must be greater than zero!");
             }
-
 
         } catch (Exception e) {
             Notification.show("Error saving cash :" + e.getMessage());
@@ -293,7 +300,7 @@ public class CashView extends Composite<VerticalLayout> {
         parameters.put("address", companyDto.getAddress());
         parameters.put("details", infoTextArea.getValue());
 
-        ReceiptGenerator.cashReceiptGenerator(parameters);
+        ReceiptGenerator.cashReceiptGenerator(parameters,directory);
 
     }
 

@@ -26,6 +26,8 @@ public class Cash {
     private String status;
     @Column(length = 1024)
     private String details;
+    @Column(name = "receipt_path")
+    private String receiptPath;
 
     @ManyToMany
     @JoinTable(

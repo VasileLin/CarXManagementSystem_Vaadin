@@ -20,6 +20,7 @@ public class CashDto {
     private LocalDate date;
     private String status;
     private String details;
+    private String receiptPath;
 
     private Set<ServiceDto> services;
     private Set<GoodsDto> goods;

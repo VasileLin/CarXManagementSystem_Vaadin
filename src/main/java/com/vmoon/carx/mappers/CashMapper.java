@@ -24,6 +24,7 @@ public class CashMapper {
                 .date(cash.getDate())
                 .status(cash.getStatus())
                 .details(cash.getDetails())
+                .receiptPath(cash.getReceiptPath())
                 .build();
 
         if (cash.getServices() != null) {
@@ -49,6 +50,7 @@ public class CashMapper {
                 .date(cashDto.getDate())
                 .status(cashDto.getStatus())
                 .details(cashDto.getDetails())
+                .receiptPath(cashDto.getReceiptPath())
                 .build();
 
         Set<Service> services = cashDto.getServices() != null

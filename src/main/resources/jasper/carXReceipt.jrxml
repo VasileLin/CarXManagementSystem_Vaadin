@@ -267,12 +267,12 @@
 					<datasetRun subDataset="Goods" uuid="77b14856-3a95-4b7e-86b6-6ada3ebed5c9">
 						<dataSourceExpression><![CDATA[$P{goodsDataSource}]]></dataSourceExpression>
 					</datasetRun>
-					<jr:column width="160" uuid="bc22e5a0-5ca5-49f3-a4d5-311d092ae088">
+					<jr:column width="150" uuid="bc22e5a0-5ca5-49f3-a4d5-311d092ae088">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
 						<jr:tableFooter style="Table 4_TH" height="30"/>
 						<jr:columnHeader style="Table 4_CH" height="30">
 							<staticText>
-								<reportElement x="0" y="0" width="160" height="30" uuid="0ffe52c0-fc3a-443a-ab3f-a77b21a3ff4d"/>
+								<reportElement x="0" y="0" width="150" height="30" uuid="0ffe52c0-fc3a-443a-ab3f-a77b21a3ff4d"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
@@ -282,7 +282,7 @@
 						<jr:columnFooter style="Table 4_CH" height="30"/>
 						<jr:detailCell style="Table 4_TD" height="30">
 							<textField>
-								<reportElement x="0" y="0" width="160" height="30" uuid="d5b6adf5-c43b-434a-af04-47d3648f6383"/>
+								<reportElement x="0" y="0" width="150" height="30" uuid="d5b6adf5-c43b-434a-af04-47d3648f6383"/>
 								<textElement verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{costName}]]></textFieldExpression>
 							</textField>
@@ -309,12 +309,12 @@
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="63" uuid="9d91c46b-93d6-4697-b156-a8574c18ab67">
+					<jr:column width="60" uuid="9d91c46b-93d6-4697-b156-a8574c18ab67">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
 						<jr:tableFooter style="Table 4_TH" height="30"/>
 						<jr:columnHeader style="Table 4_CH" height="30">
 							<staticText>
-								<reportElement x="0" y="0" width="63" height="30" uuid="5d1cd37c-912e-4155-a752-15a2b5fd1d77"/>
+								<reportElement x="0" y="0" width="60" height="30" uuid="5d1cd37c-912e-4155-a752-15a2b5fd1d77"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
@@ -324,8 +324,8 @@
 						<jr:columnFooter style="Table 4_CH" height="30"/>
 						<jr:detailCell style="Table 4_TD" height="30">
 							<textField>
-								<reportElement x="0" y="0" width="63" height="30" uuid="66614704-8298-49a1-9fb4-662b6e2c11c3"/>
-								<textElement verticalAlignment="Middle"/>
+								<reportElement x="0" y="0" width="60" height="30" uuid="66614704-8298-49a1-9fb4-662b6e2c11c3"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{quantity}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
@@ -380,7 +380,7 @@
 						<jr:detailCell style="Table 1_TD" height="30">
 							<textField>
 								<reportElement x="0" y="0" width="110" height="30" uuid="a77815ae-d4f1-48d8-862a-1d07fe1069da"/>
-								<textElement verticalAlignment="Middle"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{price}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
@@ -404,14 +404,14 @@
 				<textFieldExpression><![CDATA[$P{transactionNo}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="351" y="11" width="99" height="30" uuid="a95e1840-6933-4a0d-a22a-83bdeb9c0672"/>
+				<reportElement x="351" y="11" width="89" height="30" uuid="a95e1840-6933-4a0d-a22a-83bdeb9c0672"/>
 				<textElement verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Total Price]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="450" y="11" width="100" height="30" uuid="f71add07-fa4e-4f88-b803-fe2d81da05c1"/>
+				<reportElement x="440" y="11" width="80" height="30" uuid="f71add07-fa4e-4f88-b803-fe2d81da05c1"/>
 				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$P{totalPrice}]]></textFieldExpression>
 			</textField>
@@ -426,6 +426,13 @@
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Additional details]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="520" y="11" width="24" height="30" uuid="3c2943d9-6162-4122-91f1-93c09a8d73fa"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[lei]]></text>
 			</staticText>
 		</band>
 	</summary>

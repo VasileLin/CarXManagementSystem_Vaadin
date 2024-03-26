@@ -1,6 +1,5 @@
 package com.vmoon.carx.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 

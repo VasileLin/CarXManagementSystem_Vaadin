@@ -1,6 +1,5 @@
 package com.vmoon.carx.config;
 
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vmoon.carx.services.EmployerService;
 import com.vmoon.carx.services.GoodsService;
 import com.vmoon.carx.services.RoleService;

@@ -18,7 +18,7 @@ public class Goods {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column(name = "cost_name")
-    private String costName;
+    private String name;
     private Double cost;
     private LocalDate date;
     private int stock;

@@ -175,6 +175,7 @@ public class SettingsView extends Composite<VerticalLayout> {
 
         goodsRegistrationView.getSaveButton().addClickListener(e -> {
              goodsRegistrationView.saveGood();
+             basicGrid.getDataProvider().refreshAll();
              dialog.close();
              Notification.show("Good successfully registered!");
         });

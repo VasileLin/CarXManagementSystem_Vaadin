@@ -14,6 +14,7 @@ CREATE table if not exists cash
     date           date         not null,
     status         varchar(20)  not null,
     details        varchar(1024) not null,
+    receipt_path   varchar(1000) not null,
     customer_id int not null,
     CONSTRAINT cash_pk PRIMARY KEY (id),
     FOREIGN KEY (customer_id) REFERENCES customers(id)

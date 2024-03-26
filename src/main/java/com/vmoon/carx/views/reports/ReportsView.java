@@ -1,14 +1,17 @@
 package com.vmoon.carx.views.reports;
 
 import com.vaadin.flow.component.Composite;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -16,8 +19,10 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import com.vmoon.carx.dto.CashDto;
@@ -30,6 +35,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.time.LocalDate;
 
 @PageTitle("Reports")
@@ -240,7 +249,6 @@ public class ReportsView extends Composite<VerticalLayout> {
         layoutRow.add(layoutColumn2);
         layoutRow.add(exportButton);
 
-
         revenuesContent = new VerticalLayout(layoutRow,cashGrid);
         revenuesContent.setVisible(false);
     }
@@ -274,7 +282,42 @@ public class ReportsView extends Composite<VerticalLayout> {
                 .setSortable(true)
                 .setSortProperty("status");
 
-        grid.setColumnOrder(transactionColumn,dateColumn,priceColumn,statusColumn);
+        Grid.Column<CashGridDto> receiptColumn = grid.addColumn(new ComponentRenderer<>(cash -> {
+            Button saveButton = new Button(new Icon(VaadinIcon.DOWNLOAD), buttonClickEvent -> {
+                CashDto cashDto = cashService.getCashByTransactionNo(cash.getTransactionNo());
+                String receiptPath = cashDto.getReceiptPath();
+                File file = new File(receiptPath);
+
+                if (file.exists()) {
+                    StreamResource resource = new StreamResource(file.getName(),
+                            () -> {
+                                try {
+                                    return new FileInputStream(file);
+                                } catch (FileNotFoundException e) {
+
+                                    Notification.show("File not found", 3000, Notification.Position.MIDDLE);
+                                    return new ByteArrayInputStream(new byte[0]);
+                                }
+                            });
+
+
+                    Anchor downloadLink = new Anchor(resource, "");
+                    downloadLink.getElement().setAttribute("download", true);
+                    downloadLink.getElement().setAttribute("href", resource);
+                    downloadLink.getElement().setAttribute("style","display: none;");
+
+                    UI.getCurrent().add(downloadLink);
+                    downloadLink.getElement().callJsFunction("click");
+                } else {
+
+                    Notification.show("The requested file does not exist.", 3000, Notification.Position.MIDDLE);
+                }
+            });
+            saveButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS,ButtonVariant.LUMO_SMALL);
+            return saveButton;
+        })).setHeader("Actions");
+
+        grid.setColumnOrder(transactionColumn,dateColumn,priceColumn,statusColumn,receiptColumn);
 
 
         dataProvider = DataProvider.fromCallbacks(

@@ -26,50 +26,46 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.NumberRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vmoon.carx.dto.CashDto;
-import com.vmoon.carx.dto.CustomerDto;
-import com.vmoon.carx.dto.GoodsDto;
-import com.vmoon.carx.dto.ServiceDto;
-import com.vmoon.carx.services.CashService;
-import com.vmoon.carx.services.CustomerService;
-import com.vmoon.carx.services.GoodsService;
-import com.vmoon.carx.services.ServicesService;
+import com.vmoon.carx.dto.*;
+import com.vmoon.carx.services.*;
+import com.vmoon.carx.utils.Generators;
 import com.vmoon.carx.utils.Status;
+import com.vmoon.carx.utils.jasper.ReceiptGenerator;
 import com.vmoon.carx.views.MainLayout;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
+import java.util.*;
 
 @PageTitle("Cash")
 @Route(value = "cash-view", layout = MainLayout.class)
 @Uses(Icon.class)
 public class CashView extends Composite<VerticalLayout> {
     TextArea infoTextArea;
-
     private final CustomerService customerService;
     private final ServicesService servicesService;
     private final CashService cashService;
     private final GoodsService goodsService;
+    private final CompanyService companyService;
+    private Double servicesTotalPrice = 0.00;
+    private Double goodsTotalPrice = 0.00;
+    private Double totalPrice = 0.00;
+    private String transactionNo;
     MultiSelectComboBox<ServiceDto> multiSelectComboBox;
     MultiSelectComboBox<GoodsDto> multiSelectGoodsComboBox;
     ComboBox<CustomerDto> customerComboBox;
     List<GoodsDto> selectedGoods;
     Paragraph transactionNoText;
-    private Double servicesTotalPrice = 0.00;
-    private Double goodsTotalPrice = 0.00;
-    private Double totalPrice = 0.00;
-    private String transactionNo;
     Grid<ServiceDto> serviceGrid;
     Grid<GoodsDto> costOfGoodsGrid;
     Paragraph priceText;
-    public CashView(CustomerService customerService, ServicesService servicesService, CashService cashService, GoodsService goodsService) {
+
+    public CashView(CustomerService customerService, ServicesService servicesService, CashService cashService, GoodsService goodsService, CompanyService companyService) {
         this.customerService = customerService;
         this.servicesService = servicesService;
         this.cashService = cashService;
         this.goodsService = goodsService;
+        this.companyService = companyService;
 
         vaadinUI();
     }
@@ -78,10 +74,10 @@ public class CashView extends Composite<VerticalLayout> {
     public void vaadinUI() {
         FormLayout formLayout2Col = new FormLayout();
 
-
         customerComboBox = new ComboBox<>();
         customerComboBox.setLabel("Select customer");
         customerComboBox.setWidth("min-content");
+        customerComboBox.setPrefixComponent(new Icon(VaadinIcon.USER_STAR));
         setCustomerComboBoxData(customerComboBox);
 
         serviceGrid = new Grid<>(ServiceDto.class);
@@ -89,7 +85,7 @@ public class CashView extends Composite<VerticalLayout> {
         serviceGrid.setHeight("240px");
         serviceGrid.getStyle().set("flex-grow", "0");
 
-        costOfGoodsGrid = new Grid<>(GoodsDto.class,false);
+        costOfGoodsGrid = new Grid<>(GoodsDto.class, false);
         costOfGoodsGrid.setWidth("100%");
         costOfGoodsGrid.setHeight("240px");
         costOfGoodsGrid.getStyle().set("flex-grow", "0");
@@ -117,7 +113,7 @@ public class CashView extends Composite<VerticalLayout> {
 
         Grid.Column<GoodsDto> saveColumn = costOfGoodsGrid.addColumn(new ComponentRenderer<>(cost -> {
             Button savingButton = new Button(new Icon(VaadinIcon.CHECK));
-            savingButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS,ButtonVariant.LUMO_SMALL);
+            savingButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
 
             Dialog quantityDialog = new Dialog();
 
@@ -127,7 +123,7 @@ public class CashView extends Composite<VerticalLayout> {
             TextField quantityField = new TextField("Quantity");
             Button saveButton = new Button("Save");
 
-            dialogLayout.add(h6,quantityField, saveButton);
+            dialogLayout.add(h6, quantityField, saveButton);
             quantityDialog.add(dialogLayout);
 
             saveButton.addClickListener(event -> {
@@ -143,13 +139,12 @@ public class CashView extends Composite<VerticalLayout> {
                 quantityDialog.close();
             });
 
-            savingButton.addClickListener( e -> quantityDialog.open());
+            savingButton.addClickListener(e -> quantityDialog.open());
             return savingButton;
         })).setHeader("Actions");
 
 
-
-        costOfGoodsGrid.setColumnOrder(nameColumn,costColumn,stockColumn,countColumn,saveColumn);
+        costOfGoodsGrid.setColumnOrder(nameColumn, costColumn, stockColumn, countColumn, saveColumn);
 
         multiSelectComboBox = new MultiSelectComboBox<>();
         multiSelectComboBox.setLabel("Select rendered services");
@@ -161,10 +156,9 @@ public class CashView extends Composite<VerticalLayout> {
             countTotalPrice();
         });
 
-
         multiSelectGoodsComboBox = new MultiSelectComboBox<>();
         multiSelectGoodsComboBox.setLabel("Select used goods");
-        multiSelectGoodsComboBox.setWidth("min-content");
+        multiSelectGoodsComboBox.setWidth("100%");
         setMultiSelectGoodsData(multiSelectGoodsComboBox);
 
         multiSelectGoodsComboBox.addSelectionListener(e -> {
@@ -173,18 +167,15 @@ public class CashView extends Composite<VerticalLayout> {
         });
 
         transactionNoText = new Paragraph();
-
         priceText = new Paragraph();
         Hr hr = new Hr();
         H6 h6 = new H6();
         H6 h4 = new H6();
 
-
         Hr hr2 = new Hr();
         hr2.setWidth("100%");
         FormLayout formLayout2Col2 = new FormLayout();
         Button cashButton = new Button();
-        Button buttonSecondary = new Button();
 
         infoTextArea = new TextArea();
         infoTextArea.setPrefixComponent(new Icon(VaadinIcon.INFO));
@@ -200,7 +191,7 @@ public class CashView extends Composite<VerticalLayout> {
         transactionNoText.getStyle().set("font-size", "var(--lumo-font-size-xs)");
         generateRandomTransactionNo();
 
-        priceText.setText("Total Price:"+ servicesTotalPrice);
+        priceText.setText("Total Price:" + servicesTotalPrice);
         priceText.setWidth("100%");
         priceText.getStyle().set("font-size", "var(--lumo-font-size-xs)");
 
@@ -217,12 +208,10 @@ public class CashView extends Composite<VerticalLayout> {
         cashButton.setWidth("min-content");
         cashButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         cashButton.addClickListener(e -> cashServices());
-        buttonSecondary.setText("Generate receipt");
-        buttonSecondary.setWidth("min-content");
         getContent().add(formLayout2Col);
         formLayout2Col.add(customerComboBox);
         formLayout2Col.add(multiSelectComboBox);
-        formLayout2Col.add(multiSelectGoodsComboBox);
+        getContent().add(multiSelectGoodsComboBox);
         getContent().add(hr);
         getContent().add(h6);
         getContent().add(serviceGrid);
@@ -234,37 +223,33 @@ public class CashView extends Composite<VerticalLayout> {
         formLayout2Col2.add(transactionNoText);
         formLayout2Col2.add(priceText);
         formLayout2Col2.add(cashButton);
-        formLayout2Col2.add(buttonSecondary);
-
 
     }
 
     private void cashServices() {
-      CashDto cashDto = CashDto.builder()
-              .transactionNo(transactionNo)
-              .price(totalPrice)
-              .date(LocalDate.now())
-              .status(Status.SUCCESS.name())
-              .details(infoTextArea.getValue())
-              .build();
+        CashDto cashDto = CashDto.builder()
+                .transactionNo(transactionNo)
+                .price(totalPrice)
+                .date(LocalDate.now())
+                .status(Status.SUCCESS.name())
+                .details(infoTextArea.getValue())
+                .build();
 
         cashDto.setServices(multiSelectComboBox.getValue());
-
         cashDto.setGoods(multiSelectGoodsComboBox.getValue());
+        cashDto.setCustomer(customerComboBox.getValue());
 
-      cashDto.setCustomer(customerComboBox.getValue());
+        try {
 
-      try {
             if (cashDto.getGoods().stream().anyMatch(goodsDto -> goodsDto.getQuantity() != 0)) {
                 cashService.saveCash(cashDto);
-
                 for (GoodsDto goodsDto : cashDto.getGoods()) {
                     int newStock = goodsDto.getStock() - goodsDto.getQuantity();
                     goodsService.updateStock(goodsDto.getId(), newStock);
                 }
 
                 Notification.show("Cash successfully registered!");
-
+                generateReceipt();
                 customerComboBox.setValue(null);
                 multiSelectComboBox.setValue(new HashSet<>());
                 multiSelectGoodsComboBox.setValue(new HashSet<>());
@@ -282,24 +267,48 @@ public class CashView extends Composite<VerticalLayout> {
             }
 
 
-      } catch (Exception e) {
-          Notification.show("Error saving cash :"+e.getMessage());
-      }
+        } catch (Exception e) {
+            Notification.show("Error saving cash :" + e.getMessage());
+        }
     }
+
+    private void generateReceipt() {
+        List<ServiceDto> selectedServices = new ArrayList<>(multiSelectComboBox.getValue());
+        List<GoodsDto> selectedGoods = new ArrayList<>(multiSelectGoodsComboBox.getValue());
+        CompanyDto companyDto = companyService.getAllCompanies().get(0);
+
+        JRBeanCollectionDataSource servicesDataSource = new JRBeanCollectionDataSource(selectedServices);
+        JRBeanCollectionDataSource goodsDataSource = new JRBeanCollectionDataSource(selectedGoods);
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("transactionNo", transactionNo);
+        parameters.put("totalPrice", totalPrice);
+        parameters.put("customerName", customerComboBox.getValue().getName());
+        parameters.put("carModel", customerComboBox.getValue().getCarModel());
+        parameters.put("carNumber", customerComboBox.getValue().getCarNumber());
+        parameters.put("servicesDataSource", servicesDataSource);
+        parameters.put("goodsDataSource", goodsDataSource);
+        parameters.put("companyName", companyDto.getName());
+        parameters.put("iban", companyDto.getIban());
+        parameters.put("address", companyDto.getAddress());
+        parameters.put("details", infoTextArea.getValue());
+
+        ReceiptGenerator.cashReceiptGenerator(parameters);
+
+    }
+
 
     private void setMultiSelectGoodsData(MultiSelectComboBox<GoodsDto> multiSelectGoodsComboBox) {
         multiSelectGoodsComboBox.setItems(goodsService.allGoods()
                 .stream()
-                .filter(e->e.getStock()>0)
+                .filter(e -> e.getStock() > 0)
                 .toList());
 
         multiSelectGoodsComboBox.setItemLabelGenerator(GoodsDto::getCostName);
     }
 
     private void generateRandomTransactionNo() {
-        String data = LocalDate.now().toString().replace("-","");
-        Random random = new Random();
-        transactionNo = data + random.nextLong(10000,99999);
+        transactionNo = Generators.transactionNoGenerator();
         transactionNoText.setText("Transaction no : " + transactionNo);
     }
 
@@ -337,10 +346,9 @@ public class CashView extends Composite<VerticalLayout> {
     }
 
     public void countTotalPrice() {
-        totalPrice = goodsTotalPrice+servicesTotalPrice;
+        totalPrice = goodsTotalPrice + servicesTotalPrice;
         priceText.setText("Total Price:" + totalPrice);
     }
-
 
 
 }

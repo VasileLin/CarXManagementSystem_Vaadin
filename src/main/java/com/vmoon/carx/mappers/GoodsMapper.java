@@ -10,7 +10,7 @@ public class GoodsMapper {
     public static GoodsDto toGoodsDto(Goods goods) {
         return GoodsDto.builder()
                 .id(goods.getId())
-                .costName(goods.getCostName())
+                .costName(goods.getName())
                 .cost(goods.getCost())
                 .date(goods.getDate())
                 .stock(goods.getStock())
@@ -20,7 +20,7 @@ public class GoodsMapper {
     public static Goods toGoods(GoodsDto goodsDto) {
         return Goods.builder()
                 .id(goodsDto.getId())
-                .costName(goodsDto.getCostName())
+                .name(goodsDto.getCostName())
                 .cost(goodsDto.getCost())
                 .date(goodsDto.getDate())
                 .stock(goodsDto.getStock())

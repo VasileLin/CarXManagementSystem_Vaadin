@@ -138,6 +138,7 @@ public class CustomerFormView extends Composite<VerticalLayout> {
         cancelButton.setText("Cancel");
         cancelButton.setWidth("min-content");
         cancelButton.setPrefixComponent(new Icon(VaadinIcon.CLOSE_SMALL));
+        cancelButton.addClickListener(e -> UI.getCurrent().navigate("customers-view"));
 
 
         getContent().setWidth("100%");

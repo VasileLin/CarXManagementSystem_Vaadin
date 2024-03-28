@@ -239,14 +239,14 @@
 	<columnHeader>
 		<band height="46" splitType="Stretch">
 			<staticText>
-				<reportElement x="80" y="20" width="100" height="20" uuid="90557c5b-53b1-4205-aadf-9ab66b2f7964"/>
+				<reportElement x="362" y="20" width="100" height="20" uuid="90557c5b-53b1-4205-aadf-9ab66b2f7964"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Services]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="360" y="20" width="100" height="20" uuid="05c7e5b9-809c-4aa9-9a2b-ef867054d51b"/>
+				<reportElement x="84" y="20" width="100" height="20" uuid="05c7e5b9-809c-4aa9-9a2b-ef867054d51b"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>

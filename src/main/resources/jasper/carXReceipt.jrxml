@@ -168,6 +168,9 @@
 	<parameter name="goodsDataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="totalPrice" class="java.lang.Double"/>
 	<parameter name="details" class="java.lang.String"/>
+	<parameter name="logo" class="java.net.URL" isForPrompting="false">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -175,7 +178,7 @@
 		<band height="73" splitType="Stretch">
 			<image>
 				<reportElement x="4" y="0" width="71" height="68" uuid="47fe14f1-43b8-4fcb-8d98-31826d0c2a72"/>
-				<imageExpression><![CDATA["C:/Users/crme075/Downloads/favic-768x768.png"]]></imageExpression>
+				<imageExpression><![CDATA[$P{logo}]]></imageExpression>
 			</image>
 			<textField>
 				<reportElement x="80" y="0" width="190" height="30" uuid="a69bb98d-5f71-4104-be04-74bdb3e2def0"/>

@@ -1,9 +1,6 @@
 package com.vmoon.carx.utils;
 
-import com.vmoon.carx.dto.CashGridDto;
-import com.vmoon.carx.dto.CustomerDto;
-import com.vmoon.carx.dto.EmployerDto;
-import com.vmoon.carx.dto.ServiceDto;
+import com.vmoon.carx.dto.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
@@ -141,6 +138,39 @@ public class ExcelWorkBooks {
             row.createCell(1).setCellValue(cash.getPrice());
             row.createCell(2).setCellValue(cash.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             row.createCell(3).setCellValue(cash.getDetails());
+        }
+
+        for (int i = 0; i < columnNames.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        return workbook;
+    }
+
+    public static Workbook createCostsExcelWorkBook(List<GoodsDto> goodsList) {
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Costs");
+
+        Row headerRow = sheet.createRow(0);
+        String[] columnNames = {"Cost Name", "Cost", "Purchased date", "Stock"};
+
+        CellStyle style = workbook.createCellStyle();
+        style.setFillBackgroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+
+        for (int i = 0; i<columnNames.length; i++) {
+            headerRow.createCell(i).setCellValue(columnNames[i]);
+            headerRow.getCell(i).setCellStyle(style);
+        }
+
+        int rowNum = 1;
+        for (GoodsDto good : goodsList) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(good.getCostName());
+            row.createCell(1).setCellValue(good.getCost());
+            row.createCell(2).setCellValue(good.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+            row.createCell(3).setCellValue(good.getStock());
         }
 
         for (int i = 0; i < columnNames.length; i++) {

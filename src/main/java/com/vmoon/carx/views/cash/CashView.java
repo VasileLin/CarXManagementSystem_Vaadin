@@ -35,6 +35,7 @@ import com.vmoon.carx.views.MainLayout;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import java.io.File;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -287,6 +288,8 @@ public class CashView extends Composite<VerticalLayout> {
         JRBeanCollectionDataSource servicesDataSource = new JRBeanCollectionDataSource(selectedServices);
         JRBeanCollectionDataSource goodsDataSource = new JRBeanCollectionDataSource(selectedGoods);
 
+        URL url = getClass().getClassLoader().getResource("META-INF/resources/logo/logo.png");
+
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("transactionNo", transactionNo);
         parameters.put("totalPrice", totalPrice);
@@ -299,6 +302,7 @@ public class CashView extends Composite<VerticalLayout> {
         parameters.put("iban", companyDto.getIban());
         parameters.put("address", companyDto.getAddress());
         parameters.put("details", infoTextArea.getValue());
+        parameters.put("logo", url);
 
         ReceiptGenerator.cashReceiptGenerator(parameters,directory);
 

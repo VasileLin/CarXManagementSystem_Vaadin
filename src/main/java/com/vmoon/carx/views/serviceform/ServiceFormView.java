@@ -97,6 +97,7 @@ public class ServiceFormView extends Composite<VerticalLayout> {
         cancelButton = new Button();
         cancelButton.setText("Cancel");
         cancelButton.setWidth("min-content");
+        cancelButton.addClickListener(e -> UI.getCurrent().navigate("service-view"));
 
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");

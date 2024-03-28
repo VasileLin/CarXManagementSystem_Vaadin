@@ -43,7 +43,9 @@ public class ServicesServiceImpl implements ServicesService {
 
     @Override
     public Page<ServiceDto> searchService(String value, Pageable pageable) {
-        return null;
+        Specification<Service> spec = textInAllColumns(value);
+        Page<Service> page = serviceRepository.findAll(spec, pageable);
+        return page.map(ServiceMapper::toServiceDto);
     }
 
     @Override
@@ -58,7 +60,6 @@ public class ServicesServiceImpl implements ServicesService {
 
         final String finalText = "%" + text.toLowerCase() + "%";
         return (root, query, cb) -> cb.or(
-                cb.like(cb.lower(root.get("name")), finalText),
-                cb.like(cb.lower(root.get("price")), finalText));
+                cb.like(cb.lower(root.get("name")), finalText));
     }
 }

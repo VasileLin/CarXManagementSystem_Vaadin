@@ -8,26 +8,37 @@ import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import com.vmoon.carx.dto.ServiceDto;
 import com.vmoon.carx.services.ServicesService;
 import com.vmoon.carx.views.MainLayout;
 import com.vmoon.carx.views.serviceform.ServiceFormView;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import static com.vmoon.carx.utils.ExcelWorkBooks.createServicesExcelWorkBook;
 
 @PageTitle("Service")
 @Route(value = "service-view", layout = MainLayout.class)
@@ -37,6 +48,7 @@ public class ServiceView extends Composite<VerticalLayout> {
     Grid<ServiceDto> servicesGrid;
     private final ServicesService servicesService;
     Dialog dialog;
+    TextField searchServicesField;
 
     public ServiceView(ServicesService servicesService) {
 
@@ -73,6 +85,7 @@ public class ServiceView extends Composite<VerticalLayout> {
         layoutRow.setAlignSelf(FlexComponent.Alignment.START, exportButton);
         exportButton.setWidth("min-content");
         exportButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        configureExportButton(exportButton);
 
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
@@ -92,6 +105,16 @@ public class ServiceView extends Composite<VerticalLayout> {
         layoutRow2.setHeight("50px");
         layoutRow2.setAlignItems(Alignment.CENTER);
         layoutRow2.setJustifyContentMode(JustifyContentMode.CENTER);
+
+
+
+        searchServicesField = new TextField();
+        searchServicesField.setPlaceholder("Search Services ...");
+        searchServicesField.setWidth("100%");
+        searchServicesField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
+        searchServicesField.addValueChangeListener(e -> searchService(e.getValue().trim()));
+
+        layoutColumn2.add(searchServicesField);
         getContent().add(layoutColumn2);
         layoutColumn2.add(servicesGrid);
         layoutColumn2.add(layoutColumn3);
@@ -100,6 +123,26 @@ public class ServiceView extends Composite<VerticalLayout> {
         layoutRow.add(addServiceButton);
         layoutRow.add(layoutRow2);
         layoutRow.add(exportButton);
+    }
+
+    private void searchService(String value) {
+
+        DataProvider<ServiceDto, Void> dataProvider = DataProvider.fromCallbacks(
+                query -> {
+                    PageRequest pageRequest = PageRequest.of(
+                            query.getPage(),
+                            query.getPageSize(),
+                            query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
+                    );
+
+                    Page<ServiceDto> page = servicesService.searchService(value, pageRequest);
+                    return page.stream();
+                },
+                query -> (int) servicesService.countSearchResults(value)
+        );
+
+        servicesGrid.setDataProvider(dataProvider);
+
     }
 
     private void setGridSampleData(Grid<ServiceDto> grid) {
@@ -167,6 +210,30 @@ public class ServiceView extends Composite<VerticalLayout> {
         dialog.setHeight("auto");
         dialog.setDraggable(true);
         dialog.open();
+    }
+
+    private void configureExportButton(Button exportButton) {
+        exportButton.addClickListener(event -> {
+            StreamResource resource = new StreamResource("services.xlsx", ()-> {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+                try (Workbook workbook = createServicesExcelWorkBook(servicesService.allServices())) {
+                    workbook.write(bos);
+                } catch (IOException e) {
+                    Notification.show("Error writing file");
+                }
+
+                return new ByteArrayInputStream(bos.toByteArray());
+            });
+
+            Anchor downloadLink = new Anchor(resource, "");
+            downloadLink.getElement().setAttribute("download", true);
+            downloadLink.getElement().setAttribute("href", resource);
+            downloadLink.getElement().setAttribute("style","display: none;");
+
+            UI.getCurrent().add(downloadLink);
+            downloadLink.getElement().callJsFunction("click");
+        });
     }
 
 

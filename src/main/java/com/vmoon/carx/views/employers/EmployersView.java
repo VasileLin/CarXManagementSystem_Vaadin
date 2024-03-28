@@ -8,9 +8,11 @@ import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
@@ -20,6 +22,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vmoon.carx.dto.EmployerDto;
@@ -28,22 +31,30 @@ import com.vmoon.carx.services.RoleService;
 import com.vmoon.carx.views.MainLayout;
 import com.vmoon.carx.views.employerform.EmployerFormView;
 import lombok.Getter;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import static com.vmoon.carx.utils.ExcelWorkBooks.createEmployersExcelWorkBook;
 
 @PageTitle("Employers")
 @Route(value = "employers-view", layout = MainLayout.class)
 @Uses(Icon.class)
 public class EmployersView extends Composite<VerticalLayout> {
     @Getter
-    Grid<EmployerDto> employersGrid;
-    TextField searchEmployersField;
-
-    @Getter
     private Dialog dialog;
     private final EmployerService employerService;
     private final RoleService roleService;
+
+    @Getter
+    Grid<EmployerDto> employersGrid;
+    Button exportButton;
+    TextField searchEmployersField;
 
     public EmployersView(EmployerService employerService, RoleService roleService) {
 
@@ -67,11 +78,13 @@ public class EmployersView extends Composite<VerticalLayout> {
         addButton.addClickListener(e -> UI.getCurrent().navigate("employer-form"));
 
         HorizontalLayout layoutRow2 = new HorizontalLayout();
-        Button exportButton = new Button();
+
+        exportButton = new Button();
         exportButton.setPrefixComponent(new Icon(VaadinIcon.FILE_TEXT));
         exportButton.setText("Export Employers");
         exportButton.setWidth("min-content");
         exportButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        configureExportButton(exportButton);
 
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
@@ -102,6 +115,7 @@ public class EmployersView extends Composite<VerticalLayout> {
         layoutRow.add(layoutRow2);
         layoutRow.add(exportButton);
     }
+
 
     private void searchEmployers(String value) {
         DataProvider<EmployerDto, Void> dataProvider = DataProvider.fromCallbacks(
@@ -208,5 +222,28 @@ public class EmployersView extends Composite<VerticalLayout> {
         dialog.open();
     }
 
+    private void configureExportButton(Button exportButton) {
+        exportButton.addClickListener(event -> {
+            StreamResource resource = new StreamResource("employers.xlsx", ()-> {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+                    try (Workbook workbook = createEmployersExcelWorkBook(employersGrid.getLazyDataView().getItems().toList())) {
+                        workbook.write(bos);
+                    } catch (IOException e) {
+                        Notification.show("Error writing file");
+                    }
+
+                    return new ByteArrayInputStream(bos.toByteArray());
+            });
+
+            Anchor downloadLink = new Anchor(resource, "");
+            downloadLink.getElement().setAttribute("download", true);
+            downloadLink.getElement().setAttribute("href", resource);
+            downloadLink.getElement().setAttribute("style","display: none;");
+
+            UI.getCurrent().add(downloadLink);
+            downloadLink.getElement().callJsFunction("click");
+        });
+    }
 
 }

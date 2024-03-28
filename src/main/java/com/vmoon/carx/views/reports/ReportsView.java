@@ -31,15 +31,15 @@ import com.vmoon.carx.dto.GoodsDto;
 import com.vmoon.carx.services.CashService;
 import com.vmoon.carx.services.GoodsService;
 import com.vmoon.carx.views.MainLayout;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.time.LocalDate;
+
+import static com.vmoon.carx.utils.ExcelWorkBooks.createTransactionsExcelWorkBook;
 
 @PageTitle("Reports")
 @Route(value = "report-view", layout = MainLayout.class)
@@ -111,6 +111,7 @@ public class ReportsView extends Composite<VerticalLayout> {
         layoutRow.setAlignSelf(FlexComponent.Alignment.END, exportButton);
         exportButton.setWidth("min-content");
         exportButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        exportButton.setPrefixComponent(new Icon(VaadinIcon.DOWNLOAD));
         goodsGrid.setWidth("100%");
         goodsGrid.setHeight("600px");
         goodsGrid.getStyle().set("flex-grow", "0");
@@ -238,6 +239,8 @@ public class ReportsView extends Composite<VerticalLayout> {
         layoutRow.setAlignSelf(FlexComponent.Alignment.END, exportButton);
         exportButton.setWidth("min-content");
         exportButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        exportButton.setPrefixComponent(new Icon(VaadinIcon.DOWNLOAD));
+        configureExportButton(exportButton);
         cashGrid.setWidth("100%");
         cashGrid.setHeight("600px");
         cashGrid.getStyle().set("flex-grow", "0");
@@ -309,7 +312,6 @@ public class ReportsView extends Composite<VerticalLayout> {
                     UI.getCurrent().add(downloadLink);
                     downloadLink.getElement().callJsFunction("click");
                 } else {
-
                     Notification.show("The requested file does not exist.", 3000, Notification.Position.MIDDLE);
                 }
             });
@@ -353,6 +355,30 @@ public class ReportsView extends Composite<VerticalLayout> {
         );
 
         cashGrid.setDataProvider(dataProvider);
+    }
+
+    private void configureExportButton(Button exportButton) {
+        exportButton.addClickListener(event -> {
+            StreamResource resource = new StreamResource("transactions.xlsx", ()-> {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+                try (Workbook workbook = createTransactionsExcelWorkBook(cashGrid.getLazyDataView().getItems().toList())) {
+                    workbook.write(bos);
+                } catch (IOException e) {
+                    Notification.show("Error writing file");
+                }
+
+                return new ByteArrayInputStream(bos.toByteArray());
+            });
+
+            Anchor downloadLink = new Anchor(resource, "");
+            downloadLink.getElement().setAttribute("download", true);
+            downloadLink.getElement().setAttribute("href", resource);
+            downloadLink.getElement().setAttribute("style","display: none;");
+
+            UI.getCurrent().add(downloadLink);
+            downloadLink.getElement().callJsFunction("click");
+        });
     }
 
 }

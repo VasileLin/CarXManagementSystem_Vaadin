@@ -39,6 +39,7 @@ import org.springframework.data.domain.Sort;
 import java.io.*;
 import java.time.LocalDate;
 
+import static com.vmoon.carx.utils.ExcelWorkBooks.createCostsExcelWorkBook;
 import static com.vmoon.carx.utils.ExcelWorkBooks.createTransactionsExcelWorkBook;
 
 @PageTitle("Reports")
@@ -59,6 +60,7 @@ public class ReportsView extends Composite<VerticalLayout> {
     TextField searchCustomersField;
     Dialog dialog;
     DataProvider<CashGridDto, Void> dataProvider;
+    Button exportCostsButton;
 
     public ReportsView(CashService cashService, GoodsService goodsService) {
         this.cashService = cashService;
@@ -91,7 +93,7 @@ public class ReportsView extends Composite<VerticalLayout> {
         toGoodsDatePicker.setValue(LocalDate.now());
         toGoodsDatePicker.addValueChangeListener(e -> goodsGrid.getDataProvider().refreshAll());
         VerticalLayout layoutColumn2 = new VerticalLayout();
-        Button exportButton = new Button();
+        exportCostsButton = new Button();
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         layoutRow.setWidthFull();
@@ -107,11 +109,12 @@ public class ReportsView extends Composite<VerticalLayout> {
         layoutRow.setFlexGrow(1.0, layoutColumn2);
         layoutColumn2.setWidth("100%");
         layoutColumn2.getStyle().set("flex-grow", "1");
-        exportButton.setText("Export");
-        layoutRow.setAlignSelf(FlexComponent.Alignment.END, exportButton);
-        exportButton.setWidth("min-content");
-        exportButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        exportButton.setPrefixComponent(new Icon(VaadinIcon.DOWNLOAD));
+        exportCostsButton.setText("Export");
+        layoutRow.setAlignSelf(FlexComponent.Alignment.END, exportCostsButton);
+        exportCostsButton.setWidth("min-content");
+        exportCostsButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        exportCostsButton.setPrefixComponent(new Icon(VaadinIcon.DOWNLOAD));
+        configureCostsExportButton(exportCostsButton);
         goodsGrid.setWidth("100%");
         goodsGrid.setHeight("600px");
         goodsGrid.getStyle().set("flex-grow", "0");
@@ -120,7 +123,7 @@ public class ReportsView extends Composite<VerticalLayout> {
         layoutRow.add(fromGoodsDatePicker);
         layoutRow.add(toGoodsDatePicker);
         layoutRow.add(layoutColumn2);
-        layoutRow.add(exportButton);
+        layoutRow.add(exportCostsButton);
 
         costsContent = new VerticalLayout(layoutRow,goodsGrid);
         costsContent.setVisible(false);
@@ -380,5 +383,33 @@ public class ReportsView extends Composite<VerticalLayout> {
             downloadLink.getElement().callJsFunction("click");
         });
     }
+
+
+    private void configureCostsExportButton(Button exportButton) {
+        exportButton.addClickListener(event -> {
+            StreamResource resource = new StreamResource("costs.xlsx", ()-> {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+                try (Workbook workbook = createCostsExcelWorkBook(goodsGrid.getLazyDataView().getItems().toList())) {
+                    workbook.write(bos);
+                } catch (IOException e) {
+                    Notification.show("Error writing file");
+                }
+
+                return new ByteArrayInputStream(bos.toByteArray());
+            });
+
+            Anchor downloadLink = new Anchor(resource, "");
+            downloadLink.getElement().setAttribute("download", true);
+            downloadLink.getElement().setAttribute("href", resource);
+            downloadLink.getElement().setAttribute("style","display: none;");
+
+            UI.getCurrent().add(downloadLink);
+            downloadLink.getElement().callJsFunction("click");
+        });
+    }
+
+
+
 
 }

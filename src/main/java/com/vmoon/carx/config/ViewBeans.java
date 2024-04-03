@@ -1,5 +1,6 @@
 package com.vmoon.carx.config;
 
+import com.vmoon.carx.services.AcquisitionService;
 import com.vmoon.carx.services.EmployerService;
 import com.vmoon.carx.services.GoodsService;
 import com.vmoon.carx.services.RoleService;
@@ -20,8 +21,8 @@ public class ViewBeans {
 
     @Bean(name = "addGoodsView")
     @Scope("prototype")
-    public GoodsRegistrationView goodsRegistrationView(GoodsService goodsService) {
-        return new GoodsRegistrationView(goodsService);
+    public GoodsRegistrationView goodsRegistrationView(GoodsService goodsService, AcquisitionService acquisitionService) {
+        return new GoodsRegistrationView(goodsService,acquisitionService);
     }
 
 }

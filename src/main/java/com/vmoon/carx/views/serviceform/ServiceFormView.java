@@ -17,6 +17,7 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.validator.BeanValidator;
+import com.vaadin.flow.data.validator.DoubleRangeValidator;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
@@ -63,10 +64,13 @@ public class ServiceFormView extends Composite<VerticalLayout> {
 
         validationBinder.forField(serviceNameTextField)
                 .withValidator(new BeanValidator(ServiceDto.class,"name"))
+                .asRequired("Service name is required")
                 .bind(ServiceDto::getName,ServiceDto::setName);
 
+
         validationBinder.forField(priceField)
-                .withValidator(new BeanValidator(ServiceDto.class,"price"))
+                .withValidator(new DoubleRangeValidator("Price is wrong",0.00,5000000.00))
+                .asRequired("Price is required")
                 .bind(ServiceDto::getPrice,ServiceDto::setPrice);
 
     }

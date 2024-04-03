@@ -20,6 +20,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import com.vmoon.carx.dto.GoodsDto;
+import com.vmoon.carx.mappers.GoodsMapper;
+import com.vmoon.carx.services.AcquisitionService;
 import com.vmoon.carx.services.GoodsService;
 import com.vmoon.carx.views.MainLayout;
 import lombok.Getter;
@@ -30,6 +32,7 @@ import lombok.Getter;
 public class GoodsRegistrationView extends Composite<VerticalLayout> {
 
     private final GoodsService goodsService;
+    private final AcquisitionService acquisitionService;
 
     @Getter
     private final Button saveButton;
@@ -37,19 +40,20 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
     @Getter
     private final Button cancelButton;
     BeanValidationBinder<GoodsDto> validationBinder;
+    @Getter
     private final TextField nameTextField;
+    @Getter
     private final NumberField costTextField;
     private final DatePicker purchaseDate;
+    @Getter
     private final NumberField stockField;
     private GoodsDto goodDto;
 
     @Getter
-    private boolean updateFlag;
-
-    @Getter
     H3 h3;
-    public GoodsRegistrationView(GoodsService goodsService) {
+    public GoodsRegistrationView(GoodsService goodsService, AcquisitionService acquisitionService) {
         this.goodsService = goodsService;
+        this.acquisitionService = acquisitionService;
         VerticalLayout layoutColumn2 = new VerticalLayout();
 
         h3 = new H3();
@@ -138,6 +142,7 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
                     .stock(stockField.getValue().intValue())
                     .build();
             try {
+                acquisitionService.saveAcquisition(GoodsMapper.toAcquisitionDto(saveGood));
                 goodsService.saveGood(saveGood);
             } catch (Exception e) {
                 Notification.show("Error saving good :"+ e);

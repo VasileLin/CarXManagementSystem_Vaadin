@@ -9,6 +9,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -17,12 +18,15 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import com.vmoon.carx.dto.CompanyDto;
 import com.vmoon.carx.dto.GoodsDto;
+import com.vmoon.carx.mappers.GoodsMapper;
+import com.vmoon.carx.services.AcquisitionService;
 import com.vmoon.carx.services.CompanyService;
 import com.vmoon.carx.services.GoodsService;
 import com.vmoon.carx.views.MainLayout;
@@ -38,18 +42,21 @@ import java.util.List;
 @Uses(Icon.class)
 public class SettingsView extends Composite<VerticalLayout> {
 
-    Grid<GoodsDto> basicGrid;
+    Grid<GoodsDto> goodsDtoGrid;
     private VerticalLayout costOfGoodsContent;
     private VerticalLayout companyDataContent;
     Dialog dialog;
     private final GoodsService goodsService;
+    private final AcquisitionService acquisitionService;
     private final CompanyService companyService;
     TextField nameTextField;
     TextField addressField;
     TextField ibanField;
+    GoodsRegistrationView goodsRegistrationView;
 
-    public SettingsView(GoodsService goodsService, CompanyService companyService) {
+    public SettingsView(GoodsService goodsService, AcquisitionService acquisitionService, CompanyService companyService) {
         this.goodsService = goodsService;
+        this.acquisitionService = acquisitionService;
         this.companyService = companyService;
 
         Tabs tabs = new Tabs();
@@ -151,33 +158,29 @@ public class SettingsView extends Composite<VerticalLayout> {
     }
 
     private void initializeCostOfGoodsContent() {
-        basicGrid = new Grid<>(GoodsDto.class,false);
-        basicGrid.setWidth("100%");
-        basicGrid.setHeight("600px");
-        setGridSampleData(basicGrid);
-
-
+        goodsDtoGrid = new Grid<>(GoodsDto.class, false);
+        goodsDtoGrid.setWidth("100%");
+        goodsDtoGrid.setHeight("600px");
+        setGridSampleData(goodsDtoGrid);
 
         Button addCostButton = new Button("Add Costs");
         addCostButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addCostButton.addClickListener(e -> openAddDialog());
 
-        costOfGoodsContent = new VerticalLayout(basicGrid, addCostButton);
+        costOfGoodsContent = new VerticalLayout(goodsDtoGrid, addCostButton);
         costOfGoodsContent.setVisible(false);
     }
 
     private void openAddDialog() {
-        GoodsRegistrationView goodsRegistrationView = new GoodsRegistrationView(goodsService);
-
+        GoodsRegistrationView goodsRegistrationView = new GoodsRegistrationView(goodsService,acquisitionService);
         dialog = new Dialog(goodsRegistrationView);
 
         goodsRegistrationView.getCancelButton().addClickListener(e -> dialog.close());
-
         goodsRegistrationView.getSaveButton().addClickListener(e -> {
-             goodsRegistrationView.saveGood();
-             basicGrid.getDataProvider().refreshAll();
-             dialog.close();
-             Notification.show("Good successfully registered!");
+            goodsRegistrationView.saveGood();
+            goodsDtoGrid.getDataProvider().refreshAll();
+            dialog.close();
+            Notification.show("Good successfully registered!");
         });
 
 
@@ -217,6 +220,14 @@ public class SettingsView extends Composite<VerticalLayout> {
                 .setAutoWidth(true)
                 .setSortable(true)
                 .setSortProperty("date");
+        
+        Grid.Column<GoodsDto> actionColumn = grid.addColumn(new ComponentRenderer<>(
+                good -> {
+                    Button buyButton = new Button(new Icon(VaadinIcon.DOLLAR), buttonClickEvent -> openAcquisitionDialog(good));
+
+                    buyButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS,ButtonVariant.LUMO_SMALL);
+                    return buyButton;
+                })).setHeader("Actions");
 
         grid.addItemDoubleClickListener(event -> {
             GoodsDto goodDto = event.getItem();
@@ -224,7 +235,7 @@ public class SettingsView extends Composite<VerticalLayout> {
         });
 
 
-        grid.setColumnOrder(nameColumn,costColumn,stockColumn,dateColumn);
+        grid.setColumnOrder(nameColumn, costColumn, stockColumn, dateColumn,actionColumn);
 
         DataProvider<GoodsDto, Void> dataProvider = DataProvider.fromCallbacks(
                 query -> {
@@ -245,7 +256,7 @@ public class SettingsView extends Composite<VerticalLayout> {
     }
 
     private void openEditDialog(GoodsDto goodDto) {
-        GoodsRegistrationView goodsRegistrationView = new GoodsRegistrationView(goodsService);
+        goodsRegistrationView = new GoodsRegistrationView(goodsService,acquisitionService);
 
         goodsRegistrationView.getH3().setText("Update Good " + goodDto.getCostName());
         goodsRegistrationView.setUpdateCustomer(goodDto);
@@ -254,7 +265,35 @@ public class SettingsView extends Composite<VerticalLayout> {
         goodsRegistrationView.getSaveButton().addClickListener(event -> {
             goodsService.saveGood(goodsRegistrationView.getGoodToUpdate());
             Notification.show("Good updated successfully!");
-            basicGrid.getDataProvider().refreshAll();
+            goodsDtoGrid.getDataProvider().refreshAll();
+            dialog.close();
+        });
+
+        dialog = new Dialog(goodsRegistrationView);
+        dialog.setWidth("auto");
+        dialog.setHeight("auto");
+        dialog.setDraggable(true);
+        dialog.open();
+    }
+
+    private void openAcquisitionDialog(GoodsDto goodDto) {
+        goodsRegistrationView = new GoodsRegistrationView(goodsService,acquisitionService);
+
+        goodsRegistrationView.getH3().setText("Purchase good : " + goodDto.getCostName());
+        goodsRegistrationView.getCostTextField().setEnabled(false);
+        goodsRegistrationView.getNameTextField().setEnabled(false);
+
+        goodsRegistrationView.setUpdateCustomer(goodDto);
+        int actualStock = goodDto.getStock();
+        goodsRegistrationView.getCancelButton().addClickListener(event -> dialog.close());
+        goodsRegistrationView.getSaveButton().addClickListener(event -> {
+            double setStock =  goodsRegistrationView.getStockField().getValue();
+            acquisitionService.saveAcquisition(GoodsMapper.toAcquisitionDto(goodDto));
+
+            goodsRegistrationView.getStockField().setValue(actualStock + setStock);
+            goodsService.saveGood(goodsRegistrationView.getGoodToUpdate());
+            Notification.show("Acquisition successfully saved!");
+            goodsDtoGrid.getDataProvider().refreshAll();
             dialog.close();
         });
 

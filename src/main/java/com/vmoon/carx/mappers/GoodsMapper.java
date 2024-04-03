@@ -1,5 +1,6 @@
 package com.vmoon.carx.mappers;
 
+import com.vmoon.carx.dto.AcquisitionDto;
 import com.vmoon.carx.dto.GoodsDto;
 import com.vmoon.carx.entities.Goods;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,14 @@ public class GoodsMapper {
                 .cost(goodsDto.getCost())
                 .date(goodsDto.getDate())
                 .stock(goodsDto.getStock())
+                .build();
+    }
+
+    public static AcquisitionDto toAcquisitionDto(GoodsDto goodsDto) {
+        return AcquisitionDto.builder()
+                .quantity(goodsDto.getQuantity())
+                .totalPrice(goodsDto.getCost()* goodsDto.getStock())
+                .date(goodsDto.getDate())
                 .build();
     }
 }

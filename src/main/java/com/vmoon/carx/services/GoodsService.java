@@ -19,4 +19,6 @@ public interface GoodsService {
     void updateStock(long id, int newStock);
     Page<GoodsDto> allGoodsDate(PageRequest pageRequest, LocalDate value, LocalDate value1);
     long countDateResult(LocalDate value, LocalDate value1);
+    Page<GoodsDto> fetchGoodsForCategoryAndBrand(int categoryId, int brandId,PageRequest pageRequest);
+    long countSearchResults(int categoryId, int brandId);
 }

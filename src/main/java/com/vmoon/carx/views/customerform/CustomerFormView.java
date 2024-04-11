@@ -4,6 +4,7 @@ import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
@@ -23,7 +24,9 @@ import com.vaadin.flow.data.validator.RegexpValidator;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
+import com.vmoon.carx.dto.CarBrandDto;
 import com.vmoon.carx.dto.CustomerDto;
+import com.vmoon.carx.services.CarBrandService;
 import com.vmoon.carx.services.CustomerService;
 import com.vmoon.carx.views.MainLayout;
 import lombok.Getter;
@@ -39,6 +42,7 @@ public class CustomerFormView extends Composite<VerticalLayout> {
     TextField carModelTextField;
     TextField carNumberTextField;
     BeanValidationBinder<CustomerDto> validationBinder;
+    ComboBox<CarBrandDto> brandComboBox;
 
     @Getter
     H3 h3;
@@ -56,9 +60,11 @@ public class CustomerFormView extends Composite<VerticalLayout> {
     boolean updateFlag;
 
     private final CustomerService customerService;
+    private final CarBrandService carBrandService;
 
-    public CustomerFormView(CustomerService customerService) {
+    public CustomerFormView(CustomerService customerService, CarBrandService carBrandService) {
         this.customerService = customerService;
+        this.carBrandService = carBrandService;
 
 
         vaadinUI();
@@ -112,6 +118,12 @@ public class CustomerFormView extends Composite<VerticalLayout> {
         emailField.setLabel("Email");
         emailField.setPrefixComponent(new Icon(VaadinIcon.MAILBOX));
 
+        brandComboBox = new ComboBox<>();
+        brandComboBox.setLabel("Select Car Brand");
+        brandComboBox.setWidthFull();
+        brandComboBox.setPrefixComponent(new Icon(VaadinIcon.CAR));
+        setCarBrandComboBoxData(brandComboBox);
+
 
         carModelTextField = new TextField();
         carModelTextField.setLabel("Car Model");
@@ -162,6 +174,7 @@ public class CustomerFormView extends Composite<VerticalLayout> {
         formLayout2Col.add(emailField);
         formLayout2Col.add(carModelTextField);
         formLayout2Col.add(carNumberTextField);
+        layoutColumn2.add(brandComboBox);
         layoutColumn2.add(hr);
         layoutColumn2.add(layoutRow);
         layoutRow.add(saveButton);
@@ -187,6 +200,11 @@ public class CustomerFormView extends Composite<VerticalLayout> {
         }
     }
 
+    private void setCarBrandComboBoxData(ComboBox<CarBrandDto> brandComboBox) {
+        brandComboBox.setItems(carBrandService.allBrands());
+        brandComboBox.setItemLabelGenerator(CarBrandDto::getBrand);
+    }
+
     public CustomerDto getCustomerToUpdate() {
         return CustomerDto.builder()
                 .id(customerDto.getId())
@@ -195,6 +213,7 @@ public class CustomerFormView extends Composite<VerticalLayout> {
                 .email(emailField.getValue())
                 .carNumber(carNumberTextField.getValue())
                 .carModel(carModelTextField.getValue())
+                .carBrand(brandComboBox.getValue())
                 .build();
     }
 
@@ -205,6 +224,7 @@ public class CustomerFormView extends Composite<VerticalLayout> {
                 .email(emailField.getValue())
                 .carNumber(carNumberTextField.getValue())
                 .carModel(carModelTextField.getValue())
+                .carBrand(brandComboBox.getValue())
                 .build();
     }
 
@@ -214,6 +234,7 @@ public class CustomerFormView extends Composite<VerticalLayout> {
         phoneTextField.setValue(customerDto.getPhone());
         carNumberTextField.setValue(customerDto.getCarNumber());
         carModelTextField.setValue(customerDto.getCarModel());
+        brandComboBox.setValue(customerDto.getCarBrand());
         this.customerDto = customerDto;
     }
 }

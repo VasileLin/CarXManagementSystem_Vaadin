@@ -28,6 +28,7 @@ import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vmoon.carx.dto.CustomerDto;
+import com.vmoon.carx.services.CarBrandService;
 import com.vmoon.carx.services.CustomerService;
 import com.vmoon.carx.views.MainLayout;
 import com.vmoon.carx.views.customerform.CustomerFormView;
@@ -52,6 +53,7 @@ public class CustomersView extends Composite<VerticalLayout> {
     Grid<CustomerDto> customersGrid;
 
     private final CustomerService customerService;
+    private final CarBrandService carBrandService;
 
     @Getter
     private Dialog dialog;
@@ -59,8 +61,9 @@ public class CustomersView extends Composite<VerticalLayout> {
     TextField searchCustomersField;
 
 
-    public CustomersView(CustomerService customerService) {
+    public CustomersView(CustomerService customerService, CarBrandService carBrandService) {
         this.customerService = customerService;
+        this.carBrandService = carBrandService;
         VerticalLayout layoutColumn2 = new VerticalLayout();
         customersGrid = new Grid<>(CustomerDto.class,false);
         customersGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
@@ -212,7 +215,7 @@ public class CustomersView extends Composite<VerticalLayout> {
     }
 
     private void openEditDialog(CustomerDto customerDto) {
-        CustomerFormView customerFormView = new CustomerFormView(customerService);
+        CustomerFormView customerFormView = new CustomerFormView(customerService,carBrandService);
         customerFormView.setUpdateFlag(true);
         customerFormView.getH3().setText("Update Customer " + customerDto.getName());
         customerFormView.setUpdateCustomer(customerDto);

@@ -22,4 +22,8 @@ public class Customer {
     private String carModel;
     private String email;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id",nullable = false)
+    private CarBrand carBrand;
+
 }

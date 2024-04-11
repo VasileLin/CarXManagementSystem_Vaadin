@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class CustomerMapper {
 
     public static CustomerDto mapToCustomerDto(Customer customer) {
-        return CustomerDto.builder()
+        CustomerDto customerDto = CustomerDto.builder()
                 .id(customer.getId())
                 .name(customer.getName())
                 .phone(customer.getPhone())
@@ -16,10 +16,16 @@ public class CustomerMapper {
                 .carModel(customer.getCarModel())
                 .carNumber(customer.getCarNumber())
                 .build();
+
+        if (customer.getCarBrand() != null) {
+            customerDto.setCarBrand(CarBrandMapper.toCarBrandDto(customer.getCarBrand()));
+        }
+
+        return customerDto;
     }
 
     public static Customer mapToCustomer(CustomerDto customerDto) {
-        return Customer.builder()
+        Customer customer = Customer.builder()
                 .id(customerDto.getId())
                 .name(customerDto.getName())
                 .phone(customerDto.getPhone())
@@ -27,6 +33,12 @@ public class CustomerMapper {
                 .carModel(customerDto.getCarModel())
                 .carNumber(customerDto.getCarNumber())
                 .build();
+
+        if (customerDto.getCarBrand() != null) {
+            customer.setCarBrand(CarBrandMapper.toCarBrand(customerDto.getCarBrand()));
+        }
+
+        return customer;
     }
 
 }

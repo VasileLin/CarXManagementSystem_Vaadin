@@ -1,6 +1,5 @@
 package com.vmoon.carx.repositories;
 
-import com.vmoon.carx.entities.Cash;
 import com.vmoon.carx.entities.Goods;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,4 +18,8 @@ public interface GoodsRepository extends JpaRepository<Goods, Long>, JpaSpecific
     @Query("SELECT count(g) FROM Goods g " +
             "WHERE g.date >= :fromValue AND g.date <= :toValue")
     long countAllByDate(@Param("fromValue")LocalDate fromValue, @Param("toValue")LocalDate toValue);
+
+    Page<Goods> findAllByCategoryIdAndCarBrandId(int categoryId, int brandId,Pageable pageable);
+
+    long countAllByCategoryIdAndCarBrandId(int categoryId, int brandId);
 }

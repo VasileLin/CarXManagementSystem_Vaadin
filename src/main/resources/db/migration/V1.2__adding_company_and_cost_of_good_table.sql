@@ -14,6 +14,7 @@ CREATE table if not exists cost_of_good
     cost      decimal not null,
     date date not null,
     stock int not null,
+    car_model varchar(255),
     CONSTRAINT customer_pk PRIMARY KEY (id)
 );
 

@@ -1,0 +1,15 @@
+INSERT INTO good_category (name)
+VALUES ('Filtre'),
+       ('Suspensie'),
+       ('Ulei motor'),
+       ('Frâne'),
+       ('Anvelope'),
+       ('Sistem de iluminare'),
+       ('Sistem de încălzire și răcire'),
+       ('Sistem de evacuare'),
+       ('Accesorii interioare'),
+       ('Sistem de direcție'),
+       ('Componente motor'),
+       ('Sistem de transmisie'),
+       ('Senzori și electronice auto'),
+       ('Piese caroserie');

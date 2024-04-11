@@ -22,4 +22,14 @@ public class Goods {
     private Double cost;
     private LocalDate date;
     private int stock;
+    @Column(name = "car_model")
+    private String carModel;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id",nullable = false)
+    private GoodsCategory category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id",nullable = false)
+    private CarBrand carBrand;
 }

@@ -1,9 +1,6 @@
 package com.vmoon.carx.config;
 
-import com.vmoon.carx.services.AcquisitionService;
-import com.vmoon.carx.services.EmployerService;
-import com.vmoon.carx.services.GoodsService;
-import com.vmoon.carx.services.RoleService;
+import com.vmoon.carx.services.*;
 import com.vmoon.carx.views.employerform.EmployerFormView;
 import com.vmoon.carx.views.goods.GoodsRegistrationView;
 import org.springframework.context.annotation.Bean;
@@ -21,8 +18,8 @@ public class ViewBeans {
 
     @Bean(name = "addGoodsView")
     @Scope("prototype")
-    public GoodsRegistrationView goodsRegistrationView(GoodsService goodsService, AcquisitionService acquisitionService) {
-        return new GoodsRegistrationView(goodsService,acquisitionService);
+    public GoodsRegistrationView goodsRegistrationView(GoodsService goodsService, AcquisitionService acquisitionService, GoodsCategoryService goodsCategoryService,CarBrandService carBrandService) {
+        return new GoodsRegistrationView(goodsService,acquisitionService,goodsCategoryService,carBrandService);
     }
 
 }

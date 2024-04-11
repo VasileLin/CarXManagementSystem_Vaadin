@@ -25,4 +25,5 @@ public class CustomerDto {
     @Email(message = "Enter an valid email")
     @NotEmpty(message = "Enter an valid email")
     private String email;
+    private CarBrandDto carBrand;
 }

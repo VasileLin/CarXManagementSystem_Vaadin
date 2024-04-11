@@ -133,12 +133,11 @@ public class ServiceFormView extends Composite<VerticalLayout> {
                 if (!updateFlag) {
                     servicesService.saveService(getServiceToSave());
                     Notification.show("Service successfully saved");
-                    UI.getCurrent().navigate("employers-view");
+                    UI.getCurrent().navigate("service-view");
                 } else {
                     servicesService.saveService(getServiceToUpdate());
                     Notification.show("Service successfully updated");
                 }
-
             } catch (Exception e) {
                 Notification.show("Error saving service: " + e.getMessage());
             }

@@ -9,23 +9,45 @@ import org.springframework.stereotype.Component;
 public class GoodsMapper {
 
     public static GoodsDto toGoodsDto(Goods goods) {
-        return GoodsDto.builder()
+        GoodsDto goodsDto = GoodsDto.builder()
                 .id(goods.getId())
                 .costName(goods.getName())
                 .cost(goods.getCost())
                 .date(goods.getDate())
                 .stock(goods.getStock())
+                .carModel(goods.getCarModel())
                 .build();
+
+        if (goods.getCarBrand() != null) {
+            goodsDto.setCarBrand(CarBrandMapper.toCarBrandDto(goods.getCarBrand()));
+        }
+
+        if (goods.getCarModel() != null) {
+            goodsDto.setCarModel(goods.getCarModel());
+        }
+
+        return goodsDto;
     }
 
     public static Goods toGoods(GoodsDto goodsDto) {
-        return Goods.builder()
+        Goods goods = Goods.builder()
                 .id(goodsDto.getId())
                 .name(goodsDto.getCostName())
                 .cost(goodsDto.getCost())
                 .date(goodsDto.getDate())
                 .stock(goodsDto.getStock())
+                .carModel(goodsDto.getCarModel())
                 .build();
+
+        if (goodsDto.getCarBrand() != null) {
+            goods.setCarBrand(CarBrandMapper.toCarBrand(goodsDto.getCarBrand()));
+        }
+
+        if (goodsDto.getCategory() != null) {
+            goods.setCategory(GoodsCategoryMapper.toGoods(goodsDto.getCategory()));
+        }
+
+        return goods;
     }
 
     public static AcquisitionDto toAcquisitionDto(GoodsDto goodsDto) {

@@ -16,7 +16,9 @@ public class GoodsDto {
     private LocalDate date;
     private int stock;
     private int quantity;
-
+    private String carModel;
+    private GoodsCategoryDto category;
+    private CarBrandDto carBrand;
 }
 
 

@@ -28,7 +28,6 @@ import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vmoon.carx.dto.CustomerDto;
-import com.vmoon.carx.services.CarBrandService;
 import com.vmoon.carx.services.CustomerService;
 import com.vmoon.carx.views.MainLayout;
 import com.vmoon.carx.views.customerform.CustomerFormView;
@@ -53,7 +52,7 @@ public class CustomersView extends Composite<VerticalLayout> {
     Grid<CustomerDto> customersGrid;
 
     private final CustomerService customerService;
-    private final CarBrandService carBrandService;
+    private final CustomerFormView customerFormView;
 
     @Getter
     private Dialog dialog;
@@ -61,9 +60,9 @@ public class CustomersView extends Composite<VerticalLayout> {
     TextField searchCustomersField;
 
 
-    public CustomersView(CustomerService customerService, CarBrandService carBrandService) {
+    public CustomersView(CustomerService customerService, CustomerFormView customerFormView) {
         this.customerService = customerService;
-        this.carBrandService = carBrandService;
+        this.customerFormView = customerFormView;
         VerticalLayout layoutColumn2 = new VerticalLayout();
         customersGrid = new Grid<>(CustomerDto.class,false);
         customersGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
@@ -176,12 +175,14 @@ public class CustomersView extends Composite<VerticalLayout> {
                 .setSortable(true)
                 .setSortProperty("carNumber");
 
-        Grid.Column<CustomerDto> carModelColumn = grid.addColumn(CustomerDto::getCarModel)
-                .setHeader("Car Model")
+        Grid.Column<CustomerDto> carModelBrandColumn = grid.addColumn(customer -> {
+                    String model = customer.getCarModel() != null ? customer.getCarModel().getModel() : "N/A";
+                    String brand = customer.getCarBrand() != null ? customer.getCarBrand().getBrand() : "N/A";
+                    return brand + " " + model;
+                }).setHeader("Car Model and Brand")
                 .setResizable(true)
                 .setAutoWidth(true)
-                .setSortable(true)
-                .setSortProperty("carModel");
+                .setSortable(true);
 
         Grid.Column<CustomerDto> emailColumn = grid.addColumn(CustomerDto::getEmail)
                 .setHeader("Email")
@@ -190,7 +191,7 @@ public class CustomersView extends Composite<VerticalLayout> {
                 .setSortable(true)
                 .setSortProperty("email");
 
-        grid.setColumnOrder(nameColumn,phoneColumn,emailColumn,carModelColumn,carNumberColumn);
+        grid.setColumnOrder(nameColumn,phoneColumn,emailColumn,carModelBrandColumn,carNumberColumn);
 
         grid.addItemDoubleClickListener(event -> {
            CustomerDto customerDto = event.getItem();
@@ -215,7 +216,6 @@ public class CustomersView extends Composite<VerticalLayout> {
     }
 
     private void openEditDialog(CustomerDto customerDto) {
-        CustomerFormView customerFormView = new CustomerFormView(customerService,carBrandService);
         customerFormView.setUpdateFlag(true);
         customerFormView.getH3().setText("Update Customer " + customerDto.getName());
         customerFormView.setUpdateCustomer(customerDto);

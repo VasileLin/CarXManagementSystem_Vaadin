@@ -20,8 +20,7 @@ public class CustomerDto {
     private String phone;
     @NotEmpty(message = "Enter costumer car number!")
     private String carNumber;
-    @NotEmpty(message = "Enter costumer car model!")
-    private String carModel;
+    private CarModelDto carModel;
     @Email(message = "Enter an valid email")
     @NotEmpty(message = "Enter an valid email")
     private String email;

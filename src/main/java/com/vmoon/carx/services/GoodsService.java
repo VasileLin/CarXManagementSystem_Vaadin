@@ -1,6 +1,7 @@
 package com.vmoon.carx.services;
 
 import com.vmoon.carx.dto.GoodsDto;
+import com.vmoon.carx.entities.Goods;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,7 +13,7 @@ import java.util.List;
 public interface GoodsService {
     @NonNull Page<GoodsDto> allGoods(@NonNull Pageable pageable);
     @NonNull List<GoodsDto> allGoods();
-    void saveGood(GoodsDto employee);
+    GoodsDto saveGood(GoodsDto goodsDto);
     long count();
     Page<GoodsDto> searchGoods(String value, Pageable pageable);
     long countSearchResults(String text);

@@ -24,10 +24,14 @@ import com.vmoon.carx.dto.GoodsDto;
 import com.vmoon.carx.dto.ServiceDto;
 import com.vmoon.carx.views.MainLayout;
 import lombok.Setter;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 @PageTitle("Info Cash")
 @Route(value = "info-cash", layout = MainLayout.class)
 @Uses(Icon.class)
+@Component
+@Scope("prototype")
 public class InfoCashView extends Composite<VerticalLayout> {
 
     Grid<ServiceDto> servicesGrid;
@@ -47,7 +51,7 @@ public class InfoCashView extends Composite<VerticalLayout> {
         transactionTextField = new TextField();
         datePicker = new DatePicker();
         totalPriceTextField = new NumberField();
-        servicesGrid = new Grid<>(ServiceDto.class);
+        servicesGrid = new Grid<>(ServiceDto.class,false);
         goodsGrid = new Grid<>(GoodsDto.class,false);
         infoTextArea = new TextArea();
 
@@ -110,46 +114,65 @@ public class InfoCashView extends Composite<VerticalLayout> {
         formLayout2Col2.add(servicesGrid);
         formLayout2Col2.add(goodsGrid);
         layoutColumn2.add(infoTextArea);
+        setGridGoodsSampleData(goodsGrid);
+        setServicesGridSampleData(servicesGrid);
     }
 
-    private void setGridGoodsSampleData(Grid<GoodsDto> grid) {
-        Grid.Column<GoodsDto> idColumn = goodsGrid.addColumn(GoodsDto::getId)
+    public void setGridGoodsSampleData(Grid<GoodsDto> grid) {
+        Grid.Column<GoodsDto> idColumn = grid.addColumn(GoodsDto::getId)
                 .setHeader("ID")
                 .setResizable(true)
                 .setAutoWidth(true)
                 .setSortable(true)
                 .setSortProperty("id");
 
-        Grid.Column<GoodsDto> nameColumn = goodsGrid.addColumn(GoodsDto::getCostName)
+        Grid.Column<GoodsDto> nameColumn = grid.addColumn(GoodsDto::getCostName)
                 .setHeader("Name")
                 .setResizable(true)
                 .setAutoWidth(true)
                 .setSortable(true)
                 .setSortProperty("costName");
 
-        Grid.Column<GoodsDto> costColumn = goodsGrid.addColumn(GoodsDto::getCost)
+        Grid.Column<GoodsDto> costColumn = grid.addColumn(GoodsDto::getCost)
                 .setHeader("Cost")
                 .setResizable(true)
                 .setAutoWidth(true)
                 .setSortable(true)
                 .setSortProperty("cost");
 
-        goodsGrid.setColumnOrder(idColumn,nameColumn,costColumn);
-        grid.setItems(cashDto.getGoods());
+        grid.setColumnOrder(idColumn,nameColumn,costColumn);
+
     }
 
-    private void setServicesGridSampleData(Grid<ServiceDto> grid) {
-        grid.setItems(cashDto.getServices());
+    public void setServicesGridSampleData(Grid<ServiceDto> grid) {
+        Grid.Column<ServiceDto> idColumn = grid.addColumn(ServiceDto::getId)
+                .setHeader("Id")
+                .setResizable(true)
+                .setAutoWidth(true)
+                .setSortable(true)
+                .setSortProperty("id");
+
+        Grid.Column<ServiceDto> nameColumn = grid.addColumn(ServiceDto::getName)
+                .setHeader("Name")
+                .setResizable(true)
+                .setAutoWidth(true)
+                .setSortable(true)
+                .setSortProperty("name");
+
+        grid.setColumnOrder(idColumn,nameColumn);
+
     }
 
     public void setInfoData(){
+        servicesGrid.setItems(cashDto.getServices());
+        goodsGrid.setItems(cashDto.getGoods());
         transactionTextField.setValue(cashDto.getTransactionNo());
         datePicker.setValue(cashDto.getDate());
         totalPriceTextField.setValue(cashDto.getPrice());
         infoTextArea.setValue(cashDto.getDetails());
-        customerTextField.setValue(cashDto.getCustomer().getName());
-        setGridGoodsSampleData(goodsGrid);
-        setServicesGridSampleData(servicesGrid);
+        customerTextField.setValue(cashDto.getCustomer().getName()+" -> "+
+                cashDto.getCustomer().getCarBrand().getBrand()+" "+
+                cashDto.getCustomer().getCarModel());
     }
 
 

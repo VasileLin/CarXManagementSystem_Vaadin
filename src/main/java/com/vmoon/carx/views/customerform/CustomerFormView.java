@@ -25,29 +25,38 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import com.vmoon.carx.dto.CarBrandDto;
+import com.vmoon.carx.dto.CarModelDto;
 import com.vmoon.carx.dto.CustomerDto;
 import com.vmoon.carx.services.CarBrandService;
+import com.vmoon.carx.services.CarModelService;
 import com.vmoon.carx.services.CustomerService;
 import com.vmoon.carx.views.MainLayout;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @PageTitle("Customer Form")
 @Route(value = "customer-form", layout = MainLayout.class)
 @Uses(Icon.class)
+@Component
+@Scope("prototype")
 public class CustomerFormView extends Composite<VerticalLayout> {
     TextField nameField;
     TextField phoneTextField;
     EmailField emailField;
-    TextField carModelTextField;
+    ComboBox<CarModelDto> carModelComboBox;
     TextField carNumberTextField;
     BeanValidationBinder<CustomerDto> validationBinder;
     ComboBox<CarBrandDto> brandComboBox;
+    private final CarModelService carModelService;
 
     @Getter
     H3 h3;
 
-    @Getter
+    @Getter @Setter
     CustomerDto customerDto;
 
     @Getter
@@ -62,7 +71,8 @@ public class CustomerFormView extends Composite<VerticalLayout> {
     private final CustomerService customerService;
     private final CarBrandService carBrandService;
 
-    public CustomerFormView(CustomerService customerService, CarBrandService carBrandService) {
+    public CustomerFormView(CarModelService carModelService, CustomerService customerService, CarBrandService carBrandService) {
+        this.carModelService = carModelService;
         this.customerService = customerService;
         this.carBrandService = carBrandService;
 
@@ -90,7 +100,7 @@ public class CustomerFormView extends Composite<VerticalLayout> {
                 .withValidator(new BeanValidator(CustomerDto.class,"email"))
                 .bind(CustomerDto::getEmail,CustomerDto::setEmail);
 
-        validationBinder.forField(carModelTextField)
+        validationBinder.forField(carModelComboBox)
                 .withValidator(new BeanValidator(CustomerDto.class,"carModel"))
                 .bind(CustomerDto::getCarModel,CustomerDto::setCarModel);
     }
@@ -122,18 +132,16 @@ public class CustomerFormView extends Composite<VerticalLayout> {
         brandComboBox.setLabel("Select Car Brand");
         brandComboBox.setWidthFull();
         brandComboBox.setPrefixComponent(new Icon(VaadinIcon.CAR));
+        brandComboBox.addValueChangeListener(event -> setCarModelComboBoxData());
         setCarBrandComboBoxData(brandComboBox);
 
-
-        carModelTextField = new TextField();
-        carModelTextField.setLabel("Car Model");
-        carModelTextField.setPrefixComponent(new Icon(VaadinIcon.CAR));
-
-
+        carModelComboBox = new ComboBox<>();
+        carModelComboBox.setLabel("Car Model");
+        carModelComboBox.setPrefixComponent(new Icon(VaadinIcon.CAR));
 
         carNumberTextField = new TextField();
         carNumberTextField.setLabel("Car No.");
-        carNumberTextField.setWidth("min-content");
+        carNumberTextField.setWidth("100%");
         carNumberTextField.setPrefixComponent(new Icon(VaadinIcon.INPUT));
 
         Hr hr = new Hr();
@@ -172,9 +180,9 @@ public class CustomerFormView extends Composite<VerticalLayout> {
         layoutColumn2.add(formLayout2Col);
         formLayout2Col.add(phoneTextField);
         formLayout2Col.add(emailField);
-        formLayout2Col.add(carModelTextField);
-        formLayout2Col.add(carNumberTextField);
-        layoutColumn2.add(brandComboBox);
+        formLayout2Col.add(brandComboBox);
+        formLayout2Col.add(carModelComboBox);
+        layoutColumn2.add(carNumberTextField);
         layoutColumn2.add(hr);
         layoutColumn2.add(layoutRow);
         layoutRow.add(saveButton);
@@ -200,8 +208,20 @@ public class CustomerFormView extends Composite<VerticalLayout> {
         }
     }
 
+    private void setCarModelComboBoxData() {
+        if (brandComboBox.getValue() != null) {
+            CarBrandDto comboBoxValue = brandComboBox.getValue();
+            List<CarModelDto> carModelsByBrandId = carModelService.getCarModelsByBrandId(comboBoxValue.getId());
+            carModelComboBox.setItems(carModelsByBrandId);
+            carModelComboBox.setItemLabelGenerator(CarModelDto::getModel);
+        }
+
+    }
+
     private void setCarBrandComboBoxData(ComboBox<CarBrandDto> brandComboBox) {
-        brandComboBox.setItems(carBrandService.allBrands());
+
+        List<CarBrandDto> allBrands = carBrandService.allBrands();
+        brandComboBox.setItems(allBrands);
         brandComboBox.setItemLabelGenerator(CarBrandDto::getBrand);
     }
 
@@ -212,7 +232,7 @@ public class CustomerFormView extends Composite<VerticalLayout> {
                 .phone(phoneTextField.getValue())
                 .email(emailField.getValue())
                 .carNumber(carNumberTextField.getValue())
-                .carModel(carModelTextField.getValue())
+                .carModel(carModelComboBox.getValue())
                 .carBrand(brandComboBox.getValue())
                 .build();
     }
@@ -223,7 +243,7 @@ public class CustomerFormView extends Composite<VerticalLayout> {
                 .phone(phoneTextField.getValue())
                 .email(emailField.getValue())
                 .carNumber(carNumberTextField.getValue())
-                .carModel(carModelTextField.getValue())
+                .carModel(carModelComboBox.getValue())
                 .carBrand(brandComboBox.getValue())
                 .build();
     }
@@ -233,8 +253,11 @@ public class CustomerFormView extends Composite<VerticalLayout> {
         emailField.setValue(customerDto.getEmail());
         phoneTextField.setValue(customerDto.getPhone());
         carNumberTextField.setValue(customerDto.getCarNumber());
-        carModelTextField.setValue(customerDto.getCarModel());
+        brandComboBox.setItems(carBrandService.allBrands());
         brandComboBox.setValue(customerDto.getCarBrand());
+        carModelComboBox.setItems(customerDto.getCarModel());
+        carModelComboBox.setValue(customerDto.getCarModel());
+
         this.customerDto = customerDto;
     }
 }

@@ -12,7 +12,7 @@ import java.util.List;
 public interface GoodsService {
     @NonNull Page<GoodsDto> allGoods(@NonNull Pageable pageable);
     @NonNull List<GoodsDto> allGoods();
-    void saveGood(GoodsDto employee);
+    GoodsDto saveGood(GoodsDto goodsDto);
     long count();
     Page<GoodsDto> searchGoods(String value, Pageable pageable);
     long countSearchResults(String text);

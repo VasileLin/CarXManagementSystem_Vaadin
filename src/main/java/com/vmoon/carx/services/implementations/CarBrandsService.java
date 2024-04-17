@@ -20,8 +20,15 @@ public class CarBrandsService implements CarBrandService {
     public List<CarBrandDto> allBrands() {
         return carBrandRepository.findAll()
                 .stream()
-                .map(CarBrandMapper::toCarBrandDto)
+                .map(CarBrandMapper::toCarBrandDtoWithModels)
                 .toList();
+    }
+
+    @Override
+    public void saveBrand(CarBrandDto carBrandDto) {
+        if (carBrandDto != null) {
+            carBrandRepository.save(CarBrandMapper.toCarBrand(carBrandDto));
+        }
     }
 
     @Override

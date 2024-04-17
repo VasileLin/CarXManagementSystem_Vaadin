@@ -26,13 +26,18 @@ import com.vmoon.carx.services.ServicesService;
 import com.vmoon.carx.views.MainLayout;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 @PageTitle("Service Form")
 @Route(value = "service-form", layout = MainLayout.class)
 @Uses(Icon.class)
+@Component
+@Scope("prototype")
 public class ServiceFormView extends Composite<VerticalLayout> {
 
     NumberField priceField;
+
     TextField serviceNameTextField;
 
     @Getter

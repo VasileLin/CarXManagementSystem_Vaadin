@@ -7,6 +7,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class CarBrandMapper {
 
+    public static CarBrandDto toCarBrandDtoWithModels(CarBrand carBrand) {
+        CarBrandDto carBrandDto = CarBrandDto.builder()
+                .id(carBrand.getId())
+                .brand(carBrand.getBrand())
+                .build();
+
+        if (carBrand.getCarModels() != null) {
+            carBrandDto.setCarModels(carBrand.getCarModels()
+                    .stream()
+                    .map(CarModelMapper::toCarModelDto)
+                    .toList());
+        }
+
+        return carBrandDto;
+    }
+
     public static CarBrandDto toCarBrandDto(CarBrand carBrand) {
         return CarBrandDto.builder()
                 .id(carBrand.getId())

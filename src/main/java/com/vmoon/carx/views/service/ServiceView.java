@@ -47,12 +47,14 @@ public class ServiceView extends Composite<VerticalLayout> {
 
     Grid<ServiceDto> servicesGrid;
     private final ServicesService servicesService;
+    private final ServiceFormView serviceFormView;
     Dialog dialog;
     TextField searchServicesField;
 
-    public ServiceView(ServicesService servicesService) {
+    public ServiceView(ServicesService servicesService, ServiceFormView serviceFormView) {
 
         this.servicesService = servicesService;
+        this.serviceFormView = serviceFormView;
 
         vaadinUI();
     }
@@ -193,7 +195,6 @@ public class ServiceView extends Composite<VerticalLayout> {
     }
 
     private void openEditDialog(ServiceDto serviceDto) {
-        ServiceFormView serviceFormView = new ServiceFormView(servicesService);
         serviceFormView.setUpdateFlag(true);
         serviceFormView.getH3().setText("Update Service "+ serviceDto.getName());
         serviceFormView.setUpdateService(serviceDto);

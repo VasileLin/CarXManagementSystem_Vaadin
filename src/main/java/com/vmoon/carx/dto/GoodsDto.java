@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.Set;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,9 +18,9 @@ public class GoodsDto {
     private LocalDate date;
     private int stock;
     private int quantity;
-    private String carModel;
     private GoodsCategoryDto category;
     private CarBrandDto carBrand;
+    private Set<CarModelDto> compatibleModels;
 }
 
 

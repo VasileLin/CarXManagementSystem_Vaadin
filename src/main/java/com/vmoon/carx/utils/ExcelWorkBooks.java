@@ -70,7 +70,7 @@ public class ExcelWorkBooks {
             row.createCell(0).setCellValue(customer.getName());
             row.createCell(1).setCellValue(customer.getPhone());
             row.createCell(2).setCellValue(customer.getEmail());
-            row.createCell(3).setCellValue(customer.getCarNumber());
+            row.createCell(3).setCellValue(customer.getCarBrand().getBrand() + " " + customer.getCarModel().getModel());
             row.createCell(4).setCellValue(customer.getCarNumber());
         }
 

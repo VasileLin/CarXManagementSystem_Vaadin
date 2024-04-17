@@ -35,10 +35,11 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public void saveGood(GoodsDto goodsDto) {
+    public GoodsDto saveGood(GoodsDto goodsDto) {
         if (goodsDto != null) {
-            goodsRepository.save(GoodsMapper.toGoods(goodsDto));
+          return GoodsMapper.toGoodsDto(goodsRepository.save(GoodsMapper.toGoods(goodsDto)));
         }
+        return null;
     }
 
     @Override

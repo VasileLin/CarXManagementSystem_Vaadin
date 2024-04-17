@@ -18,12 +18,14 @@ public class Customer {
     private String phone;
     @Column(name = "car_number")
     private String carNumber;
-    @Column(name = "car_model")
-    private String carModel;
     private String email;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id",nullable = false)
     private CarBrand carBrand;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "model_id",nullable = false)
+    private CarModel carModel;
 
 }

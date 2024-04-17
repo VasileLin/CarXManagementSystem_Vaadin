@@ -5,6 +5,8 @@ import com.vmoon.carx.dto.GoodsDto;
 import com.vmoon.carx.entities.Goods;
 import org.springframework.stereotype.Component;
 
+import java.util.stream.Collectors;
+
 @Component
 public class GoodsMapper {
 
@@ -15,15 +17,21 @@ public class GoodsMapper {
                 .cost(goods.getCost())
                 .date(goods.getDate())
                 .stock(goods.getStock())
-                .carModel(goods.getCarModel())
                 .build();
+
+        if (goods.getCategory() != null) {
+            goodsDto.setCategory(GoodsCategoryMapper.toGoodsCategoryDto(goods.getCategory()));
+        }
 
         if (goods.getCarBrand() != null) {
             goodsDto.setCarBrand(CarBrandMapper.toCarBrandDto(goods.getCarBrand()));
         }
 
-        if (goods.getCarModel() != null) {
-            goodsDto.setCarModel(goods.getCarModel());
+        if (goods.getCompatibleModels() != null) {
+            goodsDto.setCompatibleModels(goods.getCompatibleModels()
+                    .stream()
+                    .map(CarModelMapper::toCarModelDto)
+                    .collect(Collectors.toSet()));
         }
 
         return goodsDto;
@@ -36,7 +44,6 @@ public class GoodsMapper {
                 .cost(goodsDto.getCost())
                 .date(goodsDto.getDate())
                 .stock(goodsDto.getStock())
-                .carModel(goodsDto.getCarModel())
                 .build();
 
         if (goodsDto.getCarBrand() != null) {
@@ -47,13 +54,20 @@ public class GoodsMapper {
             goods.setCategory(GoodsCategoryMapper.toGoods(goodsDto.getCategory()));
         }
 
+        if (goodsDto.getCompatibleModels() != null) {
+            goods.setCompatibleModels(goodsDto.getCompatibleModels()
+                    .stream()
+                    .map(CarModelMapper::toCarModel)
+                    .collect(Collectors.toSet()));
+        }
+
         return goods;
     }
 
     public static AcquisitionDto toAcquisitionDto(GoodsDto goodsDto) {
         return AcquisitionDto.builder()
                 .quantity(goodsDto.getQuantity())
-                .totalPrice(goodsDto.getCost()* goodsDto.getStock())
+                .totalPrice(goodsDto.getCost() * goodsDto.getStock())
                 .date(goodsDto.getDate())
                 .build();
     }

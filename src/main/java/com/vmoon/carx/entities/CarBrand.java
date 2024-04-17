@@ -21,4 +21,7 @@ public class CarBrand {
 
     @OneToMany(mappedBy = "carBrand")
     private List<Goods> goodsList;
+
+    @OneToMany(mappedBy = "carBrand")
+    private List<CarModel> carModels;
 }

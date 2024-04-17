@@ -1,7 +1,6 @@
 package com.vmoon.carx.services;
 
 import com.vmoon.carx.dto.GoodsDto;
-import com.vmoon.carx.entities.Goods;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

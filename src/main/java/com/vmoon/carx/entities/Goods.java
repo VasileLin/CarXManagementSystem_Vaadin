@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 @Table(name = "cost_of_good")
@@ -32,4 +33,12 @@ public class Goods {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id",nullable = false)
     private CarBrand carBrand;
+
+    @ManyToMany
+    @JoinTable(
+            name = "model_goods",
+            joinColumns = {@JoinColumn(name = "good_id",referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "model_id", referencedColumnName = "id")}
+    )
+    private Set<CarModel> compatibleModels;
 }

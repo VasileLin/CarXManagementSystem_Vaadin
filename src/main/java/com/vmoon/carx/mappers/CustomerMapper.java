@@ -13,12 +13,16 @@ public class CustomerMapper {
                 .name(customer.getName())
                 .phone(customer.getPhone())
                 .email(customer.getEmail())
-                .carModel(customer.getCarModel())
+                .carModel(CarModelMapper.toCarModelDto(customer.getCarModel()))
                 .carNumber(customer.getCarNumber())
                 .build();
 
         if (customer.getCarBrand() != null) {
             customerDto.setCarBrand(CarBrandMapper.toCarBrandDto(customer.getCarBrand()));
+        }
+
+        if (customer.getCarModel() != null) {
+            customerDto.setCarModel(CarModelMapper.toCarModelDto(customer.getCarModel()));
         }
 
         return customerDto;
@@ -30,12 +34,16 @@ public class CustomerMapper {
                 .name(customerDto.getName())
                 .phone(customerDto.getPhone())
                 .email(customerDto.getEmail())
-                .carModel(customerDto.getCarModel())
+                .carModel(CarModelMapper.toCarModel(customerDto.getCarModel()))
                 .carNumber(customerDto.getCarNumber())
                 .build();
 
         if (customerDto.getCarBrand() != null) {
             customer.setCarBrand(CarBrandMapper.toCarBrand(customerDto.getCarBrand()));
+        }
+
+        if (customerDto.getCarModel() != null) {
+            customer.setCarModel(CarModelMapper.toCarModel(customerDto.getCarModel()));
         }
 
         return customer;

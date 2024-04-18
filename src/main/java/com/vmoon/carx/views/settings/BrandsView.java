@@ -12,11 +12,13 @@ import com.vaadin.flow.component.html.H6;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vmoon.carx.dto.CarBrandDto;
 import com.vmoon.carx.dto.CarModelDto;
 import com.vmoon.carx.services.CarBrandService;
+import com.vmoon.carx.utils.DialogManager;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +31,7 @@ import java.util.List;
 public class BrandsView extends Composite<VerticalLayout> {
 
     private final CarBrandService carBrandService;
-    private final VerticalLayout addBrandContent;
+    private final AddBrandView addBrandContent;
     private final AddBrandModelView addModelContent;
 
     ComboBox<CarBrandDto> brandComboBox;
@@ -38,7 +40,7 @@ public class BrandsView extends Composite<VerticalLayout> {
 
     public BrandsView(CarBrandService carBrandService, AddBrandView addBrandView, AddBrandModelView addBrandModelView) {
         this.carBrandService = carBrandService;
-        this.addBrandContent = addBrandView.getContent();
+        this.addBrandContent = addBrandView;
         this.addModelContent = addBrandModelView;
 
         createUI();
@@ -54,6 +56,23 @@ public class BrandsView extends Composite<VerticalLayout> {
         brandComboBox.addValueChangeListener(event -> updateModelGrid());
         setSelectSampleData(brandComboBox);
 
+        Button editBrandButton = new Button("Edit selected brand");
+        editBrandButton.addClassName("edit-button-align");
+        editBrandButton.addClickListener(event -> {
+
+            CarBrandDto selectedBrand = brandComboBox.getValue();
+            if (selectedBrand != null) {
+                openEditBrandDialog(selectedBrand);
+            } else {
+                Notification.show("Please select a brand to edit.");
+            }
+        });
+
+        HorizontalLayout brandEditLayout = new HorizontalLayout(brandComboBox, editBrandButton);
+        brandEditLayout.setWidth("100%");
+        brandEditLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.BASELINE);
+        brandEditLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+
         H6 h6 = new H6();
         h6.setText("Models of selected brand");
         h6.setWidth("max-content");
@@ -61,6 +80,10 @@ public class BrandsView extends Composite<VerticalLayout> {
         carModelGrid = new Grid<>(CarModelDto.class,false);
         carModelGrid.setWidth("100%");
         carModelGrid.getStyle().set("flex-grow", "0");
+        carModelGrid.addItemDoubleClickListener(event -> {
+            CarModelDto carModelDto = event.getItem();
+            openEditDialog(carModelDto);
+        });
         setGridSampleData(carModelGrid);
 
         Hr hr = new Hr();
@@ -91,7 +114,7 @@ public class BrandsView extends Composite<VerticalLayout> {
         formLayout2Col.setWidth("100%");
         getContent().add(layoutColumn2);
         layoutColumn2.add(h3);
-        layoutColumn2.add(brandComboBox);
+        layoutColumn2.add(brandEditLayout);
         layoutColumn2.add(h6);
         layoutColumn2.add(carModelGrid);
         layoutColumn2.add(hr);
@@ -100,15 +123,47 @@ public class BrandsView extends Composite<VerticalLayout> {
         formLayout2Col.add(addModelButton);
     }
 
+    private void openEditBrandDialog(CarBrandDto selectedBrand) {
+        dialog = new Dialog(addBrandContent);
+        addBrandContent.setUpdatedBrand(selectedBrand);
+        addBrandContent.setUpdateFlag(true);
+
+        addBrandContent.getSaveButton().addClickListener(event -> {
+            addBrandContent.saveBrand();
+            setSelectSampleData(brandComboBox);
+        });
+        DialogManager.registerDialog(dialog);
+        dialog.open();
+
+    }
+
+    private void openEditDialog(CarModelDto carModelDto) {
+        dialog = new Dialog(addModelContent);
+        if (brandComboBox.getValue() != null) {
+            addModelContent.setUpdateFlag(true);
+            addModelContent.setUpdateModel(carModelDto);
+
+            addModelContent.getSaveButton().addClickListener(event -> {
+                addModelContent.saveModel();
+                updateModelGrid();
+                DialogManager.closeAll();
+            });
+        }
+        DialogManager.registerDialog(dialog);
+        dialog.open();
+    }
+
     private void openAddModelDialog() {
         if (brandComboBox.getValue() != null) {
             dialog = new Dialog(addModelContent);
+            addModelContent.setUpdateFlag(false);
             addModelContent.setCarBrandDto(brandComboBox.getValue());
             addModelContent.getSaveButton().addClickListener(event -> {
                     addModelContent.saveModel();
                     setSelectSampleData(brandComboBox);
                     dialog.close();
             });
+            DialogManager.registerDialog(dialog);
             dialog.open();
         } else {
             Notification.show("First chose a brand!");
@@ -118,6 +173,9 @@ public class BrandsView extends Composite<VerticalLayout> {
 
     private void openAddDialog() {
         dialog = new Dialog(addBrandContent);
+        addBrandContent.setUpdateFlag(false);
+        addBrandContent.getSaveButton().addClickListener(event -> addBrandContent.saveBrand());
+        DialogManager.registerDialog(dialog);
         dialog.open();
     }
 

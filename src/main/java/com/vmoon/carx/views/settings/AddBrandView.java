@@ -1,7 +1,6 @@
 package com.vmoon.carx.views.settings;
 
 import com.vaadin.flow.component.Composite;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H3;
@@ -16,6 +15,9 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import com.vmoon.carx.dto.CarBrandDto;
 import com.vmoon.carx.services.CarBrandService;
+import com.vmoon.carx.utils.DialogManager;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +28,15 @@ public class AddBrandView extends Composite<VerticalLayout> {
 
     TextField brandNameTextField;
     BeanValidationBinder<CarBrandDto> carBrandBeanValidationBinder;
+
+    @Setter
+    private CarBrandDto updateBrand;
+
+    @Getter
+    private Button saveButton;
+
+    @Setter
+    private boolean updateFlag;
 
     private final CarBrandService brandService;
 
@@ -42,20 +53,19 @@ public class AddBrandView extends Composite<VerticalLayout> {
         h3.setText("Add Brand");
         h3.setWidth("100%");
 
-
         brandNameTextField = new TextField();
         brandNameTextField.setLabel("Brand Name");
         brandNameTextField.setWidth("100%");
 
         HorizontalLayout layoutRow = new HorizontalLayout();
-        Button saveButton = new Button();
+
+        saveButton = new Button();
         saveButton.setText("Save");
         saveButton.setWidth("min-content");
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        saveButton.addClickListener(e -> saveBrand());
 
         Button cancelButton = new Button();
-        cancelButton.addClickListener(event -> UI.getCurrent().navigate(""));
+        cancelButton.addClickListener(event -> DialogManager.closeAll());
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         getContent().setJustifyContentMode(FlexComponent.JustifyContentMode.START);
@@ -89,17 +99,33 @@ public class AddBrandView extends Composite<VerticalLayout> {
                 .bind(CarBrandDto::getBrand,CarBrandDto::setBrand);
     }
 
-    private void saveBrand() {
+    public void saveBrand() {
         if (carBrandBeanValidationBinder.validate().isOk()) {
-            CarBrandDto carBrand = CarBrandDto.builder()
-                    .brand(brandNameTextField.getValue())
-                    .build();
+            if (!updateFlag) {
+                CarBrandDto carBrand = CarBrandDto.builder()
+                        .brand(brandNameTextField.getValue())
+                        .build();
+                brandService.saveBrand(carBrand);
+                DialogManager.closeAll();
+                Notification.show("Brand saved successfully!");
+            }else {
+                saveUpdatedBrand();
+                Notification.show("Brand updated successfully!");
+            }
 
-            brandService.saveBrand(carBrand);
-            UI.getCurrent().getPage().reload();
         }else {
             Notification.show("Invalid brand name!");
         }
+    }
 
+    public void setUpdatedBrand(CarBrandDto carBrandDto) {
+        brandNameTextField.setValue(carBrandDto.getBrand());
+        this.updateBrand = carBrandDto;
+    }
+
+    private void saveUpdatedBrand() {
+        updateBrand.setBrand(brandNameTextField.getValue());
+        brandService.saveBrand(updateBrand);
+        DialogManager.closeAll();
     }
 }

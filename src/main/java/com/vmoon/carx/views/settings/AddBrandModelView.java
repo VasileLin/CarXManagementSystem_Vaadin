@@ -11,11 +11,14 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.validator.BeanValidator;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import com.vmoon.carx.dto.CarBrandDto;
 import com.vmoon.carx.dto.CarModelDto;
 import com.vmoon.carx.services.CarModelService;
+import com.vmoon.carx.utils.DialogManager;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.annotation.Scope;
@@ -31,8 +34,14 @@ public class AddBrandModelView extends Composite<VerticalLayout> {
 
     @Setter
     CarBrandDto carBrandDto;
+    CarModelDto updateModel;
+
     TextField modelTextField;
     NumberField yearNumberField;
+    BeanValidationBinder<CarModelDto> validationBinder;
+
+    @Setter
+    private boolean updateFlag;
 
     private final CarModelService carModelService;
 
@@ -40,6 +49,25 @@ public class AddBrandModelView extends Composite<VerticalLayout> {
         this.carModelService = carModelService;
 
         createUI();
+        validateFields();
+
+    }
+
+    private void validateFields() {
+        validationBinder = new BeanValidationBinder<>(CarModelDto.class);
+
+        validationBinder.forField(modelTextField)
+                .withValidator(new BeanValidator(CarModelDto.class,"model"))
+                .asRequired("Car model is required!")
+                .bind(CarModelDto::getModel,CarModelDto::setModel);
+
+        validationBinder.forField(yearNumberField)
+                .withValidator(new BeanValidator(CarModelDto.class,"year"))
+                .asRequired("Production year is required")
+                .bind(
+                        carModelDto -> (double) carModelDto.getYear(),
+                        (carModelDto, fieldValue) -> carModelDto.setYear(fieldValue.intValue())
+                );
     }
 
     private void createUI() {
@@ -69,6 +97,7 @@ public class AddBrandModelView extends Composite<VerticalLayout> {
         Button cancelButton = new Button();
         cancelButton.setText("Cancel");
         cancelButton.setWidth("min-content");
+        cancelButton.addClickListener(event -> DialogManager.closeAll());
 
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
@@ -97,6 +126,8 @@ public class AddBrandModelView extends Composite<VerticalLayout> {
         layoutRow.add(cancelButton);
     }
 
+
+
     public void saveModel() {
         CarModelDto carModelDto = CarModelDto.builder()
                 .model(modelTextField.getValue())
@@ -107,7 +138,30 @@ public class AddBrandModelView extends Composite<VerticalLayout> {
             carModelDto.setCarBrand(carBrandDto);
         }
 
-        carModelService.saveModel(carModelDto);
-        Notification.show("Model of "+carBrandDto.getBrand()+" saved successfully!");
+        if (validationBinder.validate().isOk()) {
+            if (updateFlag) {
+                saveUpdatedModel();
+                Notification.show("Model of "+updateModel.getCarBrand().getBrand()+" updated successfully!");
+            } else {
+                carModelService.saveModel(carModelDto);
+                Notification.show("Model of "+carBrandDto.getBrand()+" saved successfully!");
+            }
+
+        } else {
+            Notification.show("Error saving brand model verify completed fields");
+        }
+
+    }
+
+    public void setUpdateModel(CarModelDto carModelDto) {
+        modelTextField.setValue(carModelDto.getModel());
+        yearNumberField.setValue((double) carModelDto.getYear());
+        this.updateModel = carModelDto;
+    }
+
+    private void saveUpdatedModel() {
+        updateModel.setModel(modelTextField.getValue());
+        updateModel.setYear(yearNumberField.getValue().intValue());
+        carModelService.saveModel(updateModel);
     }
 }

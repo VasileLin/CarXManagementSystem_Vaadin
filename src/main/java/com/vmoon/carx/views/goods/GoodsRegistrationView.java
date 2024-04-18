@@ -35,6 +35,7 @@ import com.vmoon.carx.views.MainLayout;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @PageTitle("Goods Registration")
@@ -52,6 +53,8 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
 
     @Getter
     private final Button cancelButton;
+
+    @Getter
     BeanValidationBinder<GoodsDto> validationBinder;
 
     @Getter
@@ -92,6 +95,7 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
         nameTextField = new TextField();
         costTextField = new NumberField();
         purchaseDate = new DatePicker();
+        purchaseDate.setValue(LocalDate.now());
         stockField = new NumberField();
         carModelMultiSelect = new MultiSelectComboBox<>();
         HorizontalLayout layoutRow = new HorizontalLayout();
@@ -101,11 +105,9 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
         saveButton.setWidth("min-content");
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-
         cancelButton = new Button();
         cancelButton.setText("Cancel");
         cancelButton.setWidth("min-content");
-
 
         brandComboBox = new ComboBox<>();
         brandComboBox.setLabel("Select Car Brand");
@@ -190,14 +192,29 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
 
         validationBinder.forField(purchaseDate)
                 .withValidator(new BeanValidator(GoodsDto.class,"date"))
+                .asRequired("Enter a good purchase date")
                 .bind(GoodsDto::getDate,GoodsDto::setDate);
 
         validationBinder.forField(stockField)
                 .withValidator(new BeanValidator(GoodsDto.class,"stock"))
+                .asRequired("Stock number is required")
                 .bind(
                         goodsDto -> (double) goodsDto.getStock(),
                         (goodsDto, fieldValue) -> goodsDto.setStock(fieldValue.intValue())
                 );
+
+        validationBinder.forField(categoryComboBox)
+                .withValidator(new BeanValidator(GoodsDto.class,"category"))
+                .bind(GoodsDto::getCategory,GoodsDto::setCategory);
+
+        validationBinder.forField(brandComboBox)
+                .withValidator(new BeanValidator(GoodsDto.class,"carBrand"))
+                .bind(GoodsDto::getCarBrand,GoodsDto::setCarBrand);
+
+        validationBinder.forField(carModelMultiSelect)
+                .withValidator(new BeanValidator(GoodsDto.class,"compatibleModels"))
+                .asRequired("Select a good compatible models")
+                .bind(GoodsDto::getCompatibleModels,GoodsDto::setCompatibleModels);
 
     }
 

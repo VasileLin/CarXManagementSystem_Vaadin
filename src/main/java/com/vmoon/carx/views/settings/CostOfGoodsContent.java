@@ -228,8 +228,8 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
                 .setSortProperty("date");
 
         Grid.Column<GoodsDto> modelColumn = grid.addColumn(model -> model.getCompatibleModels().stream()
-                .map(CarModelDto::getModel)
-                .collect(Collectors.joining(", ")))
+                        .map(CarModelDto::getModel)
+                        .collect(Collectors.joining(", ")))
                 .setHeader("Compatible Models")
                 .setResizable(true)
                 .setAutoWidth(true)
@@ -240,7 +240,7 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
                 good -> {
                     Button buyButton = new Button(new Icon(VaadinIcon.DOLLAR), buttonClickEvent -> openAcquisitionDialog(good));
 
-                    buyButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS,ButtonVariant.LUMO_SMALL);
+                    buyButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
                     return buyButton;
                 })).setHeader("Actions");
 
@@ -250,7 +250,7 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
         });
 
 
-        grid.setColumnOrder(nameColumn, costColumn, stockColumn, dateColumn,modelColumn,actionColumn);
+        grid.setColumnOrder(nameColumn, costColumn, stockColumn, dateColumn, modelColumn, actionColumn);
 
     }
 

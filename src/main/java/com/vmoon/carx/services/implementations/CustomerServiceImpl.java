@@ -65,8 +65,6 @@ public class CustomerServiceImpl implements CustomerService {
         return (root, query, cb) -> cb.or(
                 cb.like(cb.lower(root.get("name")), finalText),
                 cb.like(cb.lower(root.get("phone")), finalText),
-                cb.like(cb.lower(root.get("carNumber")), finalText),
-                cb.like(cb.lower(root.get("carModel")), finalText),
                 cb.like(cb.lower(root.get("email")), finalText));
 
     }

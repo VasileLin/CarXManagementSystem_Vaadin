@@ -265,13 +265,24 @@ public class CashView extends Composite<VerticalLayout> {
         Dialog quantityDialog = new Dialog();
         H6 h6 = new H6("Set quantity");
         TextField quantityField = new TextField("Quantity");
+
         Button saveButton = new Button("Save", event -> {
-            currentCost.get().setQuantity(Integer.parseInt(quantityField.getValue()));
-            goodsTotalPrice = calculateSumOfSelectedGoods(selectedGoods);
-            costOfGoodsGrid.setItems(new ArrayList<>());
-            costOfGoodsGrid.setItems(selectedGoods);
-            countTotalPrice();
-            quantityDialog.close();
+            try {
+                int currentStock = currentCost.get().getStock();
+                int quantityFieldValue = Integer.parseInt(quantityField.getValue());
+                if (quantityFieldValue < currentStock) {
+                    currentCost.get().setQuantity(Integer.parseInt(quantityField.getValue()));
+                    goodsTotalPrice = calculateSumOfSelectedGoods(selectedGoods);
+                    costOfGoodsGrid.setItems(new ArrayList<>());
+                    costOfGoodsGrid.setItems(selectedGoods);
+                    countTotalPrice();
+                    quantityDialog.close();
+                } else {
+                    Notification.show("Entered value must be less than available stock!");
+                }
+            } catch (NumberFormatException e) {
+                Notification.show("Entered value must be an number!");
+            }
         });
 
         VerticalLayout dialogLayout = new VerticalLayout(h6, quantityField, saveButton);

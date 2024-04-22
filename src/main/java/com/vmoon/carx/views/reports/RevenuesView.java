@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.time.LocalDate;
+import java.util.List;
 
 import static com.vmoon.carx.utils.ExcelWorkBooks.createTransactionsExcelWorkBook;
 
@@ -57,15 +58,26 @@ public class RevenuesView extends Composite<VerticalLayout> {
 
     private void initializeCashReport() {
         HorizontalLayout layoutRow = new HorizontalLayout();
+
         cashGrid = new Grid<>(CashGridDto.class,false);
+        cashGrid.setWidth("100%");
+        cashGrid.setHeight("600px");
+        cashGrid.getStyle().set("flex-grow", "0");
+        cashGrid.addItemDoubleClickListener(item -> openInfoDialog(cashService.getCashByTransactionNo(item.getItem().getTransactionNo())));
+        setCashGridSampleData(cashGrid);
 
 
         fromDatePicker = new DatePicker();
         fromDatePicker.addValueChangeListener(e -> cashGrid.getDataProvider().refreshAll());
         fromDatePicker.setValue(LocalDate.now());
+        fromDatePicker.setLabel("From");
+        fromDatePicker.setWidth("min-content");
+
         toDatePicker = new DatePicker();
         toDatePicker.setValue(LocalDate.now());
         toDatePicker.addValueChangeListener(e -> cashGrid.getDataProvider().refreshAll());
+        toDatePicker.setLabel("To");
+        toDatePicker.setWidth("min-content");
 
         searchCustomersField = new TextField();
         searchCustomersField.setLabel("Search by transaction number");
@@ -74,8 +86,14 @@ public class RevenuesView extends Composite<VerticalLayout> {
         searchCustomersField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
         searchCustomersField.addValueChangeListener(e -> searchCash(e.getValue().trim()));
 
-        VerticalLayout layoutColumn2 = new VerticalLayout();
         Button exportButton = new Button();
+        exportButton.setText("Export");
+        layoutRow.setAlignSelf(FlexComponent.Alignment.END, exportButton);
+        exportButton.setWidth("min-content");
+        exportButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        exportButton.setPrefixComponent(new Icon(VaadinIcon.DOWNLOAD));
+        configureExportButton(exportButton);
+
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         layoutRow.setWidthFull();
@@ -83,25 +101,12 @@ public class RevenuesView extends Composite<VerticalLayout> {
         layoutRow.addClassName(LumoUtility.Gap.XLARGE);
         layoutRow.setWidth("100%");
         layoutRow.setHeight("80px");
-        fromDatePicker.setLabel("From");
-        fromDatePicker.setWidth("min-content");
-        toDatePicker.setLabel("To");
-        toDatePicker.setWidth("min-content");
+
+        VerticalLayout layoutColumn2 = new VerticalLayout();
         layoutColumn2.setHeightFull();
         layoutRow.setFlexGrow(1.0, layoutColumn2);
         layoutColumn2.setWidth("100%");
         layoutColumn2.getStyle().set("flex-grow", "1");
-        exportButton.setText("Export");
-        layoutRow.setAlignSelf(FlexComponent.Alignment.END, exportButton);
-        exportButton.setWidth("min-content");
-        exportButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        exportButton.setPrefixComponent(new Icon(VaadinIcon.DOWNLOAD));
-        configureExportButton(exportButton);
-        cashGrid.setWidth("100%");
-        cashGrid.setHeight("600px");
-        cashGrid.getStyle().set("flex-grow", "0");
-        cashGrid.addItemDoubleClickListener(item -> openInfoDialog(cashService.getCashByTransactionNo(item.getItem().getTransactionNo())));
-        setCashGridSampleData(cashGrid);
         getContent().add(layoutRow);
         getContent().add(cashGrid);
         layoutRow.add(fromDatePicker);
@@ -217,10 +222,16 @@ public class RevenuesView extends Composite<VerticalLayout> {
             StreamResource resource = new StreamResource("transactions.xlsx", ()-> {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-                try (Workbook workbook = createTransactionsExcelWorkBook(cashGrid.getLazyDataView().getItems().toList())) {
-                    workbook.write(bos);
-                } catch (IOException e) {
-                    Notification.show("Error writing file");
+                List<CashGridDto> gridDtoList = cashGrid.getLazyDataView().getItems().toList();
+
+                if (gridDtoList.isEmpty()){
+                    Notification.show("Grid is empty!");
+                } else {
+                    try (Workbook workbook = createTransactionsExcelWorkBook(gridDtoList)) {
+                        workbook.write(bos);
+                    } catch (IOException e) {
+                        Notification.show("Error writing file");
+                    }
                 }
 
                 return new ByteArrayInputStream(bos.toByteArray());

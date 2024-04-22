@@ -104,10 +104,12 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
         saveButton.setText("Save");
         saveButton.setWidth("min-content");
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.setPrefixComponent(new Icon(VaadinIcon.PLUS_CIRCLE));
 
         cancelButton = new Button();
         cancelButton.setText("Cancel");
         cancelButton.setWidth("min-content");
+        cancelButton.setPrefixComponent(new Icon(VaadinIcon.CLOSE));
 
         brandComboBox = new ComboBox<>();
         brandComboBox.setLabel("Select Car Brand");
@@ -267,7 +269,7 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
         brandComboBox.setValue(goodDto.getCarBrand());
         carModelMultiSelect.setItems(goodDto.getCompatibleModels());
         carModelMultiSelect.setValue(goodDto.getCompatibleModels());
-        categoryComboBox.setItems(goodDto.getCategory());
+        categoryComboBox.setItems(categoryService.getAllCategories());
         categoryComboBox.setValue(goodDto.getCategory());
 
         this.goodDto = goodDto;

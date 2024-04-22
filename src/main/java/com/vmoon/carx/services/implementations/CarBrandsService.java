@@ -31,8 +31,4 @@ public class CarBrandsService implements CarBrandService {
         }
     }
 
-    @Override
-    public List<CarBrandDto> searchBrands(String value) {
-        return List.of();
-    }
 }

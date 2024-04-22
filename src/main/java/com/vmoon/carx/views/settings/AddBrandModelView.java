@@ -84,9 +84,7 @@ public class AddBrandModelView extends Composite<VerticalLayout> {
         yearNumberField.setLabel("Year");
         yearNumberField.setWidth("468px");
 
-
         HorizontalLayout layoutRow = new HorizontalLayout();
-
 
         saveButton = new Button();
         saveButton.setText("Save");
@@ -129,16 +127,18 @@ public class AddBrandModelView extends Composite<VerticalLayout> {
 
 
     public void saveModel() {
-        CarModelDto carModelDto = CarModelDto.builder()
-                .model(modelTextField.getValue())
-                .year(yearNumberField.getValue().intValue())
-                .build();
-
-        if (carBrandDto != null) {
-            carModelDto.setCarBrand(carBrandDto);
-        }
 
         if (validationBinder.validate().isOk()) {
+
+            CarModelDto carModelDto = CarModelDto.builder()
+                    .model(modelTextField.getValue())
+                    .year(yearNumberField.getValue().intValue())
+                    .build();
+
+            if (carBrandDto != null) {
+                carModelDto.setCarBrand(carBrandDto);
+            }
+
             if (updateFlag) {
                 saveUpdatedModel();
                 Notification.show("Model of "+updateModel.getCarBrand().getBrand()+" updated successfully!");
@@ -148,7 +148,7 @@ public class AddBrandModelView extends Composite<VerticalLayout> {
             }
 
         } else {
-            Notification.show("Error saving brand model verify completed fields");
+            Notification.show("Error saving brand model, complete all inputs!");
         }
 
     }

@@ -22,7 +22,6 @@ public class ReceiptGenerator {
 
             byte[] pdfContent = JasperExportManager.exportReportToPdf(jasperPrint);
 
-
             if (!pathDirectory.exists()) {
                boolean isCreated = pathDirectory.mkdirs();
 

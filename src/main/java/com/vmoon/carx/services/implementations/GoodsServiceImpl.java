@@ -1,15 +1,21 @@
 package com.vmoon.carx.services.implementations;
 
 import com.vmoon.carx.dto.GoodsDto;
+import com.vmoon.carx.entities.CarBrand;
+import com.vmoon.carx.entities.CarModel;
 import com.vmoon.carx.entities.Goods;
 import com.vmoon.carx.mappers.GoodsMapper;
 import com.vmoon.carx.repositories.GoodsRepository;
 import com.vmoon.carx.services.GoodsService;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,11 +29,6 @@ import java.util.Optional;
 public class GoodsServiceImpl implements GoodsService {
 
     private final GoodsRepository goodsRepository;
-
-    @Override
-    public @NonNull Page<GoodsDto> allGoods(@NonNull Pageable pageable) {
-        return goodsRepository.findAll(pageable).map(GoodsMapper::toGoodsDto);
-    }
 
     @Override
     public @NonNull List<GoodsDto> allGoods() {
@@ -48,13 +49,16 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public Page<GoodsDto> searchGoods(String value, Pageable pageable) {
-        return null;
+    public Page<GoodsDto> searchGoods(int categoryId, int brandId, String searchText, Pageable pageable) {
+        Specification<Goods> combinedSpec = byCategoryBrandAndText(categoryId, brandId, searchText);
+        return goodsRepository.findAll(combinedSpec, pageable).map(GoodsMapper::toGoodsDto);
+
     }
 
     @Override
-    public long countSearchResults(String text) {
-        return 0;
+    public long countSearchResults(int categoryId, int brandId, String searchText) {
+        Specification<Goods> combinedSpec = byCategoryBrandAndText(categoryId, brandId, searchText);
+        return goodsRepository.count(combinedSpec);
     }
 
     @Override
@@ -86,5 +90,40 @@ public class GoodsServiceImpl implements GoodsService {
     public Page<GoodsDto> fetchGoodsForCategoryAndBrand(int categoryId, int brandId,PageRequest pageRequest) {
         return goodsRepository.findAllByCategoryIdAndCarBrandId(categoryId,brandId,pageRequest)
          .map(GoodsMapper::toGoodsDto);
+    }
+
+    public static Specification<Goods> byCategoryBrandAndText(int categoryId, int brandId, String searchText) {
+        return (root, query, cb) -> {
+            Predicate categoryPredicate = cb.equal(root.get("category").get("id"), categoryId);
+            Predicate brandPredicate = cb.equal(root.get("carBrand").get("id"), brandId);
+            Predicate searchPredicate = textInAllColumns(searchText).toPredicate(root, query, cb);
+
+            if (searchPredicate != null) {
+                return cb.and(categoryPredicate, brandPredicate, searchPredicate);
+            } else {
+                return cb.and(categoryPredicate, brandPredicate);
+            }
+        };
+    }
+
+    public static Specification<Goods> textInAllColumns(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            return null;
+        }
+
+        final String finalText = "%" + text.toLowerCase() + "%";
+        return (root, query, cb) -> {
+
+            Join<Goods, CarBrand> carBrandJoin = root.join("carBrand");
+            Join<Goods, CarModel> compatibleModelsJoin = root.join("compatibleModels", JoinType.LEFT);
+            query.distinct(true);
+
+            return cb.or(
+                    cb.like(cb.lower(root.get("name")), finalText),
+                    cb.like(cb.lower(carBrandJoin.get("brand")), finalText),
+                    cb.like(cb.lower(root.get("carModel")), finalText),
+                    cb.like(cb.lower(compatibleModelsJoin.get("model")), finalText)
+            );
+        };
     }
 }

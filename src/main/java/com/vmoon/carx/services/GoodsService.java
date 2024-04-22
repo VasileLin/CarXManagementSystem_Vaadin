@@ -10,12 +10,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface GoodsService {
-    @NonNull Page<GoodsDto> allGoods(@NonNull Pageable pageable);
     @NonNull List<GoodsDto> allGoods();
     GoodsDto saveGood(GoodsDto goodsDto);
     long count();
-    Page<GoodsDto> searchGoods(String value, Pageable pageable);
-    long countSearchResults(String text);
+    Page<GoodsDto> searchGoods(int categoryId, int brandId, String searchText, Pageable pageable);
+    long countSearchResults(int categoryId, int brandId, String searchText);
     void updateStock(long id, int newStock);
     Page<GoodsDto> allGoodsDate(PageRequest pageRequest, LocalDate value, LocalDate value1);
     long countDateResult(LocalDate value, LocalDate value1);

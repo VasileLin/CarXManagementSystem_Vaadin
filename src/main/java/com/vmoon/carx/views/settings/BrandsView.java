@@ -10,6 +10,8 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H6;
 import com.vaadin.flow.component.html.Hr;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -93,11 +95,13 @@ public class BrandsView extends Composite<VerticalLayout> {
         addBrandButton.setWidth("min-content");
         addBrandButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addBrandButton.addClickListener(event -> openAddDialog());
+        addBrandButton.setPrefixComponent(new Icon(VaadinIcon.FILE_TREE));
 
         Button addModelButton = new Button();
         addModelButton.setText("Add new model to selected brand");
         addModelButton.setWidth("100%");
         addModelButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        addModelButton.setPrefixComponent(new Icon(VaadinIcon.FILE_TREE_SMALL));
         addModelButton.addClickListener(event -> openAddModelDialog());
 
         getContent().setWidth("100%");

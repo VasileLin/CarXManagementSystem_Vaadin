@@ -16,10 +16,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
-import com.vmoon.carx.dto.CarBrandDto;
-import com.vmoon.carx.dto.CarModelDto;
-import com.vmoon.carx.dto.GoodsCategoryDto;
-import com.vmoon.carx.dto.GoodsDto;
+import com.vmoon.carx.dto.*;
 import com.vmoon.carx.mappers.GoodsMapper;
 import com.vmoon.carx.services.AcquisitionService;
 import com.vmoon.carx.services.CarBrandService;
@@ -47,8 +44,14 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
     private final CarBrandService carBrandService;
     GoodsRegistrationView goodsRegistrationView;
     VerticalLayout categoryLayout;
+    private GoodsCategoryDto selectedCategory = null;
+    private CarBrandDto selectedBrand = null;
 
-    public CostOfGoodsContent(GoodsService goodsService, AcquisitionService acquisitionService, GoodsCategoryService goodsCategoryService, CarBrandService carBrandService) {
+    public CostOfGoodsContent(GoodsService goodsService,
+                              AcquisitionService acquisitionService,
+                              GoodsCategoryService goodsCategoryService,
+                              CarBrandService carBrandService) {
+
         this.goodsService = goodsService;
         this.acquisitionService = acquisitionService;
         this.goodsCategoryService = goodsCategoryService;
@@ -73,6 +76,7 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
         searchGoods.setClearButtonVisible(true);
         searchGoods.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
         searchGoods.addClassName("search-bar");
+        searchGoods.addValueChangeListener(event -> searchGoodsByCategoryAndBrand(event.getValue().trim()));
 
         goodsDtoGrid = new Grid<>(GoodsDto.class, false);
         goodsDtoGrid.setHeight("500px");
@@ -96,11 +100,37 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
         Button addCostButton = new Button("Add Costs");
         addCostButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addCostButton.getStyle().set("margin-top", "50px");
+        addCostButton.setPrefixComponent(new Icon(VaadinIcon.PLUS_CIRCLE));
         addCostButton.addClickListener(e -> openAddDialog());
+
 
         getContent().add(flexLayout,addCostButton);
 
     }
+
+    private void searchGoodsByCategoryAndBrand(String searchText) {
+
+        if (searchText.isEmpty() || (selectedCategory == null || selectedBrand == null)) {
+            Notification.show("Select car brand from category and type searched good or search textbox is empty");
+        } else {
+            DataProvider<GoodsDto, Void> dataProvider = DataProvider.fromCallbacks(
+                    query -> {
+                        PageRequest pageRequest = PageRequest.of(
+                                query.getPage(),
+                                query.getPageSize(),
+                                query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
+                        );
+
+                        Page<GoodsDto> page = goodsService.searchGoods(selectedCategory.getId(), selectedBrand.getId(), searchText, pageRequest);
+                        return page.stream();
+                    },
+                    query -> (int) goodsService.countSearchResults(selectedCategory.getId(), selectedBrand.getId(),searchText)
+            );
+            goodsDtoGrid.setDataProvider(dataProvider);
+        }
+
+    }
+
 
     private void setAccordionCategoryData(Accordion accordion) {
         List<CarBrandDto> carBrands = carBrandService.allBrands();
@@ -146,7 +176,11 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
     }
 
     private Button createBrandButton(GoodsCategoryDto category, CarBrandDto carBrand) {
-        Button brandButton = new Button(carBrand.getBrand(), buttonClickEvent -> updateGoodsGrid(category.getId(), carBrand.getId()));
+        Button brandButton = new Button(carBrand.getBrand(), buttonClickEvent -> {
+            updateGoodsGrid(category.getId(), carBrand.getId());
+            selectedCategory = category;
+            selectedBrand = carBrand;
+        });
         brandButton.setWidthFull();
         brandButton.setIcon(VaadinIcon.CAR.create());
         return brandButton;
@@ -175,6 +209,7 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
     private void openAddDialog() {
 
         goodsRegistrationView = new GoodsRegistrationView(goodsService,acquisitionService,goodsCategoryService,carBrandService);
+
         dialog = new Dialog(goodsRegistrationView);
 
         goodsRegistrationView.getCancelButton().addClickListener(e -> dialog.close());

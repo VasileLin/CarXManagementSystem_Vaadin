@@ -2,7 +2,9 @@ package com.vmoon.carx.mappers;
 
 import com.vmoon.carx.dto.CarModelDto;
 import com.vmoon.carx.entities.CarModel;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CarModelMapper {
 
     public static CarModelDto toCarModelDto(CarModel carModel) {

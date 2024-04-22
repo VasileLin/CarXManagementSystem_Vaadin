@@ -8,6 +8,7 @@ import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
@@ -100,12 +101,14 @@ public class ServiceFormView extends Composite<VerticalLayout> {
         saveButton.setText("Save");
         saveButton.setWidth("min-content");
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        saveButton.setPrefixComponent(new Icon(VaadinIcon.PLUS_CIRCLE));
         saveButton.addClickListener(e -> saveService());
 
 
         cancelButton = new Button();
         cancelButton.setText("Cancel");
         cancelButton.setWidth("min-content");
+        cancelButton.setPrefixComponent(new Icon(VaadinIcon.CLOSE_CIRCLE));
         cancelButton.addClickListener(e -> UI.getCurrent().navigate("service-view"));
 
         getContent().setWidth("100%");

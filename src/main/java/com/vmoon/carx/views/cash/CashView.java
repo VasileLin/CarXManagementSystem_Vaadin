@@ -1,6 +1,7 @@
 package com.vmoon.carx.views.cash;
 
 import com.vaadin.flow.component.Composite;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -161,6 +162,7 @@ public class CashView extends Composite<VerticalLayout> {
         cashButton.setWidth("min-content");
         cashButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         cashButton.addClickListener(e -> cashServices());
+
         getContent().add(formLayout2Col);
         formLayout2Col.add(customerComboBox);
         formLayout2Col.add(multiSelectComboBox);
@@ -360,9 +362,7 @@ public class CashView extends Composite<VerticalLayout> {
 
                 Notification.show("Cash successfully registered!");
                 generateReceipt();
-                clearInputs();
-                generateRandomTransactionNo();
-                countTotalPrice();
+                UI.getCurrent().getPage().reload();
 
             } else {
                 Notification.show("Quantity must be greater than zero!");
@@ -373,17 +373,6 @@ public class CashView extends Composite<VerticalLayout> {
         }
     }
 
-    private void clearInputs() {
-        customerComboBox.setValue(customerComboBox.getEmptyValue());
-        multiSelectComboBox.setValue(new HashSet<>());
-        multiSelectGoodsComboBox.setValue(new HashSet<>());
-        totalPrice = 0.00;
-        goodsTotalPrice = 0.00;
-        servicesTotalPrice = 0.00;
-        infoTextArea.setValue("");
-        costOfGoodsGrid.setItems(new ArrayList<>());
-        serviceGrid.setItems(new ArrayList<>());
-    }
 
     private void generateReceipt() {
         List<ServiceDto> selectedServices = new ArrayList<>(multiSelectComboBox.getValue());

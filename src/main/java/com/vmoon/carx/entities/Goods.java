@@ -2,6 +2,7 @@ package com.vmoon.carx.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -34,6 +35,7 @@ public class Goods {
     @JoinColumn(name = "brand_id",nullable = false)
     private CarBrand carBrand;
 
+    @BatchSize(size = 30)
     @ManyToMany
     @JoinTable(
             name = "model_goods",

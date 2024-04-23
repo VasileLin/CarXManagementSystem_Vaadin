@@ -20,6 +20,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vmoon.carx.dto.CarBrandDto;
 import com.vmoon.carx.dto.CarModelDto;
 import com.vmoon.carx.services.CarBrandService;
+import com.vmoon.carx.services.CarModelService;
 import com.vmoon.carx.utils.DialogManager;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -33,17 +34,17 @@ import java.util.List;
 public class BrandsView extends Composite<VerticalLayout> {
 
     private final CarBrandService carBrandService;
-    private final AddBrandView addBrandContent;
-    private final AddBrandModelView addModelContent;
+    private final CarModelService carModelService;
+    private  AddBrandView addBrandContent;
+    private  AddBrandModelView addModelContent;
 
     ComboBox<CarBrandDto> brandComboBox;
     Grid<CarModelDto> carModelGrid;
     Dialog dialog;
 
-    public BrandsView(CarBrandService carBrandService, AddBrandView addBrandView, AddBrandModelView addBrandModelView) {
+    public BrandsView(CarBrandService carBrandService, CarModelService carModelService) {
         this.carBrandService = carBrandService;
-        this.addBrandContent = addBrandView;
-        this.addModelContent = addBrandModelView;
+        this.carModelService = carModelService;
 
         createUI();
     }
@@ -128,6 +129,7 @@ public class BrandsView extends Composite<VerticalLayout> {
     }
 
     private void openEditBrandDialog(CarBrandDto selectedBrand) {
+        addBrandContent = new AddBrandView(carBrandService);
         dialog = new Dialog(addBrandContent);
         addBrandContent.setUpdatedBrand(selectedBrand);
         addBrandContent.setUpdateFlag(true);
@@ -142,6 +144,7 @@ public class BrandsView extends Composite<VerticalLayout> {
     }
 
     private void openEditDialog(CarModelDto carModelDto) {
+        addModelContent = new AddBrandModelView(carModelService);
         dialog = new Dialog(addModelContent);
         if (brandComboBox.getValue() != null) {
             addModelContent.setUpdateFlag(true);
@@ -159,6 +162,7 @@ public class BrandsView extends Composite<VerticalLayout> {
 
     private void openAddModelDialog() {
         if (brandComboBox.getValue() != null) {
+            addModelContent = new AddBrandModelView(carModelService);
             dialog = new Dialog(addModelContent);
             addModelContent.setUpdateFlag(false);
             addModelContent.setCarBrandDto(brandComboBox.getValue());
@@ -176,6 +180,7 @@ public class BrandsView extends Composite<VerticalLayout> {
     }
 
     private void openAddDialog() {
+        addBrandContent = new AddBrandView(carBrandService);
         dialog = new Dialog(addBrandContent);
         addBrandContent.setUpdateFlag(false);
         addBrandContent.getSaveButton().addClickListener(event -> addBrandContent.saveBrand());

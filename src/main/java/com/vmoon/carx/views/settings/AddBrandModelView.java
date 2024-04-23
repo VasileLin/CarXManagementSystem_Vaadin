@@ -162,6 +162,11 @@ public class AddBrandModelView extends Composite<VerticalLayout> {
     private void saveUpdatedModel() {
         updateModel.setModel(modelTextField.getValue());
         updateModel.setYear(yearNumberField.getValue().intValue());
-        carModelService.saveModel(updateModel);
+
+        if (validationBinder.validate().isOk()) {
+            carModelService.saveModel(updateModel);
+            modelTextField.setValue("");
+            yearNumberField.setValue(0D);
+        }
     }
 }

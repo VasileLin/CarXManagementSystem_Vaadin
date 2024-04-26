@@ -12,7 +12,6 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
@@ -28,8 +27,10 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vmoon.carx.dto.EmployerDto;
 import com.vmoon.carx.services.EmployerService;
 import com.vmoon.carx.services.RoleService;
+import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.views.MainLayout;
 import com.vmoon.carx.views.employerform.EmployerFormView;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.Getter;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
@@ -45,6 +46,7 @@ import static com.vmoon.carx.utils.ExcelWorkBooks.createEmployersExcelWorkBook;
 @PageTitle("Employers")
 @Route(value = "employers-view", layout = MainLayout.class)
 @Uses(Icon.class)
+@RolesAllowed({"ADMIN","MANAGER"})
 public class EmployersView extends Composite<VerticalLayout> {
     @Getter
     private Dialog dialog;
@@ -224,16 +226,18 @@ public class EmployersView extends Composite<VerticalLayout> {
 
     private void configureExportButton(Button exportButton) {
         exportButton.addClickListener(event -> {
-            StreamResource resource = new StreamResource("employers.xlsx", ()-> {
+            String fileName = "employers.xlsx";
+            StreamResource resource = new StreamResource(fileName, ()-> {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-                    try (Workbook workbook = createEmployersExcelWorkBook(employersGrid.getLazyDataView().getItems().toList())) {
-                        workbook.write(bos);
-                    } catch (IOException e) {
-                        Notification.show("Error writing file");
-                    }
+                try (Workbook workbook = createEmployersExcelWorkBook(employersGrid.getLazyDataView().getItems().toList())) {
+                    workbook.write(bos);
+                } catch (IOException e) {
+                    Notifications.errorNotification("Error writing file").open();
+                    return null;
+                }
 
-                    return new ByteArrayInputStream(bos.toByteArray());
+                return new ByteArrayInputStream(bos.toByteArray());
             });
 
             Anchor downloadLink = new Anchor(resource, "");
@@ -243,6 +247,7 @@ public class EmployersView extends Composite<VerticalLayout> {
 
             UI.getCurrent().add(downloadLink);
             downloadLink.getElement().callJsFunction("click");
+            Notifications.UploadSuccessNotification(fileName).open();
         });
     }
 

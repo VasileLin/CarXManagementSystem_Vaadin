@@ -30,9 +30,11 @@ import com.vaadin.flow.router.Route;
 import com.vmoon.carx.dto.*;
 import com.vmoon.carx.services.*;
 import com.vmoon.carx.utils.Generators;
-import com.vmoon.carx.utils.Status;
+import com.vmoon.carx.enums.Status;
+import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.utils.jasper.ReceiptGenerator;
 import com.vmoon.carx.views.MainLayout;
+import jakarta.annotation.security.RolesAllowed;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import java.io.File;
@@ -45,6 +47,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @PageTitle("Cash")
 @Route(value = "cash-view", layout = MainLayout.class)
 @Uses(Icon.class)
+@RolesAllowed({"ADMIN","CASHIER"})
 public class CashView extends Composite<VerticalLayout> {
     TextArea infoTextArea;
     private final CustomerService customerService;
@@ -159,7 +162,7 @@ public class CashView extends Composite<VerticalLayout> {
 
         formLayout2Col2.setWidth("100%");
         cashButton.setText("Cash");
-        cashButton.setWidth("min-content");
+        cashButton.setWidthFull();
         cashButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         cashButton.addClickListener(e -> cashServices());
 
@@ -174,11 +177,10 @@ public class CashView extends Composite<VerticalLayout> {
         getContent().add(costOfGoodsGrid);
         getContent().add(hr2);
         getContent().add(infoTextArea);
-        getContent().add(formLayout2Col2);
         formLayout2Col2.add(transactionNoText);
         formLayout2Col2.add(priceText);
-        formLayout2Col2.add(cashButton);
-
+        getContent().add(formLayout2Col2);
+        getContent().add(cashButton);
     }
 
     private void setServiceGridData(Grid<ServiceDto> serviceGrid) {
@@ -360,16 +362,16 @@ public class CashView extends Composite<VerticalLayout> {
                     goodsService.updateStock(goodsDto.getId(), newStock);
                 }
 
-                Notification.show("Cash successfully registered!");
+                Notifications.successNotification("Cash successfully registered!").open();
                 generateReceipt();
                 UI.getCurrent().getPage().reload();
 
             } else {
-                Notification.show("Quantity must be greater than zero!");
+                Notifications.warningNotification("Quantity must be greater than zero!").open();
             }
 
         } catch (Exception e) {
-            Notification.show("Error saving cash :" + e.getMessage());
+            Notifications.errorNotification("Error saving cash :" + e.getMessage()).open();
         }
     }
 

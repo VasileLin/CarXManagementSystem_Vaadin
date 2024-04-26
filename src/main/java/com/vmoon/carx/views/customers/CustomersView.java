@@ -12,7 +12,6 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
@@ -22,15 +21,16 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vmoon.carx.dto.CustomerDto;
 import com.vmoon.carx.services.CustomerService;
+import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.views.MainLayout;
 import com.vmoon.carx.views.customerform.CustomerFormView;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.Getter;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
@@ -45,11 +45,9 @@ import static com.vmoon.carx.utils.ExcelWorkBooks.createCustomersExcelWorkBook;
 
 @PageTitle("Customers")
 @Route(value = "customers-view", layout = MainLayout.class)
-@RouteAlias(value = "",layout = MainLayout.class)
 @Uses(Icon.class)
+@RolesAllowed({"ADMIN","MANAGER","CASHIER"})
 public class CustomersView extends Composite<VerticalLayout> {
-
-    Grid<CustomerDto> customersGrid;
 
     private final CustomerService customerService;
     private final CustomerFormView customerFormView;
@@ -57,6 +55,7 @@ public class CustomersView extends Composite<VerticalLayout> {
     @Getter
     private Dialog dialog;
 
+    Grid<CustomerDto> customersGrid;
     TextField searchCustomersField;
 
 
@@ -236,13 +235,14 @@ public class CustomersView extends Composite<VerticalLayout> {
 
     private void configureExportButton(Button exportButton) {
         exportButton.addClickListener(event -> {
-            StreamResource resource = new StreamResource("customers.xlsx", ()-> {
+            String fileName = "customers.xlsx";
+            StreamResource resource = new StreamResource(fileName, ()-> {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
                 try (Workbook workbook = createCustomersExcelWorkBook(customersGrid.getLazyDataView().getItems().toList())) {
                     workbook.write(bos);
                 } catch (IOException e) {
-                    Notification.show("Error writing file");
+                    Notifications.errorNotification("Error writing file").open();
                 }
 
                 return new ByteArrayInputStream(bos.toByteArray());
@@ -255,6 +255,7 @@ public class CustomersView extends Composite<VerticalLayout> {
 
             UI.getCurrent().add(downloadLink);
             downloadLink.getElement().callJsFunction("click");
+            Notifications.UploadSuccessNotification(fileName).open();
         });
     }
 

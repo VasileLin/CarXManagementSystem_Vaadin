@@ -4,17 +4,18 @@ import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vmoon.carx.dto.*;
 import com.vmoon.carx.mappers.GoodsMapper;
@@ -22,7 +23,9 @@ import com.vmoon.carx.services.AcquisitionService;
 import com.vmoon.carx.services.CarBrandService;
 import com.vmoon.carx.services.GoodsCategoryService;
 import com.vmoon.carx.services.GoodsService;
+import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.views.goods.GoodsRegistrationView;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +35,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@PageTitle("Goods")
+@Uses(Icon.class)
+@RolesAllowed({"ADMIN","MANAGER"})
 @Component
 @Scope("prototype")
 public class CostOfGoodsContent  extends Composite<VerticalLayout> {
@@ -47,6 +53,7 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
     private GoodsCategoryDto selectedCategory = null;
     private CarBrandDto selectedBrand = null;
 
+
     public CostOfGoodsContent(GoodsService goodsService,
                               AcquisitionService acquisitionService,
                               GoodsCategoryService goodsCategoryService,
@@ -57,8 +64,10 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
         this.goodsCategoryService = goodsCategoryService;
         this.carBrandService = carBrandService;
 
+
         initializeCostOfGoodsContent();
     }
+
 
     private void initializeCostOfGoodsContent() {
         FlexLayout flexLayout = new FlexLayout();
@@ -111,7 +120,7 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
     private void searchGoodsByCategoryAndBrand(String searchText) {
 
         if (searchText.isEmpty() || (selectedCategory == null || selectedBrand == null)) {
-            Notification.show("Select car brand from category and type searched good or search textbox is empty");
+            Notifications.warningNotification("Select car brand from category and type searched good or search textbox is empty").open();
         } else {
             DataProvider<GoodsDto, Void> dataProvider = DataProvider.fromCallbacks(
                     query -> {
@@ -219,7 +228,7 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
                 goodsDtoGrid.getDataProvider().refreshAll();
                 dialog.close();
             } catch (Exception ex) {
-                Notification.show("Failed registering good: " + ex.getMessage());
+                Notifications.errorNotification("Failed registering good: " + ex.getMessage()).open();
             }
 
         });
@@ -299,7 +308,7 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
         goodsRegistrationView.getCancelButton().addClickListener(event -> dialog.close());
         goodsRegistrationView.getSaveButton().addClickListener(event -> {
             goodsService.saveGood(goodsRegistrationView.getGoodToUpdate());
-            Notification.show("Good updated successfully!");
+            Notifications.successNotification("Good updated successfully!").open();
             goodsDtoGrid.getDataProvider().refreshAll();
             dialog.close();
         });
@@ -332,7 +341,7 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
 
             goodsRegistrationView.getStockField().setValue(actualStock + setStock);
             goodsService.saveGood(goodsRegistrationView.getGoodToUpdate());
-            Notification.show("Acquisition successfully saved!");
+            Notifications.successNotification("Acquisition successfully saved!").open();
             goodsDtoGrid.getDataProvider().refreshAll();
             dialog.close();
         });

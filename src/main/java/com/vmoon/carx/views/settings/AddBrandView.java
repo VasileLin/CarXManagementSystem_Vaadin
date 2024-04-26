@@ -3,10 +3,10 @@ package com.vmoon.carx.views.settings;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -14,16 +14,22 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.validator.BeanValidator;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import com.vmoon.carx.dto.CarBrandDto;
 import com.vmoon.carx.services.CarBrandService;
 import com.vmoon.carx.utils.DialogManager;
+import com.vmoon.carx.utils.Notifications;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @PageTitle("Add Brand View")
+@Route(value = "brand-form")
+@Uses(Icon.class)
+@RolesAllowed({"ADMIN","MANAGER"})
 @Component
 @Scope("prototype")
 public class AddBrandView extends Composite<VerticalLayout> {
@@ -111,14 +117,14 @@ public class AddBrandView extends Composite<VerticalLayout> {
                         .build();
                 brandService.saveBrand(carBrand);
                 DialogManager.closeAll();
-                Notification.show("Brand saved successfully!");
+                Notifications.successNotification("Brand saved successfully!").open();
             }else {
                 saveUpdatedBrand();
-                Notification.show("Brand updated successfully!");
+                Notifications.successNotification("Brand updated successfully!").open();
             }
 
         }else {
-            Notification.show("Invalid brand name!");
+            Notifications.warningNotification("Invalid brand name!").open();
         }
     }
 

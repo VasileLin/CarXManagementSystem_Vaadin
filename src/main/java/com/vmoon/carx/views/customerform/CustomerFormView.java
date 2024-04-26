@@ -11,7 +11,6 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -30,7 +29,9 @@ import com.vmoon.carx.dto.CustomerDto;
 import com.vmoon.carx.services.CarBrandService;
 import com.vmoon.carx.services.CarModelService;
 import com.vmoon.carx.services.CustomerService;
+import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.views.MainLayout;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.annotation.Scope;
@@ -43,6 +44,7 @@ import java.util.List;
 @Uses(Icon.class)
 @Component
 @Scope("prototype")
+@RolesAllowed({"ADMIN","MANAGER","CASHIER"})
 public class CustomerFormView extends Composite<VerticalLayout> {
     TextField nameField;
     TextField phoneTextField;
@@ -194,17 +196,17 @@ public class CustomerFormView extends Composite<VerticalLayout> {
             try {
                 if (!updateFlag) {
                     customerService.saveCustomer(getCustomerToSave());
-                    Notification.show("Customer successfully saved");
+                    Notifications.successNotification("Customer successfully saved").open();
                     UI.getCurrent().navigate("customers-view");
                 } else {
                     customerService.saveCustomer(getCustomerToUpdate());
-                    Notification.show("Customer successfully updated");
+                    Notifications.successNotification("Customer successfully updated").open();
                 }
             } catch (Exception e) {
-                Notification.show("Error saving customer: " + e.getMessage());
+                Notifications.errorNotification("Error saving customer: " + e.getMessage()).open();
             }
         } else {
-            Notification.show("Invalid data!");
+            Notifications.warningNotification("Invalid data!").open();
         }
     }
 

@@ -5,24 +5,29 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import com.vmoon.carx.dto.CashDto;
 import com.vmoon.carx.dto.CashGridDto;
 import com.vmoon.carx.services.CashService;
+import com.vmoon.carx.utils.Notifications;
+import com.vmoon.carx.views.MainLayout;
+import jakarta.annotation.security.RolesAllowed;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
@@ -36,8 +41,13 @@ import java.util.List;
 
 import static com.vmoon.carx.utils.ExcelWorkBooks.createTransactionsExcelWorkBook;
 
+
+@PageTitle("Revenues")
+@Route(value = "revenues-view", layout = MainLayout.class)
+@Uses(Icon.class)
 @Component
 @Scope("prototype")
+@RolesAllowed({"ADMIN","MANAGER","CASHIER"})
 public class RevenuesView extends Composite<VerticalLayout> {
 
     private final CashService cashService;
@@ -45,7 +55,7 @@ public class RevenuesView extends Composite<VerticalLayout> {
     DatePicker fromDatePicker;
     DatePicker toDatePicker;
     Grid<CashGridDto> cashGrid;
-    TextField searchCustomersField;
+    TextField searchTransactionsTextBox;
     DataProvider<CashGridDto, Void> dataProvider;
     Dialog dialog;
 
@@ -79,12 +89,13 @@ public class RevenuesView extends Composite<VerticalLayout> {
         toDatePicker.setLabel("To");
         toDatePicker.setWidth("min-content");
 
-        searchCustomersField = new TextField();
-        searchCustomersField.setLabel("Search by transaction number");
-        searchCustomersField.setPlaceholder("Enter transaction number ...");
-        searchCustomersField.setWidth("80%");
-        searchCustomersField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
-        searchCustomersField.addValueChangeListener(e -> searchCash(e.getValue().trim()));
+        searchTransactionsTextBox = new TextField();
+        searchTransactionsTextBox.setLabel("Search by transaction number");
+        searchTransactionsTextBox.setPlaceholder("Enter transaction number ...");
+        searchTransactionsTextBox.setWidth("80%");
+        searchTransactionsTextBox.setTooltipText("Search by transaction number from receipt");
+        searchTransactionsTextBox.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
+        searchTransactionsTextBox.addValueChangeListener(e -> searchCash(e.getValue().trim()));
 
         Button exportButton = new Button();
         exportButton.setText("Export");
@@ -111,7 +122,7 @@ public class RevenuesView extends Composite<VerticalLayout> {
         getContent().add(cashGrid);
         layoutRow.add(fromDatePicker);
         layoutRow.add(toDatePicker);
-        layoutRow.add(searchCustomersField);
+        layoutRow.add(searchTransactionsTextBox);
         layoutRow.add(layoutColumn2);
         layoutRow.add(exportButton);
     }
@@ -158,7 +169,7 @@ public class RevenuesView extends Composite<VerticalLayout> {
                                     return new FileInputStream(file);
                                 } catch (FileNotFoundException e) {
 
-                                    Notification.show("File not found", 3000, Notification.Position.MIDDLE);
+                                    Notifications.errorNotification("File not found").open();
                                     return new ByteArrayInputStream(new byte[0]);
                                 }
                             });
@@ -172,7 +183,7 @@ public class RevenuesView extends Composite<VerticalLayout> {
                     UI.getCurrent().add(downloadLink);
                     downloadLink.getElement().callJsFunction("click");
                 } else {
-                    Notification.show("The requested file does not exist.", 3000, Notification.Position.MIDDLE);
+                    Notifications.warningNotification("The requested file does not exist.").open();
                 }
             });
             saveButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS,ButtonVariant.LUMO_SMALL);
@@ -219,18 +230,19 @@ public class RevenuesView extends Composite<VerticalLayout> {
 
     private void configureExportButton(Button exportButton) {
         exportButton.addClickListener(event -> {
-            StreamResource resource = new StreamResource("transactions.xlsx", ()-> {
+            String fileName = "transactions.xlsx";
+            StreamResource resource = new StreamResource(fileName, ()-> {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
                 List<CashGridDto> gridDtoList = cashGrid.getLazyDataView().getItems().toList();
 
                 if (gridDtoList.isEmpty()){
-                    Notification.show("Grid is empty!");
+                    Notifications.warningNotification("Grid is empty!").open();
                 } else {
                     try (Workbook workbook = createTransactionsExcelWorkBook(gridDtoList)) {
                         workbook.write(bos);
                     } catch (IOException e) {
-                        Notification.show("Error writing file");
+                        Notifications.errorNotification("Error writing file").open();
                     }
                 }
 
@@ -244,6 +256,7 @@ public class RevenuesView extends Composite<VerticalLayout> {
 
             UI.getCurrent().add(downloadLink);
             downloadLink.getElement().callJsFunction("click");
+            Notifications.UploadSuccessNotification(fileName).open();
         });
     }
 

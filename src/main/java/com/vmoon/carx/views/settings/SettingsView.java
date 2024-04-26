@@ -10,10 +10,12 @@ import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vmoon.carx.views.MainLayout;
+import jakarta.annotation.security.RolesAllowed;
 
 @PageTitle("Settings")
 @Route(value = "settings-view", layout = MainLayout.class)
 @Uses(Icon.class)
+@RolesAllowed({"ADMIN","MANAGER","CASHIER"})
 public class SettingsView extends Composite<VerticalLayout> {
 
     private final VerticalLayout companyDataContent;

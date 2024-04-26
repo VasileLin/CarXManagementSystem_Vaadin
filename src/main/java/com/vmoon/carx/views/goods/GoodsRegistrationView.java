@@ -11,7 +11,6 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -31,7 +30,9 @@ import com.vmoon.carx.services.AcquisitionService;
 import com.vmoon.carx.services.CarBrandService;
 import com.vmoon.carx.services.GoodsCategoryService;
 import com.vmoon.carx.services.GoodsService;
+import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.views.MainLayout;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,6 +42,7 @@ import java.util.List;
 @PageTitle("Goods Registration")
 @Route(value = "good-form", layout = MainLayout.class)
 @Uses(Icon.class)
+@RolesAllowed({"ADMIN","MANAGER"})
 public class GoodsRegistrationView extends Composite<VerticalLayout> {
 
     private final GoodsService goodsService;
@@ -237,13 +239,13 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
                 savedGood.setCompatibleModels(carModelMultiSelect.getValue());
                 savedGood.setCategory(categoryComboBox.getValue());
                 goodsService.saveGood(savedGood);
-                Notification.show("Good successfully " + (updateFlag ? "updated" : "added"));
+                Notifications.successNotification("Good successfully " + (updateFlag ? "updated" : "added")).open();
             } catch (Exception e) {
-                Notification.show("Error saving good :"+ e);
+                Notifications.errorNotification("Error saving good :"+ e).open();
             }
 
         } else {
-            Notification.show("Invalid data, verify data or fill all fields!");
+            Notifications.warningNotification("Invalid data, verify data or fill all fields!").open();
         }
     }
 

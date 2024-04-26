@@ -12,7 +12,6 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
@@ -27,8 +26,10 @@ import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import com.vmoon.carx.dto.ServiceDto;
 import com.vmoon.carx.services.ServicesService;
+import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.views.MainLayout;
 import com.vmoon.carx.views.serviceform.ServiceFormView;
+import jakarta.annotation.security.RolesAllowed;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,6 +44,7 @@ import static com.vmoon.carx.utils.ExcelWorkBooks.createServicesExcelWorkBook;
 @PageTitle("Service")
 @Route(value = "service-view", layout = MainLayout.class)
 @Uses(Icon.class)
+@RolesAllowed({"ADMIN","MANAGER"})
 public class ServiceView extends Composite<VerticalLayout> {
 
     Grid<ServiceDto> servicesGrid;
@@ -215,13 +217,15 @@ public class ServiceView extends Composite<VerticalLayout> {
 
     private void configureExportButton(Button exportButton) {
         exportButton.addClickListener(event -> {
-            StreamResource resource = new StreamResource("services.xlsx", ()-> {
+            String fileName = "services.xlsx";
+            StreamResource resource = new StreamResource(fileName, ()-> {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
                 try (Workbook workbook = createServicesExcelWorkBook(servicesService.allServices())) {
                     workbook.write(bos);
+                    Notifications.UploadSuccessNotification(fileName).open();
                 } catch (IOException e) {
-                    Notification.show("Error writing file");
+                    Notifications.errorNotification("Error writing file").open();
                 }
 
                 return new ByteArrayInputStream(bos.toByteArray());

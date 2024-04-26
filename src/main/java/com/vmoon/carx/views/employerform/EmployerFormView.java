@@ -11,7 +11,6 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -31,13 +30,16 @@ import com.vmoon.carx.dto.EmployerDto;
 import com.vmoon.carx.dto.RoleDto;
 import com.vmoon.carx.services.EmployerService;
 import com.vmoon.carx.services.RoleService;
+import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.views.MainLayout;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.Getter;
 import lombok.Setter;
 
 @PageTitle("Employer Form")
 @Route(value = "employer-form", layout = MainLayout.class)
 @Uses(Icon.class)
+@RolesAllowed({"ADMIN","MANAGER"})
 public class EmployerFormView extends Composite<VerticalLayout> {
     TextField fullName;
     DatePicker dateOfBirthPicker;
@@ -195,18 +197,18 @@ public class EmployerFormView extends Composite<VerticalLayout> {
             try {
                 if (!updateFlag) {
                     employerService.saveEmployer(getEmployerToSave());
-                    Notification.show("Employer successfully saved");
+                    Notifications.successNotification("Employer successfully saved").open();
                     UI.getCurrent().navigate("employers-view");
                 } else {
                     employerService.saveEmployer(getEmployerToUpdate());
-                    Notification.show("Employer successfully updated");
+                    Notifications.successNotification("Employer successfully updated").open();
                 }
 
             } catch (Exception e) {
-                Notification.show("Error saving employer: " + e.getMessage());
+                Notifications.errorNotification("Error saving employer: " + e.getMessage()).open();
             }
         } else {
-            Notification.show("Invalid data!");
+            Notifications.warningNotification("Invalid data!").open();
         }
 
     }

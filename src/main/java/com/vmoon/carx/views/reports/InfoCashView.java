@@ -23,6 +23,7 @@ import com.vmoon.carx.dto.CashDto;
 import com.vmoon.carx.dto.GoodsDto;
 import com.vmoon.carx.dto.ServiceDto;
 import com.vmoon.carx.views.MainLayout;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.Setter;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Component;
 @Uses(Icon.class)
 @Component
 @Scope("prototype")
+@RolesAllowed({"ADMIN","MANAGER","CASHIER"})
 public class InfoCashView extends Composite<VerticalLayout> {
 
     Grid<ServiceDto> servicesGrid;

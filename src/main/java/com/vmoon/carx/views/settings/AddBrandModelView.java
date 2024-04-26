@@ -3,9 +3,10 @@ package com.vmoon.carx.views.settings;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -14,17 +15,23 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.validator.BeanValidator;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import com.vmoon.carx.dto.CarBrandDto;
 import com.vmoon.carx.dto.CarModelDto;
 import com.vmoon.carx.services.CarModelService;
 import com.vmoon.carx.utils.DialogManager;
+import com.vmoon.carx.utils.Notifications;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @PageTitle("Add Brand Model View")
+@Route(value = "brand-model-form")
+@Uses(Icon.class)
+@RolesAllowed({"ADMIN","MANAGER"})
 @Component
 @Scope("prototype")
 public class AddBrandModelView extends Composite<VerticalLayout> {
@@ -35,7 +42,6 @@ public class AddBrandModelView extends Composite<VerticalLayout> {
     @Setter
     CarBrandDto carBrandDto;
     CarModelDto updateModel;
-
     TextField modelTextField;
     NumberField yearNumberField;
     BeanValidationBinder<CarModelDto> validationBinder;
@@ -78,7 +84,6 @@ public class AddBrandModelView extends Composite<VerticalLayout> {
         modelTextField = new TextField();
         modelTextField.setLabel("Model");
         modelTextField.setWidth("min-content");
-
 
         yearNumberField = new NumberField();
         yearNumberField.setLabel("Year");
@@ -141,14 +146,14 @@ public class AddBrandModelView extends Composite<VerticalLayout> {
 
             if (updateFlag) {
                 saveUpdatedModel();
-                Notification.show("Model of "+updateModel.getCarBrand().getBrand()+" updated successfully!");
+                Notifications.successNotification("Model of "+updateModel.getCarBrand().getBrand()+" updated successfully!").open();
             } else {
                 carModelService.saveModel(carModelDto);
-                Notification.show("Model of "+carBrandDto.getBrand()+" saved successfully!");
+                Notifications.successNotification("Model of "+carBrandDto.getBrand()+" saved successfully!").open();
             }
 
         } else {
-            Notification.show("Error saving brand model, complete all inputs!");
+            Notifications.errorNotification("Error saving brand model, complete all inputs!").open();
         }
 
     }

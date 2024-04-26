@@ -4,6 +4,7 @@ import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -12,7 +13,6 @@ import com.vaadin.flow.component.html.H6;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.PageTitle;
@@ -22,6 +22,8 @@ import com.vmoon.carx.dto.CarModelDto;
 import com.vmoon.carx.services.CarBrandService;
 import com.vmoon.carx.services.CarModelService;
 import com.vmoon.carx.utils.DialogManager;
+import com.vmoon.carx.utils.Notifications;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @PageTitle("Brands")
+@Uses(Icon.class)
+@RolesAllowed({"ADMIN","MANAGER"})
 @Component
 @Scope("prototype")
 public class BrandsView extends Composite<VerticalLayout> {
@@ -67,7 +71,7 @@ public class BrandsView extends Composite<VerticalLayout> {
             if (selectedBrand != null) {
                 openEditBrandDialog(selectedBrand);
             } else {
-                Notification.show("Please select a brand to edit.");
+                Notifications.warningNotification("Please select a brand to edit.").open();
             }
         });
 
@@ -174,7 +178,7 @@ public class BrandsView extends Composite<VerticalLayout> {
             DialogManager.registerDialog(dialog);
             dialog.open();
         } else {
-            Notification.show("First chose a brand!");
+            Notifications.warningNotification("First chose a brand!").open();
         }
 
     }

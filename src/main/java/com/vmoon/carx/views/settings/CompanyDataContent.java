@@ -3,11 +3,11 @@ package com.vmoon.carx.views.settings;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -16,12 +16,16 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import com.vmoon.carx.dto.CompanyDto;
 import com.vmoon.carx.services.CompanyService;
+import com.vmoon.carx.utils.Notifications;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @PageTitle("Company Data")
+@Uses(Icon.class)
+@RolesAllowed({"ADMIN","MANAGER"})
 @Component
 @Scope("prototype")
 public class CompanyDataContent extends Composite<VerticalLayout> {
@@ -104,6 +108,6 @@ public class CompanyDataContent extends Composite<VerticalLayout> {
                 .build();
 
         companyService.saveCompany(companyDto);
-        Notification.show("Company data updated");
+        Notifications.successNotification("Company data updated").open();
     }
 }

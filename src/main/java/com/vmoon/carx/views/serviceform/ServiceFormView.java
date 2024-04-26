@@ -9,7 +9,6 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -24,7 +23,9 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import com.vmoon.carx.dto.ServiceDto;
 import com.vmoon.carx.services.ServicesService;
+import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.views.MainLayout;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.annotation.Scope;
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Component;
 @Uses(Icon.class)
 @Component
 @Scope("prototype")
+@RolesAllowed({"ADMIN","MANAGER"})
 public class ServiceFormView extends Composite<VerticalLayout> {
 
     NumberField priceField;
@@ -140,17 +142,17 @@ public class ServiceFormView extends Composite<VerticalLayout> {
             try {
                 if (!updateFlag) {
                     servicesService.saveService(getServiceToSave());
-                    Notification.show("Service successfully saved");
+                    Notifications.successNotification("Service successfully saved").open();
                     UI.getCurrent().navigate("service-view");
                 } else {
                     servicesService.saveService(getServiceToUpdate());
-                    Notification.show("Service successfully updated");
+                    Notifications.successNotification("Service successfully updated").open();
                 }
             } catch (Exception e) {
-                Notification.show("Error saving service: " + e.getMessage());
+                Notifications.errorNotification("Error saving service: " + e.getMessage()).open();
             }
         } else {
-            Notification.show("Invalid data!");
+            Notifications.warningNotification("Invalid data!").open();
         }
     }
 

@@ -4,6 +4,7 @@ import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
@@ -19,6 +20,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
@@ -57,6 +59,7 @@ public class CustomersView extends Composite<VerticalLayout> {
 
     Grid<CustomerDto> customersGrid;
     TextField searchCustomersField;
+    DataProvider<CustomerDto, Void> customerDataProvider;
 
 
     public CustomersView(CustomerService customerService, CustomerFormView customerFormView) {
@@ -135,21 +138,28 @@ public class CustomersView extends Composite<VerticalLayout> {
     }
 
     private void searchCustomers(String value) {
-        DataProvider<CustomerDto, Void> dataProvider = DataProvider.fromCallbacks(
-                query -> {
-                    PageRequest pageRequest = PageRequest.of(
-                            query.getPage(),
-                            query.getPageSize(),
-                            query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
-                    );
+        if (value.isEmpty()) {
+            Notifications.warningNotification("Search bar is empty!").open();
+            customersGrid.setDataProvider(customerDataProvider);
+            customersGrid.getDataProvider().refreshAll();
+        } else  {
+            DataProvider<CustomerDto, Void> dataProvider = DataProvider.fromCallbacks(
+                    query -> {
+                        PageRequest pageRequest = PageRequest.of(
+                                query.getPage(),
+                                query.getPageSize(),
+                                query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
+                        );
 
-                    Page<CustomerDto> page = customerService.searchCustomers(value, pageRequest);
-                    return page.stream();
-                },
-                query -> (int) customerService.countSearchResults(value)
-        );
+                        Page<CustomerDto> page = customerService.searchCustomers(value, pageRequest);
+                        return page.stream();
+                    },
+                    query -> (int) customerService.countSearchResults(value)
+            );
 
-        customersGrid.setDataProvider(dataProvider);
+            customersGrid.setDataProvider(dataProvider);
+        }
+
     }
 
     private void setGridSampleData(Grid<CustomerDto> grid) {
@@ -190,14 +200,21 @@ public class CustomersView extends Composite<VerticalLayout> {
                 .setSortable(true)
                 .setSortProperty("email");
 
-        grid.setColumnOrder(nameColumn,phoneColumn,emailColumn,carModelBrandColumn,carNumberColumn);
+        Grid.Column<CustomerDto> deleteColumn = grid.addColumn(new ComponentRenderer<>(customerDto -> {
+            Button deleteButton = new Button(new Icon(VaadinIcon.TRASH), buttonClickEvent -> confirmDeleteDialog(customerDto));
+            deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_SMALL);
+            return deleteButton;
+        })).setHeader("Actions");
+
+        grid.setColumnOrder(nameColumn,phoneColumn,emailColumn,carModelBrandColumn,carNumberColumn,deleteColumn);
 
         grid.addItemDoubleClickListener(event -> {
            CustomerDto customerDto = event.getItem();
            openEditDialog(customerDto);
         });
 
-        DataProvider<CustomerDto, Void> dataProvider = DataProvider.fromCallbacks(
+
+        customerDataProvider = DataProvider.fromCallbacks(
           query -> {
               PageRequest pageRequest = PageRequest.of(
                       query.getPage(),
@@ -208,10 +225,29 @@ public class CustomersView extends Composite<VerticalLayout> {
               return page.stream();
           },
 
-          query -> (int) customerService.count()
+          query -> (int) customerService.countCustomers()
         );
 
-        grid.setDataProvider(dataProvider);
+        grid.setDataProvider(customerDataProvider);
+    }
+
+    public void deleteCustomer(CustomerDto customerDto) {
+        customerDto.setDeleted(true);
+        customerService.saveCustomer(customerDto);
+        Notifications.successNotification("Customer are successfully deleted!").open();
+        customersGrid.getDataProvider().refreshAll();
+    }
+
+    private void confirmDeleteDialog(CustomerDto customerDto) {
+        ConfirmDialog dialog = new ConfirmDialog();
+        dialog.setHeader("Customer "+ customerDto.getName());
+        dialog.setText("Are you sure you want to delete this customer?");
+        dialog.setCancelable(true);
+
+        dialog.setConfirmText("Delete");
+        dialog.setConfirmButtonTheme("error primary");
+        dialog.addConfirmListener(event -> deleteCustomer(customerDto));
+        dialog.open();
     }
 
     private void openEditDialog(CustomerDto customerDto) {

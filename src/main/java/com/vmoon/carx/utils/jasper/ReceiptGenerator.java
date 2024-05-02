@@ -19,7 +19,6 @@ public class ReceiptGenerator {
             InputStream reportStream = ReceiptGenerator.class.getResourceAsStream("/jasper/carXReceipt.jrxml");
             JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
-
             byte[] pdfContent = JasperExportManager.exportReportToPdf(jasperPrint);
 
             if (!pathDirectory.exists()) {

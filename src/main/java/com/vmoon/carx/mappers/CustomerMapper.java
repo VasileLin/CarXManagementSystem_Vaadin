@@ -15,6 +15,7 @@ public class CustomerMapper {
                 .email(customer.getEmail())
                 .carModel(CarModelMapper.toCarModelDto(customer.getCarModel()))
                 .carNumber(customer.getCarNumber())
+                .isDeleted(customer.isDeleted())
                 .build();
 
         if (customer.getCarBrand() != null) {
@@ -36,6 +37,7 @@ public class CustomerMapper {
                 .email(customerDto.getEmail())
                 .carModel(CarModelMapper.toCarModel(customerDto.getCarModel()))
                 .carNumber(customerDto.getCarNumber())
+                .isDeleted(customerDto.isDeleted())
                 .build();
 
         if (customerDto.getCarBrand() != null) {

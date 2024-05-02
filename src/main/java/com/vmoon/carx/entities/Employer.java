@@ -23,6 +23,7 @@ public class Employer {
     private LocalDate dateOfBirth;
     private String address;
     private String email;
+    private boolean isDeleted;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)

@@ -15,6 +15,7 @@ public class EmployerMapper {
                 .phone(employer.getPhone())
                 .email(employer.getEmail())
                 .dateOfBirth(employer.getDateOfBirth())
+                .isDeleted(employer.isDeleted())
                 .build();
 
         if (employer.getRole() != null) {
@@ -33,6 +34,7 @@ public class EmployerMapper {
                 .phone(employerDto.getPhone())
                 .email(employerDto.getEmail())
                 .dateOfBirth(employerDto.getDateOfBirth())
+                .isDeleted(employerDto.isDeleted())
                 .build();
 
         if (employerDto.getRole() != null) {

@@ -8,19 +8,19 @@ import org.springframework.data.jpa.domain.Specification;
 
 public interface UserService {
 
-    UserDto getById(Long id);
-
     UserEntity update(UserDto entity);
 
     UserEntity add(UserDto entity);
-    void delete(Long id);
+
     Page<UserDto> list(Pageable pageable);
 
+    Page<UserDto> listDeleted(Pageable pageable);
+
     Page<UserDto> list(Pageable pageable, Specification<UserEntity> filter);
+
     int count();
 
-    UserEntity findByUsername(String username);
+    int countDeleted();
 
-    boolean existsByUsername(String value);
-}
+    UserEntity findByUsername(String username);}
 

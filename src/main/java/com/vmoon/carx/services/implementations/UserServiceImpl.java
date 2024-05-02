@@ -7,7 +7,6 @@ import com.vmoon.carx.mappers.RoleMapper;
 import com.vmoon.carx.mappers.UserMapper;
 import com.vmoon.carx.repositories.UserRepository;
 import com.vmoon.carx.services.UserService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -34,12 +33,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public @NonNull UserDto getById(@NonNull Long id) {
-        UserEntity user = userRepository.findById(id).orElseThrow(()->new EntityNotFoundException("User not found"));
-        return UserMapper.mapToUserDto(user);
-    }
-
-    @Transactional
     public @NonNull UserEntity add(@NonNull UserDto entity) {
         UserEntity user = new UserEntity();
         user.setUsername(entity.getUsername());
@@ -55,13 +48,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public void delete(@NonNull Long id) {
-        userRepository.deleteById(id);
-    }
-
-    @Transactional
     public @NonNull Page<UserDto> list(@NonNull Pageable pageable) {
         return userRepository.findAll(pageable).map(UserMapper::mapToUserDto);
+    }
+
+    @Override
+    public Page<UserDto> listDeleted(Pageable pageable) {
+        return userRepository.findAllDeleted(pageable).map(UserMapper::mapToUserDto);
     }
 
     @Transactional
@@ -74,14 +67,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public @NonNull UserEntity findByUsername(@NonNull String username) {
-        return userRepository.findByUsername(username);
+    public int countDeleted() {
+        return (int) userRepository.countDeleted();
     }
 
     @Override
-    public boolean existsByUsername(@NonNull String value) {
-        return !userRepository.existsByUsername(value);
+    @Transactional(readOnly = true)
+    public @NonNull UserEntity findByUsername(@NonNull String username) {
+        return userRepository.findByUsername(username);
     }
 
 }

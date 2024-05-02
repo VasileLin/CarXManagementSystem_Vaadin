@@ -1,4 +1,4 @@
-package com.vmoon.carx.views.employers;
+package com.vmoon.carx.views.recovery;
 
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.UI;
@@ -6,14 +6,11 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.Uses;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -23,49 +20,34 @@ import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vmoon.carx.dto.EmployerDto;
 import com.vmoon.carx.services.EmployerService;
-import com.vmoon.carx.services.RoleService;
 import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.views.MainLayout;
-import com.vmoon.carx.views.employerform.EmployerFormView;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.Getter;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
-import static com.vmoon.carx.utils.ExcelWorkBooks.createEmployersExcelWorkBook;
 
 @PageTitle("Employers")
-@Route(value = "employers-view", layout = MainLayout.class)
+@Route(value = "deleted-employers-view", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed({"ADMIN","MANAGER"})
-public class EmployersView extends Composite<VerticalLayout> {
+@RolesAllowed({"ADMIN"})
+public class DeletedEmployerView extends Composite<VerticalLayout> {
 
-    @Getter
-    private Dialog dialog;
     private final EmployerService employerService;
-    private final RoleService roleService;
-    DataProvider<EmployerDto, Void> employersDataProvider;
-
+    DataProvider<EmployerDto, Void> deletedEmployersDataProvider;
     @Getter
     Grid<EmployerDto> employersGrid;
-    Button exportButton;
     TextField searchEmployersField;
 
-    public EmployersView(EmployerService employerService, RoleService roleService) {
+    public DeletedEmployerView(EmployerService employerService) {
 
         this.employerService = employerService;
-        this.roleService = roleService;
 
         employersGrid = new Grid<>(EmployerDto.class, false);
         employersGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
@@ -85,13 +67,6 @@ public class EmployersView extends Composite<VerticalLayout> {
 
         HorizontalLayout layoutRow2 = new HorizontalLayout();
 
-        exportButton = new Button();
-        exportButton.setPrefixComponent(new Icon(VaadinIcon.FILE_TEXT));
-        exportButton.setText("Export Employers");
-        exportButton.setWidth("min-content");
-        exportButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        configureExportButton(exportButton);
-
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         layoutRow.setWidthFull();
@@ -105,7 +80,6 @@ public class EmployersView extends Composite<VerticalLayout> {
         layoutRow2.setHeight("50px");
         layoutRow2.setAlignItems(Alignment.CENTER);
         layoutRow2.setJustifyContentMode(JustifyContentMode.CENTER);
-        layoutRow.setAlignSelf(FlexComponent.Alignment.START, exportButton);
 
         searchEmployersField = new TextField();
         searchEmployersField.setPlaceholder("Search Employers ...");
@@ -119,14 +93,13 @@ public class EmployersView extends Composite<VerticalLayout> {
         getContent().add(layoutRow);
         layoutRow.add(addButton);
         layoutRow.add(layoutRow2);
-        layoutRow.add(exportButton);
     }
 
 
     private void searchEmployers(String value) {
         if (value.isEmpty()) {
             Notifications.warningNotification("Search bar is empty!").open();
-            employersGrid.setDataProvider(employersDataProvider);
+            employersGrid.setDataProvider(deletedEmployersDataProvider);
             employersGrid.getDataProvider().refreshAll();
         } else {
             DataProvider<EmployerDto, Void> dataProvider = DataProvider.fromCallbacks(
@@ -137,15 +110,14 @@ public class EmployersView extends Composite<VerticalLayout> {
                                 query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
                         );
 
-                        Page<EmployerDto> page = employerService.searchEmployers(value, pageRequest,false);
+                        Page<EmployerDto> page = employerService.searchEmployers(value, pageRequest,true);
                         return page.stream();
                     },
-                    query -> (int) employerService.countSearchResults(value,false)
+                    query -> (int) employerService.countSearchResults(value,true)
             );
 
             employersGrid.setDataProvider(dataProvider);
         }
-
 
     }
 
@@ -192,101 +164,52 @@ public class EmployersView extends Composite<VerticalLayout> {
                 .setSortable(true)
                 .setSortProperty("role");
 
-        Grid.Column<EmployerDto> deleteColumn = employerDtoGrid.addColumn(new ComponentRenderer<>(employerDto -> {
-            Button deleteButton = new Button(new Icon(VaadinIcon.TRASH), buttonClickEvent -> confirmDeleteDialog(employerDto));
-            deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_SMALL);
+        Grid.Column<EmployerDto> recoveryColumn = employerDtoGrid.addColumn(new ComponentRenderer<>(employerDto -> {
+            Button deleteButton = new Button(new Icon(VaadinIcon.RECYCLE), buttonClickEvent -> confirmRecoveryDialog(employerDto));
+            deleteButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS,ButtonVariant.LUMO_SMALL);
             return deleteButton;
         })).setHeader("Actions");
 
-        employerDtoGrid.setColumnOrder(fullNameColumn, dateOfBirthColumn, addressColumn, emailColumn, phoneColumn, roleColumn,deleteColumn);
-
-        employerDtoGrid.addItemDoubleClickListener(event -> {
-            EmployerDto employerDto = event.getItem();
-            openEditDialog(employerDto);
-        });
+        employerDtoGrid.setColumnOrder(fullNameColumn, dateOfBirthColumn, addressColumn, emailColumn, phoneColumn, roleColumn,recoveryColumn);
 
 
-        employersDataProvider = DataProvider.fromCallbacks(
+
+        deletedEmployersDataProvider = DataProvider.fromCallbacks(
                 query -> {
                     PageRequest pageRequest = PageRequest.of(
                             query.getPage(),
                             query.getPageSize(),
                             query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
                     );
-                    Page<EmployerDto> page = employerService.allEmployers(pageRequest);
+                    Page<EmployerDto> page = employerService.allDeletedEmployers(pageRequest);
                     return page.stream();
                 },
-                query -> (int) employerService.count(false)
+                query -> (int) employerService.count(true)
         );
 
-        employersGrid.setDataProvider(employersDataProvider);
+        employersGrid.setDataProvider(deletedEmployersDataProvider);
     }
 
-    private void confirmDeleteDialog(EmployerDto employerDto) {
+    private void confirmRecoveryDialog(EmployerDto employerDto) {
         ConfirmDialog dialog = new ConfirmDialog();
         dialog.setHeader("Employer "+ employerDto.getFullName());
-        dialog.setText("Are you sure you want to delete this employer?");
+        dialog.setText("Are you sure you want to recover this employer?");
         dialog.setCancelable(true);
 
-        dialog.setConfirmText("Delete");
-        dialog.setConfirmButtonTheme("error primary");
-        dialog.addConfirmListener(event -> deleteEmployer(employerDto));
+        dialog.setConfirmText("Recover");
+        dialog.setConfirmButtonTheme("success primary");
+        dialog.addConfirmListener(event -> recoverEmployer(employerDto));
         dialog.open();
     }
 
-    private void deleteEmployer(EmployerDto employerDto) {
-        employerDto.setDeleted(true);
+    private void recoverEmployer(EmployerDto employerDto) {
+        employerDto.setDeleted(false);
         employerService.saveEmployer(employerDto);
-        Notifications.successNotification("Employer are successfully deleted!").open();
+        Notifications.successNotification("Employer are successfully recovered!").open();
         employersGrid.getDataProvider().refreshAll();
     }
 
-    private void openEditDialog(EmployerDto employerDto) {
 
-        EmployerFormView employerFormView = new EmployerFormView(roleService, employerService);
-        employerFormView.setUpdateFlag(true);
-        employerFormView.getH3().setText("Update Employer "+ employerDto.getFullName());
-        employerFormView.setUpdateEmployer(employerDto);
 
-        employerFormView.getCancelButton().addClickListener(event -> dialog.close());
-        employerFormView.getSaveButton().addClickListener(event -> {
-            employerService.saveEmployer(employerFormView.getEmployerToUpdate());
-            employersGrid.getDataProvider().refreshAll();
-            dialog.close();
-        });
-
-        dialog = new Dialog(employerFormView);
-        dialog.setWidth("auto");
-        dialog.setHeight("auto");
-        dialog.setDraggable(true);
-        dialog.open();
-    }
-
-    private void configureExportButton(Button exportButton) {
-        exportButton.addClickListener(event -> {
-            String fileName = "employers.xlsx";
-            StreamResource resource = new StreamResource(fileName, ()-> {
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-                try (Workbook workbook = createEmployersExcelWorkBook(employersGrid.getLazyDataView().getItems().toList())) {
-                    workbook.write(bos);
-                } catch (IOException e) {
-                    Notifications.errorNotification("Error writing file").open();
-                    return null;
-                }
-
-                return new ByteArrayInputStream(bos.toByteArray());
-            });
-
-            Anchor downloadLink = new Anchor(resource, "");
-            downloadLink.getElement().setAttribute("download", true);
-            downloadLink.getElement().setAttribute("href", resource);
-            downloadLink.getElement().setAttribute("style","display: none;");
-
-            UI.getCurrent().add(downloadLink);
-            downloadLink.getElement().callJsFunction("click");
-            Notifications.UploadSuccessNotification(fileName).open();
-        });
-    }
 
 }

@@ -18,10 +18,20 @@ public interface UserRepository extends JpaRepository<UserEntity,Long>, JpaSpeci
             "WHERE u.username = :username")
     UserEntity findByUsername(@Param("username") String username);
 
-    boolean existsByUsername(String value);
-
-    @Query("SELECT u FROM users u ")
+    @Query("SELECT u FROM users u where u.isDeleted = false")
     @NonNull
     Page<UserEntity> findAll(@NonNull Pageable pageable);
+
+    @Query("SELECT COUNT(u) FROM users u WHERE u.isDeleted = true")
+    long countDeleted();
+
+    @Query("SELECT COUNT(u) FROM users u WHERE u.isDeleted = false")
+    long count();
+
+    @Query("SELECT u FROM users u " +
+            "LEFT JOIN FETCH u.roles" +
+            " WHERE u.isDeleted = true")
+    @NonNull
+    Page<UserEntity> findAllDeleted(@NonNull Pageable pageable);
 }
 

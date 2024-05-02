@@ -1,19 +1,14 @@
-package com.vmoon.carx.views.customers;
+package com.vmoon.carx.views.recovery;
 
 import com.vaadin.flow.component.Composite;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.Uses;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -23,7 +18,6 @@ import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
@@ -31,40 +25,26 @@ import com.vmoon.carx.dto.CustomerDto;
 import com.vmoon.carx.services.CustomerService;
 import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.views.MainLayout;
-import com.vmoon.carx.views.customerform.CustomerFormView;
 import jakarta.annotation.security.RolesAllowed;
-import lombok.Getter;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
-import static com.vmoon.carx.utils.ExcelWorkBooks.createCustomersExcelWorkBook;
-
-@PageTitle("Customers")
-@Route(value = "customers-view", layout = MainLayout.class)
+@PageTitle("Deleted customers")
+@Route(value = "deleted-customers-view", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed({"ADMIN","MANAGER","CASHIER"})
-public class CustomersView extends Composite<VerticalLayout> {
+@RolesAllowed({"ADMIN"})
+public class DeletedCustomersView extends Composite<VerticalLayout> {
 
     private final CustomerService customerService;
-    private final CustomerFormView customerFormView;
-
-    @Getter
-    private Dialog dialog;
 
     Grid<CustomerDto> customersGrid;
     TextField searchCustomersField;
-    DataProvider<CustomerDto, Void> customerDataProvider;
+    DataProvider<CustomerDto, Void> deletedCustomersDataProvider;
 
 
-    public CustomersView(CustomerService customerService, CustomerFormView customerFormView) {
+    public DeletedCustomersView(CustomerService customerService) {
         this.customerService = customerService;
-        this.customerFormView = customerFormView;
         VerticalLayout layoutColumn2 = new VerticalLayout();
         customersGrid = new Grid<>(CustomerDto.class,false);
         customersGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
@@ -75,24 +55,8 @@ public class CustomersView extends Composite<VerticalLayout> {
 
         VerticalLayout layoutColumn3 = new VerticalLayout();
         VerticalLayout layoutColumn4 = new VerticalLayout();
-        Hr hr = new Hr();
         HorizontalLayout layoutRow = new HorizontalLayout();
-
-        Button addButton = new Button();
-        addButton.setPrefixComponent(new Icon(VaadinIcon.PLUS));
-        addButton.setText("Add Customer");
-        addButton.setWidth("min-content");
-        addButton.addClickListener(e -> UI.getCurrent().navigate("customer-form"));
-        addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
         HorizontalLayout layoutRow2 = new HorizontalLayout();
-        Button exportButton = new Button();
-        exportButton.setPrefixComponent(new Icon(VaadinIcon.FILE_TEXT));
-        exportButton.setText("Export Customers");
-        layoutRow.setAlignSelf(FlexComponent.Alignment.START, exportButton);
-        exportButton.setWidth("min-content");
-        exportButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        configureExportButton(exportButton);
 
         getContent().setHeightFull();
         getContent().setWidthFull();
@@ -130,17 +94,15 @@ public class CustomersView extends Composite<VerticalLayout> {
         getContent().add(layoutColumn4);
         layoutColumn2.add(searchCustomersField);
         layoutColumn2.add(customersGrid);
-        layoutColumn4.add(hr);
         layoutColumn4.add(layoutRow);
-        layoutRow.add(addButton);
         layoutRow.add(layoutRow2);
-        layoutRow.add(exportButton);
     }
+
 
     private void searchCustomers(String value) {
         if (value.isEmpty()) {
             Notifications.warningNotification("Search bar is empty!").open();
-            customersGrid.setDataProvider(customerDataProvider);
+            customersGrid.setDataProvider(deletedCustomersDataProvider);
             customersGrid.getDataProvider().refreshAll();
         } else  {
             DataProvider<CustomerDto, Void> dataProvider = DataProvider.fromCallbacks(
@@ -151,10 +113,10 @@ public class CustomersView extends Composite<VerticalLayout> {
                                 query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
                         );
 
-                        Page<CustomerDto> page = customerService.searchCustomers(value, pageRequest);
+                        Page<CustomerDto> page = customerService.searchDeletedCustomers(value, pageRequest);
                         return page.stream();
                     },
-                    query -> (int) customerService.countSearchResults(value)
+                    query -> (int) customerService.countDeletedSearchResults(value)
             );
 
             customersGrid.setDataProvider(dataProvider);
@@ -200,99 +162,49 @@ public class CustomersView extends Composite<VerticalLayout> {
                 .setSortable(true)
                 .setSortProperty("email");
 
-        Grid.Column<CustomerDto> deleteColumn = grid.addColumn(new ComponentRenderer<>(customerDto -> {
-            Button deleteButton = new Button(new Icon(VaadinIcon.TRASH), buttonClickEvent -> confirmDeleteDialog(customerDto));
-            deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_SMALL);
+        Grid.Column<CustomerDto> recoveryColumn = grid.addColumn(new ComponentRenderer<>(customerDto -> {
+            Button deleteButton = new Button(new Icon(VaadinIcon.RECYCLE), buttonClickEvent -> confirmRecoveryDialog(customerDto));
+            deleteButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS,ButtonVariant.LUMO_SMALL);
             return deleteButton;
         })).setHeader("Actions");
 
-        grid.setColumnOrder(nameColumn,phoneColumn,emailColumn,carModelBrandColumn,carNumberColumn,deleteColumn);
-
-        grid.addItemDoubleClickListener(event -> {
-           CustomerDto customerDto = event.getItem();
-           openEditDialog(customerDto);
-        });
+        grid.setColumnOrder(nameColumn,phoneColumn,emailColumn,carModelBrandColumn,carNumberColumn,recoveryColumn);
 
 
-        customerDataProvider = DataProvider.fromCallbacks(
-          query -> {
-              PageRequest pageRequest = PageRequest.of(
-                      query.getPage(),
-                      query.getPageSize(),
-                      query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
-              );
-              Page<CustomerDto> page = customerService.allCustomers(pageRequest);
-              return page.stream();
-          },
+        deletedCustomersDataProvider = DataProvider.fromCallbacks(
+                query -> {
+                    PageRequest pageRequest = PageRequest.of(
+                            query.getPage(),
+                            query.getPageSize(),
+                            query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
+                    );
+                    Page<CustomerDto> page = customerService.allDeletedCustomers(pageRequest);
+                    return page.stream();
+                },
 
-          query -> (int) customerService.countCustomers()
+                query -> (int) customerService.countDeleted()
         );
 
-        grid.setDataProvider(customerDataProvider);
+        grid.setDataProvider(deletedCustomersDataProvider);
     }
 
-    public void deleteCustomer(CustomerDto customerDto) {
-        customerDto.setDeleted(true);
+    public void recoveryCustomer(CustomerDto customerDto) {
+        customerDto.setDeleted(false);
         customerService.saveCustomer(customerDto);
-        Notifications.successNotification("Customer are successfully deleted!").open();
         customersGrid.getDataProvider().refreshAll();
+        Notifications.successNotification("Customer are successfully recovered!").open();
     }
 
-    private void confirmDeleteDialog(CustomerDto customerDto) {
+    private void confirmRecoveryDialog(CustomerDto customerDto) {
         ConfirmDialog dialog = new ConfirmDialog();
         dialog.setHeader("Customer "+ customerDto.getName());
-        dialog.setText("Are you sure you want to delete this customer?");
+        dialog.setText("Are you sure you want to recovery this customer?");
         dialog.setCancelable(true);
 
-        dialog.setConfirmText("Delete");
-        dialog.setConfirmButtonTheme("error primary");
-        dialog.addConfirmListener(event -> deleteCustomer(customerDto));
+        dialog.setConfirmText("Recover");
+        dialog.setConfirmButtonTheme("success primary");
+        dialog.addConfirmListener(event -> recoveryCustomer(customerDto));
         dialog.open();
-    }
-
-    private void openEditDialog(CustomerDto customerDto) {
-        customerFormView.setUpdateFlag(true);
-        customerFormView.getH3().setText("Update Customer " + customerDto.getName());
-        customerFormView.setUpdateCustomer(customerDto);
-
-        customerFormView.getCancelButton().addClickListener(event -> dialog.close());
-        customerFormView.getSaveButton().addClickListener(event -> {
-            customerService.saveCustomer(customerFormView.getCustomerToUpdate());
-            customersGrid.getDataProvider().refreshAll();
-            dialog.close();
-        });
-
-        dialog = new Dialog(customerFormView);
-        dialog.setWidth("auto");
-        dialog.setHeight("auto");
-        dialog.setDraggable(true);
-        dialog.open();
-    }
-
-    private void configureExportButton(Button exportButton) {
-        exportButton.addClickListener(event -> {
-            String fileName = "customers.xlsx";
-            StreamResource resource = new StreamResource(fileName, ()-> {
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-                try (Workbook workbook = createCustomersExcelWorkBook(customersGrid.getLazyDataView().getItems().toList())) {
-                    workbook.write(bos);
-                } catch (IOException e) {
-                    Notifications.errorNotification("Error writing file").open();
-                }
-
-                return new ByteArrayInputStream(bos.toByteArray());
-            });
-
-            Anchor downloadLink = new Anchor(resource, "");
-            downloadLink.getElement().setAttribute("download", true);
-            downloadLink.getElement().setAttribute("href", resource);
-            downloadLink.getElement().setAttribute("style","display: none;");
-
-            UI.getCurrent().add(downloadLink);
-            downloadLink.getElement().callJsFunction("click");
-            Notifications.UploadSuccessNotification(fileName).open();
-        });
     }
 
 }

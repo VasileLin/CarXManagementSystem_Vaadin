@@ -4,6 +4,7 @@ import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
@@ -19,6 +20,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
@@ -48,10 +50,12 @@ import static com.vmoon.carx.utils.ExcelWorkBooks.createEmployersExcelWorkBook;
 @Uses(Icon.class)
 @RolesAllowed({"ADMIN","MANAGER"})
 public class EmployersView extends Composite<VerticalLayout> {
+
     @Getter
     private Dialog dialog;
     private final EmployerService employerService;
     private final RoleService roleService;
+    DataProvider<EmployerDto, Void> employersDataProvider;
 
     @Getter
     Grid<EmployerDto> employersGrid;
@@ -120,21 +124,29 @@ public class EmployersView extends Composite<VerticalLayout> {
 
 
     private void searchEmployers(String value) {
-        DataProvider<EmployerDto, Void> dataProvider = DataProvider.fromCallbacks(
-                query -> {
-                    PageRequest pageRequest = PageRequest.of(
-                            query.getPage(),
-                            query.getPageSize(),
-                            query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
-                    );
+        if (value.isEmpty()) {
+            Notifications.warningNotification("Search bar is empty!").open();
+            employersGrid.setDataProvider(employersDataProvider);
+            employersGrid.getDataProvider().refreshAll();
+        } else {
+            DataProvider<EmployerDto, Void> dataProvider = DataProvider.fromCallbacks(
+                    query -> {
+                        PageRequest pageRequest = PageRequest.of(
+                                query.getPage(),
+                                query.getPageSize(),
+                                query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
+                        );
 
-                    Page<EmployerDto> page = employerService.searchEmployers(value, pageRequest);
-                    return page.stream();
-                },
-                query -> (int) employerService.countSearchResults(value)
-        );
+                        Page<EmployerDto> page = employerService.searchEmployers(value, pageRequest,false);
+                        return page.stream();
+                    },
+                    query -> (int) employerService.countSearchResults(value,false)
+            );
 
-        employersGrid.setDataProvider(dataProvider);
+            employersGrid.setDataProvider(dataProvider);
+        }
+
+
     }
 
     private void setGridSampleData(Grid<EmployerDto> employerDtoGrid) {
@@ -180,14 +192,21 @@ public class EmployersView extends Composite<VerticalLayout> {
                 .setSortable(true)
                 .setSortProperty("role");
 
-        employerDtoGrid.setColumnOrder(fullNameColumn, dateOfBirthColumn, addressColumn, emailColumn, phoneColumn, roleColumn);
+        Grid.Column<EmployerDto> deleteColumn = employerDtoGrid.addColumn(new ComponentRenderer<>(employerDto -> {
+            Button deleteButton = new Button(new Icon(VaadinIcon.TRASH), buttonClickEvent -> confirmDeleteDialog(employerDto));
+            deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_SMALL);
+            return deleteButton;
+        })).setHeader("Actions");
+
+        employerDtoGrid.setColumnOrder(fullNameColumn, dateOfBirthColumn, addressColumn, emailColumn, phoneColumn, roleColumn,deleteColumn);
 
         employerDtoGrid.addItemDoubleClickListener(event -> {
             EmployerDto employerDto = event.getItem();
             openEditDialog(employerDto);
         });
 
-        DataProvider<EmployerDto, Void> dataProvider = DataProvider.fromCallbacks(
+
+        employersDataProvider = DataProvider.fromCallbacks(
                 query -> {
                     PageRequest pageRequest = PageRequest.of(
                             query.getPage(),
@@ -197,10 +216,29 @@ public class EmployersView extends Composite<VerticalLayout> {
                     Page<EmployerDto> page = employerService.allEmployers(pageRequest);
                     return page.stream();
                 },
-                query -> (int) employerService.count()
+                query -> (int) employerService.count(false)
         );
 
-        employersGrid.setDataProvider(dataProvider);
+        employersGrid.setDataProvider(employersDataProvider);
+    }
+
+    private void confirmDeleteDialog(EmployerDto employerDto) {
+        ConfirmDialog dialog = new ConfirmDialog();
+        dialog.setHeader("Employer "+ employerDto.getFullName());
+        dialog.setText("Are you sure you want to delete this employer?");
+        dialog.setCancelable(true);
+
+        dialog.setConfirmText("Delete");
+        dialog.setConfirmButtonTheme("error primary");
+        dialog.addConfirmListener(event -> deleteEmployer(employerDto));
+        dialog.open();
+    }
+
+    private void deleteEmployer(EmployerDto employerDto) {
+        employerDto.setDeleted(true);
+        employerService.saveEmployer(employerDto);
+        Notifications.successNotification("Employer are successfully deleted!").open();
+        employersGrid.getDataProvider().refreshAll();
     }
 
     private void openEditDialog(EmployerDto employerDto) {

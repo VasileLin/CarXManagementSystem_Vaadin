@@ -20,6 +20,9 @@ import com.vmoon.carx.security.AuthenticatedUser;
 import com.vmoon.carx.views.cash.CashView;
 import com.vmoon.carx.views.customers.CustomersView;
 import com.vmoon.carx.views.employers.EmployersView;
+import com.vmoon.carx.views.recovery.DeletedCustomersView;
+import com.vmoon.carx.views.recovery.DeletedEmployerView;
+import com.vmoon.carx.views.recovery.DeletedUsersView;
 import com.vmoon.carx.views.reports.ReportsView;
 import com.vmoon.carx.views.service.ServiceView;
 import com.vmoon.carx.views.settings.SettingsView;
@@ -84,11 +87,11 @@ public class MainLayout extends AppLayout {
         }
 
         if (accessChecker.hasAccess(CustomersView.class)) {
-            nav.addItem(new SideNavItem("Customers", CustomersView.class, LineAwesomeIcon.MONEY_BILL_WAVE_SOLID.create()));
+            nav.addItem(new SideNavItem("Customers", CustomersView.class, LineAwesomeIcon.USER_TAG_SOLID.create()));
         }
 
         if (accessChecker.hasAccess(ServiceView.class)) {
-            nav.addItem(new SideNavItem("Service", ServiceView.class, LineAwesomeIcon.CAR_BATTERY_SOLID.create()));
+            nav.addItem(new SideNavItem("Service", ServiceView.class, LineAwesomeIcon.OIL_CAN_SOLID.create()));
         }
 
         if (accessChecker.hasAccess(CashView.class)) {
@@ -100,11 +103,23 @@ public class MainLayout extends AppLayout {
         }
 
         if (accessChecker.hasAccess(SettingsView.class)) {
-            nav.addItem(new SideNavItem("Settings", SettingsView.class, LineAwesomeIcon.ICONS_SOLID.create()));
+            nav.addItem(new SideNavItem("Settings", SettingsView.class, LineAwesomeIcon.TOOLS_SOLID.create()));
         }
 
         if (accessChecker.hasAccess(UsersView.class)) {
-            nav.addItem(new SideNavItem("Users", UsersView.class, LineAwesomeIcon.USERS_COG_SOLID.create()));
+            nav.addItem(new SideNavItem("Users", UsersView.class, LineAwesomeIcon.USER_SHIELD_SOLID.create()));
+        }
+
+        if (accessChecker.hasAccess(DeletedCustomersView.class)) {
+            nav.addItem(new SideNavItem("Deleted customers", DeletedCustomersView.class, LineAwesomeIcon.USER_SLASH_SOLID.create()));
+        }
+
+        if (accessChecker.hasAccess(DeletedEmployerView.class)) {
+            nav.addItem(new SideNavItem("Deleted employers", DeletedEmployerView.class, LineAwesomeIcon.USER_TIE_SOLID.create()));
+        }
+
+        if (accessChecker.hasAccess(DeletedUsersView.class)) {
+            nav.addItem(new SideNavItem("Deleted users", DeletedUsersView.class, LineAwesomeIcon.USER_NINJA_SOLID.create()));
         }
 
         return nav;

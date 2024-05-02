@@ -16,6 +16,7 @@ public class UserMapper {
                 .username(userDto.getUsername())
                 .password(userDto.getPassword())
                 .roles(userDto.getRoles().stream().map(RoleMapper::mapToRole).collect(Collectors.toSet()))
+                .isDeleted(userDto.isDeleted())
                 .build();
     }
 
@@ -26,6 +27,7 @@ public class UserMapper {
                 .username(userEntity.getUsername())
                 .password(userEntity.getPassword())
                 .roles(userEntity.getRoles().stream().map(RoleMapper::mapToRoleDto).collect(Collectors.toSet()))
+                .isDeleted(userEntity.isDeleted())
                 .build();
     }
 

@@ -13,6 +13,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EmployerRepository extends JpaRepository<Employer, Long>, JpaSpecificationExecutor<Employer> {
-    @Query("SELECT e FROM Employer e LEFT JOIN FETCH e.role")
+    @Query("SELECT e FROM Employer e LEFT JOIN FETCH e.role WHERE e.isDeleted = false")
     @NonNull Page<Employer> list(@NonNull Pageable pageable);
+
+    @Query("SELECT e FROM Employer e LEFT JOIN FETCH e.role WHERE e.isDeleted = true")
+    @NonNull Page<Employer> listDeleted(Pageable pageable);
 }

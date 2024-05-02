@@ -42,6 +42,7 @@ public class UserFormView extends Composite<VerticalLayout> {
 
     private final RoleService roleService;
     private final UserService userService;
+    @Getter
     BeanValidationBinder<UserDto> validationBinder;
     TextField usernameTextField;
     @Getter

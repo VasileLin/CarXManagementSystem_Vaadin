@@ -20,6 +20,7 @@ public class UserEntity {
     private int id;
     private String username;
     private String password;
+    private boolean isDeleted;
 
     @BatchSize(size = 10)
     @ManyToMany

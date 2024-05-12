@@ -14,3 +14,6 @@ CREATE TABLE if not exists user_to_role
     FOREIGN KEY (user_id) REFERENCES users (id),
     FOREIGN KEY (role_id) REFERENCES roles (id)
 );
+
+insert into users(username, password) values ('vaslin','$2a$10$dKNJv.lffzZAJy54RedVPuMxbbKoOinER2lKXjnt7KfbF1ROq4qSm');
+insert into user_to_role values(1,3);

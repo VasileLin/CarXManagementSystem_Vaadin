@@ -7,6 +7,8 @@ CREATE table if not exists company
     CONSTRAINT customer_pk PRIMARY KEY (id)
 );
 
+insert into company(name, address, iban) values ('CarX Company','Address sample','I3B2A3N5S9A3M1P3L0E');
+
 CREATE table if not exists cost_of_good
 (
     id         int          not null AUTO_INCREMENT,

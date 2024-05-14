@@ -30,6 +30,7 @@ import com.vmoon.carx.dto.EmployerDto;
 import com.vmoon.carx.services.EmployerService;
 import com.vmoon.carx.services.RoleService;
 import com.vmoon.carx.utils.Notifications;
+import com.vmoon.carx.utils.SecurityUtils;
 import com.vmoon.carx.views.MainLayout;
 import com.vmoon.carx.views.employerform.EmployerFormView;
 import jakarta.annotation.security.RolesAllowed;
@@ -76,6 +77,7 @@ public class EmployersView extends Composite<VerticalLayout> {
 
         Hr hr = new Hr();
         HorizontalLayout layoutRow = new HorizontalLayout();
+
         Button addButton = new Button();
         addButton.setText("Add Employer");
         addButton.setWidth("min-content");
@@ -117,7 +119,9 @@ public class EmployersView extends Composite<VerticalLayout> {
         getContent().add(employersGrid);
         getContent().add(hr);
         getContent().add(layoutRow);
-        layoutRow.add(addButton);
+        if (SecurityUtils.isUserAdmin()){
+            layoutRow.add(addButton);
+        }
         layoutRow.add(layoutRow2);
         layoutRow.add(exportButton);
     }
@@ -145,8 +149,6 @@ public class EmployersView extends Composite<VerticalLayout> {
 
             employersGrid.setDataProvider(dataProvider);
         }
-
-
     }
 
     private void setGridSampleData(Grid<EmployerDto> employerDtoGrid) {
@@ -192,18 +194,24 @@ public class EmployersView extends Composite<VerticalLayout> {
                 .setSortable(true)
                 .setSortProperty("role");
 
-        Grid.Column<EmployerDto> deleteColumn = employerDtoGrid.addColumn(new ComponentRenderer<>(employerDto -> {
-            Button deleteButton = new Button(new Icon(VaadinIcon.TRASH), buttonClickEvent -> confirmDeleteDialog(employerDto));
-            deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_SMALL);
-            return deleteButton;
-        })).setHeader("Actions");
 
-        employerDtoGrid.setColumnOrder(fullNameColumn, dateOfBirthColumn, addressColumn, emailColumn, phoneColumn, roleColumn,deleteColumn);
+        if (SecurityUtils.isUserAdmin()) {
+            Grid.Column<EmployerDto> deleteColumn = employerDtoGrid.addColumn(new ComponentRenderer<>(employerDto -> {
+                Button deleteButton = new Button(new Icon(VaadinIcon.TRASH), buttonClickEvent -> confirmDeleteDialog(employerDto));
+                deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_SMALL);
+                return deleteButton;
+            })).setHeader("Actions");
+
+            employerDtoGrid.setColumnOrder(fullNameColumn, dateOfBirthColumn, addressColumn, emailColumn, phoneColumn, roleColumn,deleteColumn);
+        } else {
+            employerDtoGrid.setColumnOrder(fullNameColumn, dateOfBirthColumn, addressColumn, emailColumn, phoneColumn, roleColumn);
+        }
 
         employerDtoGrid.addItemDoubleClickListener(event -> {
-            EmployerDto employerDto = event.getItem();
-            openEditDialog(employerDto);
+               EmployerDto employerDto = event.getItem();
+               openEditDialog(employerDto);
         });
+
 
 
         employersDataProvider = DataProvider.fromCallbacks(
@@ -288,5 +296,4 @@ public class EmployersView extends Composite<VerticalLayout> {
             Notifications.UploadSuccessNotification(fileName).open();
         });
     }
-
 }

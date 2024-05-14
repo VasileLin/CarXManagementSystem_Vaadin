@@ -18,7 +18,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility;
@@ -26,7 +25,6 @@ import com.vmoon.carx.dto.CashDto;
 import com.vmoon.carx.dto.CashGridDto;
 import com.vmoon.carx.services.CashService;
 import com.vmoon.carx.utils.Notifications;
-import com.vmoon.carx.views.MainLayout;
 import jakarta.annotation.security.RolesAllowed;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.context.annotation.Scope;
@@ -43,7 +41,6 @@ import static com.vmoon.carx.utils.ExcelWorkBooks.createTransactionsExcelWorkBoo
 
 
 @PageTitle("Revenues")
-@Route(value = "revenues-view", layout = MainLayout.class)
 @Uses(Icon.class)
 @Component
 @Scope("prototype")

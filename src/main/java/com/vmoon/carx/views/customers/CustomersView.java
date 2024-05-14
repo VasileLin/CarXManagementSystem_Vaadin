@@ -30,6 +30,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vmoon.carx.dto.CustomerDto;
 import com.vmoon.carx.services.CustomerService;
 import com.vmoon.carx.utils.Notifications;
+import com.vmoon.carx.utils.SecurityUtils;
 import com.vmoon.carx.views.MainLayout;
 import com.vmoon.carx.views.customerform.CustomerFormView;
 import jakarta.annotation.security.RolesAllowed;
@@ -200,13 +201,18 @@ public class CustomersView extends Composite<VerticalLayout> {
                 .setSortable(true)
                 .setSortProperty("email");
 
-        Grid.Column<CustomerDto> deleteColumn = grid.addColumn(new ComponentRenderer<>(customerDto -> {
-            Button deleteButton = new Button(new Icon(VaadinIcon.TRASH), buttonClickEvent -> confirmDeleteDialog(customerDto));
-            deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_SMALL);
-            return deleteButton;
-        })).setHeader("Actions");
+        if (SecurityUtils.isUserAdmin()) {
+            Grid.Column<CustomerDto> deleteColumn = grid.addColumn(new ComponentRenderer<>(customerDto -> {
+                Button deleteButton = new Button(new Icon(VaadinIcon.TRASH), buttonClickEvent -> confirmDeleteDialog(customerDto));
+                deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_SMALL);
+                return deleteButton;
+            })).setHeader("Actions");
 
-        grid.setColumnOrder(nameColumn,phoneColumn,emailColumn,carModelBrandColumn,carNumberColumn,deleteColumn);
+            grid.setColumnOrder(nameColumn,phoneColumn,emailColumn,carModelBrandColumn,carNumberColumn,deleteColumn);
+        } else {
+            grid.setColumnOrder(nameColumn,phoneColumn,emailColumn,carModelBrandColumn,carNumberColumn);
+        }
+
 
         grid.addItemDoubleClickListener(event -> {
            CustomerDto customerDto = event.getItem();

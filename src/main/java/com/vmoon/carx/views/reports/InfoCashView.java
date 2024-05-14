@@ -18,18 +18,15 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
 import com.vmoon.carx.dto.CashDto;
 import com.vmoon.carx.dto.GoodsDto;
 import com.vmoon.carx.dto.ServiceDto;
-import com.vmoon.carx.views.MainLayout;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.Setter;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @PageTitle("Info Cash")
-@Route(value = "info-cash", layout = MainLayout.class)
 @Uses(Icon.class)
 @Component
 @Scope("prototype")

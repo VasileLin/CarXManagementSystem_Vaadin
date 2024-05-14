@@ -15,7 +15,7 @@ import jakarta.annotation.security.RolesAllowed;
 @PageTitle("Reports")
 @Route(value = "report-view", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed({"ADMIN","MANAGER","CASHIER"})
+@RolesAllowed({"ADMIN","MANAGER"})
 public class ReportsView extends Composite<VerticalLayout> {
 
     private final VerticalLayout revenuesContent;

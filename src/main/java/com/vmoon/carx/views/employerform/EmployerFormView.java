@@ -31,6 +31,7 @@ import com.vmoon.carx.dto.RoleDto;
 import com.vmoon.carx.services.EmployerService;
 import com.vmoon.carx.services.RoleService;
 import com.vmoon.carx.utils.Notifications;
+import com.vmoon.carx.utils.SecurityUtils;
 import com.vmoon.carx.views.MainLayout;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.Getter;
@@ -188,7 +189,9 @@ public class EmployerFormView extends Composite<VerticalLayout> {
         layoutColumn2.add(address);
         layoutColumn2.add(hr);
         layoutColumn2.add(layoutRow);
-        layoutRow.add(saveButton);
+        if (SecurityUtils.isUserAdmin()){
+            layoutRow.add(saveButton);
+        }
         layoutRow.add(cancelButton);
     }
 

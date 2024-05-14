@@ -9,13 +9,14 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vmoon.carx.utils.SecurityUtils;
 import com.vmoon.carx.views.MainLayout;
 import jakarta.annotation.security.RolesAllowed;
 
 @PageTitle("Settings")
 @Route(value = "settings-view", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed({"ADMIN","MANAGER","CASHIER"})
+@RolesAllowed({"ADMIN","MANAGER"})
 public class SettingsView extends Composite<VerticalLayout> {
 
     private final VerticalLayout companyDataContent;
@@ -33,9 +34,14 @@ public class SettingsView extends Composite<VerticalLayout> {
 
         Tabs tabs = new Tabs();
         Tab tabCostOfGoods = new Tab("Cost of goods");
-        Tab tabCompanyData = new Tab("Company data");
         Tab tabBrandData = new Tab("Brand management");
-        tabs.add(tabCostOfGoods, tabCompanyData,tabBrandData);
+        Tab tabCompanyData = new Tab("Company data");
+
+        if (SecurityUtils.isUserAdmin()){
+            tabs.add(tabCostOfGoods, tabCompanyData,tabBrandData);
+        } else if (SecurityUtils.isUserManager()) {
+            tabs.add(tabCostOfGoods, tabBrandData);
+        }
 
 
         tabs.addSelectedChangeListener(event -> updateVisibleContent(tabs.getSelectedTab()));

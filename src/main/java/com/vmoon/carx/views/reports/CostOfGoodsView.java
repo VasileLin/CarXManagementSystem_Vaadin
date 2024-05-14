@@ -21,6 +21,7 @@ import com.vmoon.carx.services.GoodsService;
 import com.vmoon.carx.utils.Notifications;
 import jakarta.annotation.security.RolesAllowed;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -36,6 +37,7 @@ import static com.vmoon.carx.utils.ExcelWorkBooks.createCostsExcelWorkBook;
 
 @RolesAllowed({"ADMIN","MANAGER"})
 @Component
+@Scope("prototype")
 public class CostOfGoodsView extends Composite<VerticalLayout> {
 
     private final GoodsService goodsService;

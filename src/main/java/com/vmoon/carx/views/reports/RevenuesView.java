@@ -44,7 +44,7 @@ import static com.vmoon.carx.utils.ExcelWorkBooks.createTransactionsExcelWorkBoo
 @Uses(Icon.class)
 @Component
 @Scope("prototype")
-@RolesAllowed({"ADMIN","MANAGER","CASHIER"})
+@RolesAllowed({"ADMIN", "MANAGER", "CASHIER"})
 public class RevenuesView extends Composite<VerticalLayout> {
 
     private final CashService cashService;
@@ -66,13 +66,12 @@ public class RevenuesView extends Composite<VerticalLayout> {
     private void initializeCashReport() {
         HorizontalLayout layoutRow = new HorizontalLayout();
 
-        cashGrid = new Grid<>(CashGridDto.class,false);
+        cashGrid = new Grid<>(CashGridDto.class, false);
         cashGrid.setWidth("100%");
         cashGrid.setHeight("600px");
         cashGrid.getStyle().set("flex-grow", "0");
         cashGrid.addItemDoubleClickListener(item -> openInfoDialog(cashService.getCashByTransactionNo(item.getItem().getTransactionNo())));
         setCashGridSampleData(cashGrid);
-
 
         fromDatePicker = new DatePicker();
         fromDatePicker.addValueChangeListener(e -> cashGrid.getDataProvider().refreshAll());
@@ -175,7 +174,7 @@ public class RevenuesView extends Composite<VerticalLayout> {
                     Anchor downloadLink = new Anchor(resource, "");
                     downloadLink.getElement().setAttribute("download", true);
                     downloadLink.getElement().setAttribute("href", resource);
-                    downloadLink.getElement().setAttribute("style","display: none;");
+                    downloadLink.getElement().setAttribute("style", "display: none;");
 
                     UI.getCurrent().add(downloadLink);
                     downloadLink.getElement().callJsFunction("click");
@@ -183,11 +182,11 @@ public class RevenuesView extends Composite<VerticalLayout> {
                     Notifications.warningNotification("The requested file does not exist.").open();
                 }
             });
-            saveButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS,ButtonVariant.LUMO_SMALL);
+            saveButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
             return saveButton;
         })).setHeader("Actions");
 
-        grid.setColumnOrder(transactionColumn,dateColumn,priceColumn,statusColumn,receiptColumn);
+        grid.setColumnOrder(transactionColumn, dateColumn, priceColumn, statusColumn, receiptColumn);
 
 
         dataProvider = DataProvider.fromCallbacks(
@@ -198,10 +197,10 @@ public class RevenuesView extends Composite<VerticalLayout> {
                             query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
                     );
 
-                    Page<CashGridDto> page = cashService.allCashDate(pageRequest,fromDatePicker.getValue(),toDatePicker.getValue());
+                    Page<CashGridDto> page = cashService.allCashDate(pageRequest, fromDatePicker.getValue(), toDatePicker.getValue());
                     return page.stream();
                 },
-                query -> (int) cashService.countDateResult(fromDatePicker.getValue(),toDatePicker.getValue())
+                query -> (int) cashService.countDateResult(fromDatePicker.getValue(), toDatePicker.getValue())
         );
 
         grid.setDataProvider(dataProvider);
@@ -228,12 +227,12 @@ public class RevenuesView extends Composite<VerticalLayout> {
     private void configureExportButton(Button exportButton) {
         exportButton.addClickListener(event -> {
             String fileName = "transactions.xlsx";
-            StreamResource resource = new StreamResource(fileName, ()-> {
+            StreamResource resource = new StreamResource(fileName, () -> {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
                 List<CashGridDto> gridDtoList = cashGrid.getLazyDataView().getItems().toList();
 
-                if (gridDtoList.isEmpty()){
+                if (gridDtoList.isEmpty()) {
                     Notifications.warningNotification("Grid is empty!").open();
                 } else {
                     try (Workbook workbook = createTransactionsExcelWorkBook(gridDtoList)) {
@@ -249,7 +248,7 @@ public class RevenuesView extends Composite<VerticalLayout> {
             Anchor downloadLink = new Anchor(resource, "");
             downloadLink.getElement().setAttribute("download", true);
             downloadLink.getElement().setAttribute("href", resource);
-            downloadLink.getElement().setAttribute("style","display: none;");
+            downloadLink.getElement().setAttribute("style", "display: none;");
 
             UI.getCurrent().add(downloadLink);
             downloadLink.getElement().callJsFunction("click");

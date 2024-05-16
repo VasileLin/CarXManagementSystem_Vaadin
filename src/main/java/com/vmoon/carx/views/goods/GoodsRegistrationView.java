@@ -42,49 +42,39 @@ import java.util.List;
 @PageTitle("Goods Registration")
 @Route(value = "good-form", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed({"ADMIN","MANAGER"})
+@RolesAllowed({"ADMIN", "MANAGER"})
 public class GoodsRegistrationView extends Composite<VerticalLayout> {
 
     private final GoodsService goodsService;
     private final AcquisitionService acquisitionService;
     private final GoodsCategoryService categoryService;
     private final CarBrandService carBrandService;
-
     @Getter
     private final Button saveButton;
-
     @Getter
     private final Button cancelButton;
-
-    @Getter
-    BeanValidationBinder<GoodsDto> validationBinder;
-
     @Getter
     private final TextField nameTextField;
     @Getter
     private final MultiSelectComboBox<CarModelDto> carModelMultiSelect;
-
     @Getter
     private final NumberField costTextField;
     private final DatePicker purchaseDate;
-
     @Getter
     private final NumberField stockField;
-
-    @Setter
-    private GoodsDto goodDto;
-
     @Getter
     private final ComboBox<CarBrandDto> brandComboBox;
     @Getter
     private final ComboBox<GoodsCategoryDto> categoryComboBox;
-
-
+    @Getter
+    BeanValidationBinder<GoodsDto> validationBinder;
+    @Getter
+    H3 h3;
+    @Setter
+    private GoodsDto goodDto;
     @Setter
     private boolean updateFlag;
 
-    @Getter
-    H3 h3;
     public GoodsRegistrationView(GoodsService goodsService, AcquisitionService acquisitionService, GoodsCategoryService categoryService, CarBrandService carBrandService) {
         this.goodsService = goodsService;
         this.acquisitionService = acquisitionService;
@@ -119,7 +109,6 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
         brandComboBox.setPrefixComponent(new Icon(VaadinIcon.CAR));
         brandComboBox.addValueChangeListener(event -> getBrandModels());
         setCarBrandComboBoxData(brandComboBox);
-
 
         categoryComboBox = new ComboBox<>();
         categoryComboBox.setLabel("Select good category");
@@ -168,7 +157,7 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
         if (brandComboBox.getValue().getCarModels() != null) {
             List<CarModelDto> carModels = brandComboBox.getValue().getCarModels();
             carModelMultiSelect.setItems(carModels);
-            carModelMultiSelect.setItemLabelGenerator(CarModelDto::getModel);
+            carModelMultiSelect.setItemLabelGenerator(carModel -> carModel.getModel() + "-" + carModel.getYear());
         }
     }
 
@@ -186,21 +175,21 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
         validationBinder = new BeanValidationBinder<>(GoodsDto.class);
 
         validationBinder.forField(nameTextField)
-                .withValidator(new BeanValidator(GoodsDto.class,"costName"))
-                .bind(GoodsDto::getCostName,GoodsDto::setCostName);
+                .withValidator(new BeanValidator(GoodsDto.class, "costName"))
+                .bind(GoodsDto::getCostName, GoodsDto::setCostName);
 
         validationBinder.forField(costTextField)
-                .withValidator(new BeanValidator(GoodsDto.class,"cost"))
+                .withValidator(new BeanValidator(GoodsDto.class, "cost"))
                 .asRequired("Enter a good cost")
-                .bind(GoodsDto::getCost,GoodsDto::setCost);
+                .bind(GoodsDto::getCost, GoodsDto::setCost);
 
         validationBinder.forField(purchaseDate)
-                .withValidator(new BeanValidator(GoodsDto.class,"date"))
+                .withValidator(new BeanValidator(GoodsDto.class, "date"))
                 .asRequired("Enter a good purchase date")
-                .bind(GoodsDto::getDate,GoodsDto::setDate);
+                .bind(GoodsDto::getDate, GoodsDto::setDate);
 
         validationBinder.forField(stockField)
-                .withValidator(new BeanValidator(GoodsDto.class,"stock"))
+                .withValidator(new BeanValidator(GoodsDto.class, "stock"))
                 .asRequired("Stock number is required")
                 .bind(
                         goodsDto -> (double) goodsDto.getStock(),
@@ -208,24 +197,24 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
                 );
 
         validationBinder.forField(categoryComboBox)
-                .withValidator(new BeanValidator(GoodsDto.class,"category"))
-                .bind(GoodsDto::getCategory,GoodsDto::setCategory);
+                .withValidator(new BeanValidator(GoodsDto.class, "category"))
+                .bind(GoodsDto::getCategory, GoodsDto::setCategory);
 
         validationBinder.forField(brandComboBox)
-                .withValidator(new BeanValidator(GoodsDto.class,"carBrand"))
-                .bind(GoodsDto::getCarBrand,GoodsDto::setCarBrand);
+                .withValidator(new BeanValidator(GoodsDto.class, "carBrand"))
+                .bind(GoodsDto::getCarBrand, GoodsDto::setCarBrand);
 
         validationBinder.forField(carModelMultiSelect)
-                .withValidator(new BeanValidator(GoodsDto.class,"compatibleModels"))
+                .withValidator(new BeanValidator(GoodsDto.class, "compatibleModels"))
                 .asRequired("Select a good compatible models")
-                .bind(GoodsDto::getCompatibleModels,GoodsDto::setCompatibleModels);
+                .bind(GoodsDto::getCompatibleModels, GoodsDto::setCompatibleModels);
 
     }
 
 
     public void saveGood() {
         if (validationBinder.validate().isOk()) {
-           goodDto = GoodsDto.builder()
+            goodDto = GoodsDto.builder()
                     .costName(nameTextField.getValue())
                     .cost(costTextField.getValue())
                     .date(purchaseDate.getValue())
@@ -241,7 +230,7 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
                 goodsService.saveGood(savedGood);
                 Notifications.successNotification("Good successfully " + (updateFlag ? "updated" : "added")).open();
             } catch (Exception e) {
-                Notifications.errorNotification("Error saving good :"+ e).open();
+                Notifications.errorNotification("Error saving good :" + e).open();
             }
 
         } else {
@@ -266,7 +255,7 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
         nameTextField.setValue(goodDto.getCostName());
         costTextField.setValue(goodDto.getCost());
         purchaseDate.setValue(goodDto.getDate());
-        stockField.setValue((double)goodDto.getStock());
+        stockField.setValue((double) goodDto.getStock());
         brandComboBox.setItems(carBrandService.allBrands());
         brandComboBox.setValue(goodDto.getCarBrand());
         carModelMultiSelect.setItems(goodDto.getCompatibleModels());

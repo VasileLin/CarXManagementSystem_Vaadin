@@ -42,19 +42,20 @@ public class UserFormView extends Composite<VerticalLayout> {
 
     private final RoleService roleService;
     private final UserService userService;
+    private UserDto updateUserDto;
     @Getter
     BeanValidationBinder<UserDto> validationBinder;
     TextField usernameTextField;
     @Getter
     PasswordField passwordTextField;
+    @Getter
     MultiSelectComboBox<RoleDto> userRoleComboBox;
-    private UserDto updateUserDto;
-
     @Getter
     H3 h3;
-
     @Setter
     private boolean updateFlag;
+    @Setter
+    private boolean isAdminFlag;
     @Getter
     Button saveButton;
     @Getter
@@ -139,8 +140,13 @@ public class UserFormView extends Composite<VerticalLayout> {
                     userService.add(getUserToSave());
                     Notifications.successNotification("User added successfully!").open();
                 } else {
-                    userService.update(getUserToUpdate());
-                    Notifications.successNotification("User updated successfully!").open();
+
+                    if (isAdminFlag) {
+                        userService.update(getUserToUpdate());
+                        Notifications.successNotification("User updated successfully!").open();
+                    }else {
+                        userService.updateSelf(getUserToUpdate());
+                    }
                 }
             }
         } catch (Exception e) {

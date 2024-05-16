@@ -37,17 +37,17 @@ import java.util.stream.Collectors;
 
 @PageTitle("Goods")
 @Uses(Icon.class)
-@RolesAllowed({"ADMIN","MANAGER"})
+@RolesAllowed({"ADMIN", "MANAGER"})
 @Component
 @Scope("prototype")
-public class CostOfGoodsContent  extends Composite<VerticalLayout> {
+public class CostOfGoodsContent extends Composite<VerticalLayout> {
 
-    Grid<GoodsDto> goodsDtoGrid;
-    Dialog dialog;
     private final GoodsService goodsService;
     private final AcquisitionService acquisitionService;
     private final GoodsCategoryService goodsCategoryService;
     private final CarBrandService carBrandService;
+    Grid<GoodsDto> goodsDtoGrid;
+    Dialog dialog;
     GoodsRegistrationView goodsRegistrationView;
     VerticalLayout categoryLayout;
     private GoodsCategoryDto selectedCategory = null;
@@ -111,14 +111,11 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
         addCostButton.getStyle().set("margin-top", "50px");
         addCostButton.setPrefixComponent(new Icon(VaadinIcon.PLUS_CIRCLE));
         addCostButton.addClickListener(e -> openAddDialog());
-
-
-        getContent().add(flexLayout,addCostButton);
+        getContent().add(flexLayout, addCostButton);
 
     }
 
     private void searchGoodsByCategoryAndBrand(String searchText) {
-
         if (searchText.isEmpty() || (selectedCategory == null || selectedBrand == null)) {
             Notifications.warningNotification("Select car brand from category and type searched good or search textbox is empty").open();
         } else {
@@ -133,11 +130,10 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
                         Page<GoodsDto> page = goodsService.searchGoods(selectedCategory.getId(), selectedBrand.getId(), searchText, pageRequest);
                         return page.stream();
                     },
-                    query -> (int) goodsService.countSearchResults(selectedCategory.getId(), selectedBrand.getId(),searchText)
+                    query -> (int) goodsService.countSearchResults(selectedCategory.getId(), selectedBrand.getId(), searchText)
             );
             goodsDtoGrid.setDataProvider(dataProvider);
         }
-
     }
 
 
@@ -204,24 +200,20 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
                             query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
                     );
 
-                    Page<GoodsDto> page = goodsService.fetchGoodsForCategoryAndBrand(categoryId,brandId,pageRequest);
+                    Page<GoodsDto> page = goodsService.fetchGoodsForCategoryAndBrand(categoryId, brandId, pageRequest);
                     return page.stream();
                 },
-                query -> (int) goodsService.countSearchResults(categoryId,brandId)
+                query -> (int) goodsService.countSearchResults(categoryId, brandId)
         );
-
         goodsDtoGrid.setDataProvider(dataProvider);
     }
 
 
-
     private void openAddDialog() {
-
-        goodsRegistrationView = new GoodsRegistrationView(goodsService,acquisitionService,goodsCategoryService,carBrandService);
-
+        goodsRegistrationView = new GoodsRegistrationView(goodsService, acquisitionService, goodsCategoryService, carBrandService);
+        goodsRegistrationView.getCancelButton().addClickListener(e -> dialog.close());
         dialog = new Dialog(goodsRegistrationView);
 
-        goodsRegistrationView.getCancelButton().addClickListener(e -> dialog.close());
         goodsRegistrationView.getSaveButton().addClickListener(e -> {
             try {
                 goodsRegistrationView.saveGood();
@@ -233,7 +225,6 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
 
         });
 
-
         dialog.setWidth("auto");
         dialog.setHeight("auto");
         dialog.setDraggable(true);
@@ -242,7 +233,6 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
 
 
     private void setGridSampleData(Grid<GoodsDto> grid) {
-
         Grid.Column<GoodsDto> nameColumn = grid.addColumn(GoodsDto::getCostName)
                 .setHeader("Name")
                 .setResizable(true)
@@ -293,13 +283,11 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
             openEditDialog(goodDto);
         });
 
-
         grid.setColumnOrder(nameColumn, costColumn, stockColumn, dateColumn, modelColumn, actionColumn);
-
     }
 
     private void openEditDialog(GoodsDto goodDto) {
-        goodsRegistrationView = new GoodsRegistrationView(goodsService,acquisitionService,goodsCategoryService,carBrandService);
+        goodsRegistrationView = new GoodsRegistrationView(goodsService, acquisitionService, goodsCategoryService, carBrandService);
 
         goodsRegistrationView.getH3().setText("Update Good " + goodDto.getCostName());
         goodsRegistrationView.setUpdateCustomer(goodDto);
@@ -321,22 +309,20 @@ public class CostOfGoodsContent  extends Composite<VerticalLayout> {
     }
 
     private void openAcquisitionDialog(GoodsDto goodDto) {
-        goodsRegistrationView = new GoodsRegistrationView(goodsService,acquisitionService,goodsCategoryService,carBrandService);
-
+        goodsRegistrationView = new GoodsRegistrationView(goodsService, acquisitionService, goodsCategoryService, carBrandService);
         goodsRegistrationView.getH3().setText("Purchase good : " + goodDto.getCostName());
         goodsRegistrationView.getCostTextField().setReadOnly(true);
         goodsRegistrationView.getNameTextField().setReadOnly(true);
         goodsRegistrationView.getBrandComboBox().setReadOnly(true);
         goodsRegistrationView.getCategoryComboBox().setReadOnly(true);
         goodsRegistrationView.getCarModelMultiSelect().setReadOnly(true);
-
         goodsRegistrationView.setUpdateCustomer(goodDto);
+        goodsRegistrationView.getCancelButton().addClickListener(event -> dialog.close());
         int actualStock = goodDto.getStock();
 
-        goodsRegistrationView.getCancelButton().addClickListener(event -> dialog.close());
 
         goodsRegistrationView.getSaveButton().addClickListener(event -> {
-            double setStock =  goodsRegistrationView.getStockField().getValue();
+            double setStock = goodsRegistrationView.getStockField().getValue();
             acquisitionService.saveAcquisition(GoodsMapper.toAcquisitionDto(goodDto));
 
             goodsRegistrationView.getStockField().setValue(actualStock + setStock);

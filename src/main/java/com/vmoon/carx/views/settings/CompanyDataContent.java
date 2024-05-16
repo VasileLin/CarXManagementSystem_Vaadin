@@ -25,16 +25,15 @@ import java.util.List;
 
 @PageTitle("Company Data")
 @Uses(Icon.class)
-@RolesAllowed({"ADMIN","MANAGER"})
+@RolesAllowed({"ADMIN", "MANAGER"})
 @Component
 @Scope("prototype")
 public class CompanyDataContent extends Composite<VerticalLayout> {
 
+    private final CompanyService companyService;
     TextField nameTextField;
     TextField addressField;
     TextField ibanField;
-
-    private final CompanyService companyService;
 
     public CompanyDataContent(CompanyService companyService) {
         this.companyService = companyService;
@@ -87,7 +86,6 @@ public class CompanyDataContent extends Composite<VerticalLayout> {
         formLayout2Col.add(ibanField);
         layoutColumn2.add(layoutRow);
         layoutRow.add(saveButton);
-
     }
 
     private void initializeCompanyData() {

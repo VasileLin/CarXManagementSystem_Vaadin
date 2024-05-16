@@ -15,26 +15,25 @@ import jakarta.annotation.security.RolesAllowed;
 @PageTitle("Reports")
 @Route(value = "report-view", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed({"ADMIN","MANAGER"})
+@RolesAllowed({"ADMIN", "MANAGER"})
 public class ReportsView extends Composite<VerticalLayout> {
 
     private final VerticalLayout revenuesContent;
     private final VerticalLayout costsContent;
-
 
     public ReportsView(CostOfGoodsView costOfGoodsView, RevenuesView revenuesView) {
 
         Tabs tabs = new Tabs();
         Tab tabRevenuesReport = new Tab("Revenues");
         Tab tabCashReport = new Tab("Costs");
-        tabs.add(tabRevenuesReport,tabCashReport);
+        tabs.add(tabRevenuesReport, tabCashReport);
 
         this.revenuesContent = revenuesView.getContent();
         this.costsContent = costOfGoodsView.getContent();
 
         tabs.addSelectedChangeListener(event -> updateVisibleContent(tabs.getSelectedTab()));
 
-        getContent().add(tabs, revenuesContent,costsContent);
+        getContent().add(tabs, revenuesContent, costsContent);
 
         updateVisibleContent(tabRevenuesReport);
 
@@ -51,14 +50,6 @@ public class ReportsView extends Composite<VerticalLayout> {
             costsContent.setVisible(true);
         }
     }
-
-
-
-
-
-
-
-
 
 
 }

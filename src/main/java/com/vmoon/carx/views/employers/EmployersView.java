@@ -49,19 +49,18 @@ import static com.vmoon.carx.utils.ExcelWorkBooks.createEmployersExcelWorkBook;
 @PageTitle("Employers")
 @Route(value = "employers-view", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed({"ADMIN","MANAGER"})
+@RolesAllowed({"ADMIN", "MANAGER"})
 public class EmployersView extends Composite<VerticalLayout> {
 
-    @Getter
-    private Dialog dialog;
     private final EmployerService employerService;
     private final RoleService roleService;
     DataProvider<EmployerDto, Void> employersDataProvider;
-
     @Getter
     Grid<EmployerDto> employersGrid;
     Button exportButton;
     TextField searchEmployersField;
+    @Getter
+    private Dialog dialog;
 
     public EmployersView(EmployerService employerService, RoleService roleService) {
 
@@ -84,7 +83,6 @@ public class EmployersView extends Composite<VerticalLayout> {
         addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addButton.setPrefixComponent(new Icon(VaadinIcon.PLUS));
         addButton.addClickListener(e -> UI.getCurrent().navigate("employer-form"));
-
         HorizontalLayout layoutRow2 = new HorizontalLayout();
 
         exportButton = new Button();
@@ -119,7 +117,7 @@ public class EmployersView extends Composite<VerticalLayout> {
         getContent().add(employersGrid);
         getContent().add(hr);
         getContent().add(layoutRow);
-        if (SecurityUtils.isUserAdmin()){
+        if (SecurityUtils.isUserAdmin()) {
             layoutRow.add(addButton);
         }
         layoutRow.add(layoutRow2);
@@ -141,10 +139,10 @@ public class EmployersView extends Composite<VerticalLayout> {
                                 query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
                         );
 
-                        Page<EmployerDto> page = employerService.searchEmployers(value, pageRequest,false);
+                        Page<EmployerDto> page = employerService.searchEmployers(value, pageRequest, false);
                         return page.stream();
                     },
-                    query -> (int) employerService.countSearchResults(value,false)
+                    query -> (int) employerService.countSearchResults(value, false)
             );
 
             employersGrid.setDataProvider(dataProvider);
@@ -198,20 +196,19 @@ public class EmployersView extends Composite<VerticalLayout> {
         if (SecurityUtils.isUserAdmin()) {
             Grid.Column<EmployerDto> deleteColumn = employerDtoGrid.addColumn(new ComponentRenderer<>(employerDto -> {
                 Button deleteButton = new Button(new Icon(VaadinIcon.TRASH), buttonClickEvent -> confirmDeleteDialog(employerDto));
-                deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_SMALL);
+                deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
                 return deleteButton;
             })).setHeader("Actions");
 
-            employerDtoGrid.setColumnOrder(fullNameColumn, dateOfBirthColumn, addressColumn, emailColumn, phoneColumn, roleColumn,deleteColumn);
+            employerDtoGrid.setColumnOrder(fullNameColumn, dateOfBirthColumn, addressColumn, emailColumn, phoneColumn, roleColumn, deleteColumn);
         } else {
             employerDtoGrid.setColumnOrder(fullNameColumn, dateOfBirthColumn, addressColumn, emailColumn, phoneColumn, roleColumn);
         }
 
         employerDtoGrid.addItemDoubleClickListener(event -> {
-               EmployerDto employerDto = event.getItem();
-               openEditDialog(employerDto);
+            EmployerDto employerDto = event.getItem();
+            openEditDialog(employerDto);
         });
-
 
 
         employersDataProvider = DataProvider.fromCallbacks(
@@ -232,7 +229,7 @@ public class EmployersView extends Composite<VerticalLayout> {
 
     private void confirmDeleteDialog(EmployerDto employerDto) {
         ConfirmDialog dialog = new ConfirmDialog();
-        dialog.setHeader("Employer "+ employerDto.getFullName());
+        dialog.setHeader("Employer " + employerDto.getFullName());
         dialog.setText("Are you sure you want to delete this employer?");
         dialog.setCancelable(true);
 
@@ -253,7 +250,7 @@ public class EmployersView extends Composite<VerticalLayout> {
 
         EmployerFormView employerFormView = new EmployerFormView(roleService, employerService);
         employerFormView.setUpdateFlag(true);
-        employerFormView.getH3().setText("Update Employer "+ employerDto.getFullName());
+        employerFormView.getH3().setText("Update Employer " + employerDto.getFullName());
         employerFormView.setUpdateEmployer(employerDto);
 
         employerFormView.getCancelButton().addClickListener(event -> dialog.close());
@@ -273,7 +270,7 @@ public class EmployersView extends Composite<VerticalLayout> {
     private void configureExportButton(Button exportButton) {
         exportButton.addClickListener(event -> {
             String fileName = "employers.xlsx";
-            StreamResource resource = new StreamResource(fileName, ()-> {
+            StreamResource resource = new StreamResource(fileName, () -> {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
                 try (Workbook workbook = createEmployersExcelWorkBook(employersGrid.getLazyDataView().getItems().toList())) {
@@ -289,7 +286,7 @@ public class EmployersView extends Composite<VerticalLayout> {
             Anchor downloadLink = new Anchor(resource, "");
             downloadLink.getElement().setAttribute("download", true);
             downloadLink.getElement().setAttribute("href", resource);
-            downloadLink.getElement().setAttribute("style","display: none;");
+            downloadLink.getElement().setAttribute("style", "display: none;");
 
             UI.getCurrent().add(downloadLink);
             downloadLink.getElement().callJsFunction("click");

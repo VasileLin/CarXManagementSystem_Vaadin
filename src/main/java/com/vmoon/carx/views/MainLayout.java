@@ -4,6 +4,7 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.menubar.MenuBar;
@@ -16,7 +17,9 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import com.vmoon.carx.entities.UserEntity;
+import com.vmoon.carx.mappers.UserMapper;
 import com.vmoon.carx.security.AuthenticatedUser;
+import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.views.cash.CashView;
 import com.vmoon.carx.views.customers.CustomersView;
 import com.vmoon.carx.views.employers.EmployersView;
@@ -26,9 +29,11 @@ import com.vmoon.carx.views.recovery.DeletedUsersView;
 import com.vmoon.carx.views.reports.ReportsView;
 import com.vmoon.carx.views.service.ServiceView;
 import com.vmoon.carx.views.settings.SettingsView;
+import com.vmoon.carx.views.users.UserFormView;
 import com.vmoon.carx.views.users.UsersView;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -38,12 +43,13 @@ public class MainLayout extends AppLayout {
 
     private final AuthenticatedUser authenticatedUser;
     private final AccessAnnotationChecker accessChecker;
-
+    private final UserFormView userFormView;
     private H2 viewTitle;
 
-    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
+    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker, UserFormView userFormView) {
         this.authenticatedUser = authenticatedUser;
         this.accessChecker = accessChecker;
+        this.userFormView = userFormView;
         setPrimarySection(Section.DRAWER);
         addDrawerContent();
         addHeaderContent();
@@ -73,9 +79,7 @@ public class MainLayout extends AppLayout {
         headerLayout.setSpacing(true);
 
         Header header = new Header(headerLayout);
-
         Scroller scroller = new Scroller(createNavigation());
-
         addToDrawer(header, scroller, createFooter());
     }
 
@@ -127,35 +131,64 @@ public class MainLayout extends AppLayout {
 
     private Footer createFooter() {
         Footer layout = new Footer();
-
         Optional<UserEntity> maybeUser = authenticatedUser.get();
 
-            if (maybeUser.isPresent()) {
+        if (maybeUser.isPresent()) {
+            UserEntity user = maybeUser.get();
+            Avatar avatar = new Avatar("User");
+            avatar.setThemeName("xsmall");
+            avatar.getElement().setAttribute("tabindex", "-1");
 
-                UserEntity user = maybeUser.get();
-                Avatar avatar = new Avatar("User");
-                avatar.setThemeName("xsmall");
-                avatar.getElement().setAttribute("tabindex", "-1");
+            MenuBar userMenu = new MenuBar();
+            userMenu.setThemeName("tertiary-inline contrast");
 
-                MenuBar userMenu = new MenuBar();
-                userMenu.setThemeName("tertiary-inline contrast");
+            MenuItem userName = userMenu.addItem("");
+            Div div = new Div();
+            div.add(avatar);
+            div.add(user.getUsername());
+            div.add(new Icon("lumo", "dropdown"));
+            div.getElement().getStyle().set("display", "flex");
+            div.getElement().getStyle().set("align-items", "center");
+            div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
+            userName.add(div);
+            userName.getSubMenu().addItem("Profile Settings", e -> openSettingsDialog());
+            userName.getSubMenu().addItem("Sign out", e -> authenticatedUser.logout());
 
-                MenuItem userName = userMenu.addItem("");
-                Div div = new Div();
-                div.add(avatar);
-                div.add(user.getUsername());
-                div.add(new Icon("lumo", "dropdown"));
-                div.getElement().getStyle().set("display", "flex");
-                div.getElement().getStyle().set("align-items", "center");
-                div.getElement().getStyle().set("gap", "var(--lumo-space-s)");
-                userName.add(div);
-                userName.getSubMenu().addItem("Sign out", e -> authenticatedUser.logout());
-
-                layout.add(userMenu);
-            }
+            layout.add(userMenu);
+        }
 
 
         return layout;
+    }
+
+    private void openSettingsDialog() {
+        Dialog dialog = new Dialog(userFormView);
+        userFormView.setUpdateUser(UserMapper.mapToUserDto(Objects.requireNonNull(authenticatedUser.get().orElse(null))));
+        userFormView.setUpdateFlag(true);
+        userFormView.getH3().setText("My Profile");
+        userFormView.getSaveButton().setText("Update");
+        userFormView.getPasswordTextField().setReadOnly(false);
+        userFormView.getPasswordTextField().setRevealButtonVisible(true);
+        userFormView.getPasswordTextField().setValue("");
+        userFormView.getUserRoleComboBox().setReadOnly(true);
+
+        userFormView.getSaveButton().addClickListener(event -> {
+            if (userFormView.getValidationBinder().validate().isOk()) {
+                userFormView.saveUser();
+                dialog.close();
+                authenticatedUser.logout();
+                Notifications.successNotification("Data successfully updated,login with updated credentials!");
+            } else {
+                Notifications.warningNotification("Complete all fields!!!");
+            }
+
+        });
+
+        userFormView.getCancelButton().addClickListener(buttonClickEvent -> dialog.close());
+        dialog.setWidth("auto");
+        dialog.setHeight("auto");
+        dialog.setDraggable(true);
+        dialog.open();
     }
 
     @Override

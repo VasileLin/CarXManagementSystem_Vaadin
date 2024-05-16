@@ -40,8 +40,7 @@ public class DeletedUsersView extends Composite<VerticalLayout> {
 
     private void createUI() {
         VerticalLayout layoutColumn2 = new VerticalLayout();
-
-        usersGrid = new Grid<>(UserDto.class,false);
+        usersGrid = new Grid<>(UserDto.class, false);
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         layoutColumn2.setWidthFull();
@@ -81,13 +80,11 @@ public class DeletedUsersView extends Composite<VerticalLayout> {
 
         Grid.Column<UserDto> recoveryColumn = usersGrid.addColumn(new ComponentRenderer<>(userDto -> {
             Button deleteButton = new Button(new Icon(VaadinIcon.RECYCLE), buttonClickEvent -> confirmRecoveryDialog(userDto));
-            deleteButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS,ButtonVariant.LUMO_SMALL);
+            deleteButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
             return deleteButton;
         })).setHeader("Actions");
 
-
-        usersGrid.setColumnOrder(idColumn,usernameColumn,rolesColumn,recoveryColumn);
-
+        usersGrid.setColumnOrder(idColumn, usernameColumn, rolesColumn, recoveryColumn);
 
         DataProvider<UserDto, Void> dataProvider = DataProvider.fromCallbacks(
                 query -> {
@@ -102,13 +99,12 @@ public class DeletedUsersView extends Composite<VerticalLayout> {
                 },
                 query -> userService.countDeleted()
         );
-
         usersGrid.setDataProvider(dataProvider);
     }
 
     private void confirmRecoveryDialog(UserDto userDto) {
         ConfirmDialog dialog = new ConfirmDialog();
-        dialog.setHeader("User "+ userDto.getUsername());
+        dialog.setHeader("User " + userDto.getUsername());
         dialog.setText("Are you sure you want to recover this user?");
         dialog.setCancelable(true);
 
@@ -116,7 +112,6 @@ public class DeletedUsersView extends Composite<VerticalLayout> {
         dialog.setConfirmButtonTheme("success primary");
         dialog.addConfirmListener(event -> recoverUser(userDto));
         dialog.open();
-
     }
 
     private void recoverUser(UserDto userDto) {

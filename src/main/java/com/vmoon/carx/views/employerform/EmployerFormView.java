@@ -40,34 +40,27 @@ import lombok.Setter;
 @PageTitle("Employer Form")
 @Route(value = "employer-form", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed({"ADMIN","MANAGER"})
+@RolesAllowed({"ADMIN", "MANAGER"})
 public class EmployerFormView extends Composite<VerticalLayout> {
+    private final RoleService roleService;
+    private final EmployerService employerService;
     TextField fullName;
     DatePicker dateOfBirthPicker;
     TextField phoneNumber;
     Select<RoleDto> roleSelect;
     EmailField emailField;
     TextArea address;
-
     @Getter
     Button saveButton;
-
     @Getter
     Button cancelButton;
-
     @Getter
     H3 h3;
     BeanValidationBinder<EmployerDto> validationBinder;
-
     @Getter
     EmployerDto employerDto;
-
     @Setter
     boolean updateFlag;
-
-    private final RoleService roleService;
-    private final EmployerService employerService;
-
 
 
     public EmployerFormView(RoleService roleService, EmployerService employerService) {
@@ -76,36 +69,34 @@ public class EmployerFormView extends Composite<VerticalLayout> {
 
         vaadinUI();
         fieldsValidation();
-
-
     }
 
     private void fieldsValidation() {
         validationBinder = new BeanValidationBinder<>(EmployerDto.class);
 
         validationBinder.forField(fullName)
-                .withValidator(new BeanValidator(EmployerDto.class,"fullName"))
-                .bind(EmployerDto::getFullName,EmployerDto::setFullName);
+                .withValidator(new BeanValidator(EmployerDto.class, "fullName"))
+                .bind(EmployerDto::getFullName, EmployerDto::setFullName);
 
         validationBinder.forField(emailField)
-                .withValidator(new BeanValidator(EmployerDto.class,"email"))
-                .bind(EmployerDto::getEmail,EmployerDto::setEmail);
+                .withValidator(new BeanValidator(EmployerDto.class, "email"))
+                .bind(EmployerDto::getEmail, EmployerDto::setEmail);
 
         validationBinder.forField(address)
-                .withValidator(new BeanValidator(EmployerDto.class,"address"))
-                .bind(EmployerDto::getAddress,EmployerDto::setAddress);
+                .withValidator(new BeanValidator(EmployerDto.class, "address"))
+                .bind(EmployerDto::getAddress, EmployerDto::setAddress);
 
         validationBinder.forField(roleSelect)
-                .withValidator(new BeanValidator(EmployerDto.class,"role"))
-                .bind(EmployerDto::getRole,EmployerDto::setRole);
+                .withValidator(new BeanValidator(EmployerDto.class, "role"))
+                .bind(EmployerDto::getRole, EmployerDto::setRole);
 
         validationBinder.forField(dateOfBirthPicker)
-                .withValidator(new BeanValidator(EmployerDto.class,"dateOfBirth"))
-                .bind(EmployerDto::getDateOfBirth,EmployerDto::setDateOfBirth);
+                .withValidator(new BeanValidator(EmployerDto.class, "dateOfBirth"))
+                .bind(EmployerDto::getDateOfBirth, EmployerDto::setDateOfBirth);
 
         validationBinder.forField(phoneNumber)
-                .withValidator( new RegexpValidator("Enter an valid phone number","^(\\+\\d{1,2}\\s?)?1?\\-?\\.?\\s?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"))
-                .bind(EmployerDto::getPhone,EmployerDto::setPhone);
+                .withValidator(new RegexpValidator("Enter an valid phone number", "^(\\+\\d{1,2}\\s?)?1?\\-?\\.?\\s?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"))
+                .bind(EmployerDto::getPhone, EmployerDto::setPhone);
 
     }
 
@@ -132,14 +123,12 @@ public class EmployerFormView extends Composite<VerticalLayout> {
         setSelectSampleData(roleSelect);
         roleSelect.setPrefixComponent(new Icon(VaadinIcon.USER_CHECK));
 
-
         emailField = new EmailField();
         emailField.setLabel("Email");
         emailField.setPrefixComponent(new Icon(VaadinIcon.MAILBOX));
 
         address = new TextArea();
         address.setPrefixComponent(new Icon(VaadinIcon.USER_CARD));
-
 
         FormLayout formLayout2Col = new FormLayout();
         Hr hr = new Hr();
@@ -165,7 +154,6 @@ public class EmployerFormView extends Composite<VerticalLayout> {
         h3.setWidth("100%");
 
         formLayout2Col.setWidth("100%");
-
         address.setLabel("Address");
         address.setWidth("100%");
         layoutRow.addClassName(Gap.MEDIUM);
@@ -189,7 +177,7 @@ public class EmployerFormView extends Composite<VerticalLayout> {
         layoutColumn2.add(address);
         layoutColumn2.add(hr);
         layoutColumn2.add(layoutRow);
-        if (SecurityUtils.isUserAdmin()){
+        if (SecurityUtils.isUserAdmin()) {
             layoutRow.add(saveButton);
         }
         layoutRow.add(cancelButton);

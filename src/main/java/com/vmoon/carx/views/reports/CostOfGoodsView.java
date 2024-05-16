@@ -35,7 +35,7 @@ import java.time.LocalDate;
 import static com.vmoon.carx.utils.ExcelWorkBooks.createCostsExcelWorkBook;
 
 
-@RolesAllowed({"ADMIN","MANAGER"})
+@RolesAllowed({"ADMIN", "MANAGER"})
 @Component
 @Scope("prototype")
 public class CostOfGoodsView extends Composite<VerticalLayout> {
@@ -53,8 +53,7 @@ public class CostOfGoodsView extends Composite<VerticalLayout> {
 
     private void initializeCostsReport() {
         HorizontalLayout layoutRow = new HorizontalLayout();
-        goodsGrid = new Grid<>(GoodsDto.class,false);
-
+        goodsGrid = new Grid<>(GoodsDto.class, false);
 
         fromGoodsDatePicker = new DatePicker();
         fromGoodsDatePicker.addValueChangeListener(e -> goodsGrid.getDataProvider().refreshAll());
@@ -127,7 +126,7 @@ public class CostOfGoodsView extends Composite<VerticalLayout> {
                 .setSortable(true)
                 .setSortProperty("stock");
 
-        goodsGrid.setColumnOrder(nameColumn,costColumn,dateColumn,statusColumn);
+        goodsGrid.setColumnOrder(nameColumn, costColumn, dateColumn, statusColumn);
 
         DataProvider<GoodsDto, Void> dataProvider = DataProvider.fromCallbacks(
                 query -> {
@@ -136,22 +135,20 @@ public class CostOfGoodsView extends Composite<VerticalLayout> {
                             query.getPageSize(),
                             query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
                     );
-
-                    Page<GoodsDto> page = goodsService.allGoodsDate(pageRequest,fromGoodsDatePicker.getValue(),toGoodsDatePicker.getValue());
+                    Page<GoodsDto> page = goodsService.allGoodsDate(pageRequest, fromGoodsDatePicker.getValue(), toGoodsDatePicker.getValue());
                     return page.stream();
                 },
-                query -> (int) goodsService.countDateResult(fromGoodsDatePicker.getValue(),toGoodsDatePicker.getValue())
+                query -> (int) goodsService.countDateResult(fromGoodsDatePicker.getValue(), toGoodsDatePicker.getValue())
         );
 
         goodsGrid.setDataProvider(dataProvider);
     }
 
 
-
     private void configureCostsExportButton(Button exportButton) {
         exportButton.addClickListener(event -> {
             String filename = "costs.xlsx";
-            StreamResource resource = new StreamResource(filename, ()-> {
+            StreamResource resource = new StreamResource(filename, () -> {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
                 try (Workbook workbook = createCostsExcelWorkBook(goodsGrid.getLazyDataView().getItems().toList())) {
@@ -166,7 +163,7 @@ public class CostOfGoodsView extends Composite<VerticalLayout> {
             Anchor downloadLink = new Anchor(resource, "");
             downloadLink.getElement().setAttribute("download", true);
             downloadLink.getElement().setAttribute("href", resource);
-            downloadLink.getElement().setAttribute("style","display: none;");
+            downloadLink.getElement().setAttribute("style", "display: none;");
 
             UI.getCurrent().add(downloadLink);
             downloadLink.getElement().callJsFunction("click");

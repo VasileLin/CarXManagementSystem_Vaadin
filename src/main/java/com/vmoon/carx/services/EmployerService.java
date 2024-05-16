@@ -7,10 +7,17 @@ import org.springframework.data.domain.Pageable;
 
 public interface EmployerService {
 
-    @NonNull Page<EmployerDto> allEmployers(@NonNull Pageable pageable);
-    @NonNull Page<EmployerDto> allDeletedEmployers(@NonNull Pageable pageable);
+    @NonNull
+    Page<EmployerDto> allEmployers(@NonNull Pageable pageable);
+
+    @NonNull
+    Page<EmployerDto> allDeletedEmployers(@NonNull Pageable pageable);
+
     void saveEmployer(EmployerDto employee);
+
     long count(boolean isDeleted);
-    Page<EmployerDto> searchEmployers(String value, Pageable pageable,boolean isDeleted);
-    long countSearchResults(String text,boolean isDeleted);
+
+    Page<EmployerDto> searchEmployers(String value, Pageable pageable, boolean isDeleted);
+
+    long countSearchResults(String text, boolean isDeleted);
 }

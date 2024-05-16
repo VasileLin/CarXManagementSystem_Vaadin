@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 @Uses(Icon.class)
 @Component
 @Scope("prototype")
-@RolesAllowed({"ADMIN","MANAGER","CASHIER"})
+@RolesAllowed({"ADMIN", "MANAGER", "CASHIER"})
 public class InfoCashView extends Composite<VerticalLayout> {
 
     Grid<ServiceDto> servicesGrid;
@@ -50,8 +50,8 @@ public class InfoCashView extends Composite<VerticalLayout> {
         transactionTextField = new TextField();
         datePicker = new DatePicker();
         totalPriceTextField = new NumberField();
-        servicesGrid = new Grid<>(ServiceDto.class,false);
-        goodsGrid = new Grid<>(GoodsDto.class,false);
+        servicesGrid = new Grid<>(ServiceDto.class, false);
+        goodsGrid = new Grid<>(GoodsDto.class, false);
         infoTextArea = new TextArea();
 
         customerTextField = new TextField();
@@ -75,7 +75,7 @@ public class InfoCashView extends Composite<VerticalLayout> {
         layoutColumn2.setJustifyContentMode(JustifyContentMode.START);
         layoutColumn2.setAlignItems(Alignment.CENTER);
         formLayout3Col.setWidth("100%");
-        formLayout3Col.setResponsiveSteps(new ResponsiveStep("0", 1), new ResponsiveStep("250px", 2),new ResponsiveStep("500px", 3));
+        formLayout3Col.setResponsiveSteps(new ResponsiveStep("0", 1), new ResponsiveStep("250px", 2), new ResponsiveStep("500px", 3));
         transactionTextField.setLabel("Transaction number");
         transactionTextField.setWidth("min-content");
         datePicker.setLabel("Date");
@@ -139,8 +139,7 @@ public class InfoCashView extends Composite<VerticalLayout> {
                 .setSortable(true)
                 .setSortProperty("cost");
 
-        grid.setColumnOrder(idColumn,nameColumn,costColumn);
-
+        grid.setColumnOrder(idColumn, nameColumn, costColumn);
     }
 
     public void setServicesGridSampleData(Grid<ServiceDto> grid) {
@@ -158,22 +157,21 @@ public class InfoCashView extends Composite<VerticalLayout> {
                 .setSortable(true)
                 .setSortProperty("name");
 
-        grid.setColumnOrder(idColumn,nameColumn);
+        grid.setColumnOrder(idColumn, nameColumn);
 
     }
 
-    public void setInfoData(){
+    public void setInfoData() {
         servicesGrid.setItems(cashDto.getServices());
         goodsGrid.setItems(cashDto.getGoods());
         transactionTextField.setValue(cashDto.getTransactionNo());
         datePicker.setValue(cashDto.getDate());
         totalPriceTextField.setValue(cashDto.getPrice());
         infoTextArea.setValue(cashDto.getDetails());
-        customerTextField.setValue(cashDto.getCustomer().getName()+" -> "+
-                cashDto.getCustomer().getCarBrand().getBrand()+" "+
+        customerTextField.setValue(cashDto.getCustomer().getName() + " -> " +
+                cashDto.getCustomer().getCarBrand().getBrand() + " " +
                 cashDto.getCustomer().getCarModel());
     }
-
 
 
 }

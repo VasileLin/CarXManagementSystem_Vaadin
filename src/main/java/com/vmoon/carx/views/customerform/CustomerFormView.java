@@ -215,13 +215,11 @@ public class CustomerFormView extends Composite<VerticalLayout> {
             CarBrandDto comboBoxValue = brandComboBox.getValue();
             List<CarModelDto> carModelsByBrandId = carModelService.getCarModelsByBrandId(comboBoxValue.getId());
             carModelComboBox.setItems(carModelsByBrandId);
-            carModelComboBox.setItemLabelGenerator(CarModelDto::getModel);
+            carModelComboBox.setItemLabelGenerator(carModel -> carModel.getModel() +"-"+carModel.getYear());
         }
-
     }
 
     private void setCarBrandComboBoxData(ComboBox<CarBrandDto> brandComboBox) {
-
         List<CarBrandDto> allBrands = carBrandService.allBrands();
         brandComboBox.setItems(allBrands);
         brandComboBox.setItemLabelGenerator(CarBrandDto::getBrand);

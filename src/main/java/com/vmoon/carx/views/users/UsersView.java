@@ -79,11 +79,10 @@ public class UsersView extends Composite<VerticalLayout> {
         Dialog dialog = new Dialog(userFormView);
         userFormView.setUpdateUser(userDto);
         userFormView.setUpdateFlag(true);
-        userFormView.getH3().setText("Update user");
+        userFormView.getH3().setText("My Profile");
         userFormView.getSaveButton().setText("Update");
         userFormView.getPasswordTextField().setReadOnly(true);
         userFormView.getPasswordTextField().setRevealButtonVisible(false);
-
 
         userFormView.getSaveButton().addClickListener(event -> {
             userFormView.saveUser();
@@ -106,6 +105,7 @@ public class UsersView extends Composite<VerticalLayout> {
         userFormView.getSaveButton().addClickListener(event -> {
             if (userFormView.validationBinder.validate().isOk()) {
                 userFormView.saveUser();
+                usersGrid.getDataProvider().refreshAll();
                 dialog.close();
             }
         });
@@ -184,7 +184,7 @@ public class UsersView extends Composite<VerticalLayout> {
     private void deleteUser(UserDto userDto) {
         UserEntity authUser = authenticatedUser.get().orElseThrow();
         if (authUser.getId() == userDto.getId()) {
-            Notifications.errorNotification("You cant delete current logged user!").open();
+            Notifications.errorNotification("You cannot delete current logged user!").open();
         } else {
             userDto.setDeleted(true);
             userService.update(userDto);

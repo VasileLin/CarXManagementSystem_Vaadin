@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface CompanyService {
     void saveCompany(CompanyDto companyDto);
+
     List<CompanyDto> getAllCompanies();
 }

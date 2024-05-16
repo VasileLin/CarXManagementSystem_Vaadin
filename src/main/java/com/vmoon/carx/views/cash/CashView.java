@@ -28,9 +28,9 @@ import com.vaadin.flow.data.renderer.NumberRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vmoon.carx.dto.*;
+import com.vmoon.carx.enums.Status;
 import com.vmoon.carx.services.*;
 import com.vmoon.carx.utils.Generators;
-import com.vmoon.carx.enums.Status;
 import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.utils.jasper.ReceiptGenerator;
 import com.vmoon.carx.views.MainLayout;
@@ -47,9 +47,8 @@ import java.util.concurrent.atomic.AtomicReference;
 @PageTitle("Cash")
 @Route(value = "cash-view", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed({"ADMIN","CASHIER"})
+@RolesAllowed({"ADMIN", "CASHIER"})
 public class CashView extends Composite<VerticalLayout> {
-    TextArea infoTextArea;
     private final CustomerService customerService;
     private final ServicesService servicesService;
     private final CashService cashService;
@@ -59,6 +58,7 @@ public class CashView extends Composite<VerticalLayout> {
     private Double goodsTotalPrice = 0.00;
     private Double totalPrice = 0.00;
     private String transactionNo;
+    TextArea infoTextArea;
     MultiSelectComboBox<ServiceDto> multiSelectComboBox;
     MultiSelectComboBox<GoodsDto> multiSelectGoodsComboBox;
     ComboBox<CustomerDto> customerComboBox;
@@ -238,7 +238,7 @@ public class CashView extends Composite<VerticalLayout> {
         })).setHeader("Actions");
 
 
-        serviceGrid.setColumnOrder(idColumn, nameColumn, priceColumn,saveColumn);
+        serviceGrid.setColumnOrder(idColumn, nameColumn, priceColumn, saveColumn);
 
     }
 
@@ -400,7 +400,7 @@ public class CashView extends Composite<VerticalLayout> {
         parameters.put("details", infoTextArea.getValue());
         parameters.put("logo", url);
 
-        ReceiptGenerator.cashReceiptGenerator(parameters,directory);
+        ReceiptGenerator.cashReceiptGenerator(parameters, directory);
 
     }
 
@@ -412,7 +412,7 @@ public class CashView extends Composite<VerticalLayout> {
 
     private void setCustomerComboBoxData(ComboBox<CustomerDto> customerComboBox) {
         customerComboBox.setItems(customerService.listCustomers());
-        customerComboBox.setItemLabelGenerator(customer -> customer.getName() + " - "+ customer.getCarBrand().getBrand() + " " + customer.getCarModel().getModel());
+        customerComboBox.setItemLabelGenerator(customer -> customer.getName() + " - " + customer.getCarBrand().getBrand() + " " + customer.getCarModel().getModel());
     }
 
     private void setMultiSelectServicesData(MultiSelectComboBox<ServiceDto> multiSelectService) {

@@ -9,10 +9,16 @@ import java.util.List;
 
 public interface ServicesService {
 
-    @NonNull Page<ServiceDto> allServices(@NonNull Pageable pageable);
+    @NonNull
+    Page<ServiceDto> allServices(@NonNull Pageable pageable);
+
     List<ServiceDto> allServices();
+
     void saveService(ServiceDto serviceDto);
+
     long count();
+
     Page<ServiceDto> searchService(String value, Pageable pageable);
+
     long countSearchResults(String text);
 }

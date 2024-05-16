@@ -47,6 +47,16 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(UserMapper.mapToUser(entity));
     }
 
+    @Override
+    public UserEntity updateSelf(UserDto entity) {
+        UserEntity user = new UserEntity();
+        user.setId(entity.getId());
+        user.setUsername(entity.getUsername());
+        user.setPassword(passwordEncoder.encode(entity.getPassword()));
+        user.setRoles(entity.getRoles().stream().map(RoleMapper::mapToRole).collect(Collectors.toSet()));
+        return userRepository.save(user);
+    }
+
     @Transactional
     public @NonNull Page<UserDto> list(@NonNull Pageable pageable) {
         return userRepository.findAll(pageable).map(UserMapper::mapToUserDto);

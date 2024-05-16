@@ -110,10 +110,10 @@ public class DeletedEmployerView extends Composite<VerticalLayout> {
                                 query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
                         );
 
-                        Page<EmployerDto> page = employerService.searchEmployers(value, pageRequest,true);
+                        Page<EmployerDto> page = employerService.searchEmployers(value, pageRequest, true);
                         return page.stream();
                     },
-                    query -> (int) employerService.countSearchResults(value,true)
+                    query -> (int) employerService.countSearchResults(value, true)
             );
 
             employersGrid.setDataProvider(dataProvider);
@@ -166,12 +166,11 @@ public class DeletedEmployerView extends Composite<VerticalLayout> {
 
         Grid.Column<EmployerDto> recoveryColumn = employerDtoGrid.addColumn(new ComponentRenderer<>(employerDto -> {
             Button deleteButton = new Button(new Icon(VaadinIcon.RECYCLE), buttonClickEvent -> confirmRecoveryDialog(employerDto));
-            deleteButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS,ButtonVariant.LUMO_SMALL);
+            deleteButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
             return deleteButton;
         })).setHeader("Actions");
 
-        employerDtoGrid.setColumnOrder(fullNameColumn, dateOfBirthColumn, addressColumn, emailColumn, phoneColumn, roleColumn,recoveryColumn);
-
+        employerDtoGrid.setColumnOrder(fullNameColumn, dateOfBirthColumn, addressColumn, emailColumn, phoneColumn, roleColumn, recoveryColumn);
 
 
         deletedEmployersDataProvider = DataProvider.fromCallbacks(
@@ -192,7 +191,7 @@ public class DeletedEmployerView extends Composite<VerticalLayout> {
 
     private void confirmRecoveryDialog(EmployerDto employerDto) {
         ConfirmDialog dialog = new ConfirmDialog();
-        dialog.setHeader("Employer "+ employerDto.getFullName());
+        dialog.setHeader("Employer " + employerDto.getFullName());
         dialog.setText("Are you sure you want to recover this employer?");
         dialog.setCancelable(true);
 
@@ -208,8 +207,6 @@ public class DeletedEmployerView extends Composite<VerticalLayout> {
         Notifications.successNotification("Employer are successfully recovered!").open();
         employersGrid.getDataProvider().refreshAll();
     }
-
-
 
 
 }

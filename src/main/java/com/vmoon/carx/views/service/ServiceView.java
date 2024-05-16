@@ -44,12 +44,12 @@ import static com.vmoon.carx.utils.ExcelWorkBooks.createServicesExcelWorkBook;
 @PageTitle("Service")
 @Route(value = "service-view", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed({"ADMIN","MANAGER"})
+@RolesAllowed({"ADMIN", "MANAGER"})
 public class ServiceView extends Composite<VerticalLayout> {
 
-    Grid<ServiceDto> servicesGrid;
     private final ServicesService servicesService;
     private final ServiceFormView serviceFormView;
+    Grid<ServiceDto> servicesGrid;
     Dialog dialog;
     TextField searchServicesField;
 
@@ -64,7 +64,7 @@ public class ServiceView extends Composite<VerticalLayout> {
     public void vaadinUI() {
         VerticalLayout layoutColumn2 = new VerticalLayout();
 
-        servicesGrid = new Grid<>(ServiceDto.class,false);
+        servicesGrid = new Grid<>(ServiceDto.class, false);
         servicesGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         servicesGrid.setWidth("100%");
         servicesGrid.setHeight("555px");
@@ -80,7 +80,6 @@ public class ServiceView extends Composite<VerticalLayout> {
         addServiceButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addServiceButton.addClickListener(e -> UI.getCurrent().navigate("service-form"));
         addServiceButton.setPrefixComponent(new Icon(VaadinIcon.PLUS));
-
 
         HorizontalLayout layoutRow2 = new HorizontalLayout();
         Button exportButton = new Button();
@@ -110,8 +109,6 @@ public class ServiceView extends Composite<VerticalLayout> {
         layoutRow2.setAlignItems(Alignment.CENTER);
         layoutRow2.setJustifyContentMode(JustifyContentMode.CENTER);
 
-
-
         searchServicesField = new TextField();
         searchServicesField.setPlaceholder("Search Services ...");
         searchServicesField.setWidth("100%");
@@ -130,7 +127,6 @@ public class ServiceView extends Composite<VerticalLayout> {
     }
 
     private void searchService(String value) {
-
         DataProvider<ServiceDto, Void> dataProvider = DataProvider.fromCallbacks(
                 query -> {
                     PageRequest pageRequest = PageRequest.of(
@@ -144,9 +140,7 @@ public class ServiceView extends Composite<VerticalLayout> {
                 },
                 query -> (int) servicesService.countSearchResults(value)
         );
-
         servicesGrid.setDataProvider(dataProvider);
-
     }
 
     private void setGridSampleData(Grid<ServiceDto> grid) {
@@ -172,8 +166,7 @@ public class ServiceView extends Composite<VerticalLayout> {
                 .setSortable(true)
                 .setSortProperty("price");
 
-
-        grid.setColumnOrder(idColumn, nameColumn,priceColumn);
+        grid.setColumnOrder(idColumn, nameColumn, priceColumn);
 
         grid.addItemDoubleClickListener(event -> {
             ServiceDto serviceDto = event.getItem();
@@ -198,7 +191,7 @@ public class ServiceView extends Composite<VerticalLayout> {
 
     private void openEditDialog(ServiceDto serviceDto) {
         serviceFormView.setUpdateFlag(true);
-        serviceFormView.getH3().setText("Update Service "+ serviceDto.getName());
+        serviceFormView.getH3().setText("Update Service " + serviceDto.getName());
         serviceFormView.setUpdateService(serviceDto);
 
         serviceFormView.getCancelButton().addClickListener(event -> dialog.close());
@@ -218,7 +211,7 @@ public class ServiceView extends Composite<VerticalLayout> {
     private void configureExportButton(Button exportButton) {
         exportButton.addClickListener(event -> {
             String fileName = "services.xlsx";
-            StreamResource resource = new StreamResource(fileName, ()-> {
+            StreamResource resource = new StreamResource(fileName, () -> {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
                 try (Workbook workbook = createServicesExcelWorkBook(servicesService.allServices())) {
@@ -234,8 +227,7 @@ public class ServiceView extends Composite<VerticalLayout> {
             Anchor downloadLink = new Anchor(resource, "");
             downloadLink.getElement().setAttribute("download", true);
             downloadLink.getElement().setAttribute("href", resource);
-            downloadLink.getElement().setAttribute("style","display: none;");
-
+            downloadLink.getElement().setAttribute("style", "display: none;");
             UI.getCurrent().add(downloadLink);
             downloadLink.getElement().callJsFunction("click");
         });

@@ -16,7 +16,7 @@ import jakarta.annotation.security.RolesAllowed;
 @PageTitle("Settings")
 @Route(value = "settings-view", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed({"ADMIN","MANAGER"})
+@RolesAllowed({"ADMIN", "MANAGER"})
 public class SettingsView extends Composite<VerticalLayout> {
 
     private final VerticalLayout companyDataContent;
@@ -37,17 +37,14 @@ public class SettingsView extends Composite<VerticalLayout> {
         Tab tabBrandData = new Tab("Brand management");
         Tab tabCompanyData = new Tab("Company data");
 
-        if (SecurityUtils.isUserAdmin()){
-            tabs.add(tabCostOfGoods, tabCompanyData,tabBrandData);
+        if (SecurityUtils.isUserAdmin()) {
+            tabs.add(tabCostOfGoods, tabCompanyData, tabBrandData);
         } else if (SecurityUtils.isUserManager()) {
             tabs.add(tabCostOfGoods, tabBrandData);
         }
 
-
         tabs.addSelectedChangeListener(event -> updateVisibleContent(tabs.getSelectedTab()));
-
-        getContent().add(tabs, goodsDataContent, companyDataContent,brandManagementContent);
-
+        getContent().add(tabs, goodsDataContent, companyDataContent, brandManagementContent);
         updateVisibleContent(tabCostOfGoods);
     }
 
@@ -65,8 +62,4 @@ public class SettingsView extends Composite<VerticalLayout> {
             brandManagementContent.setVisible(true);
         }
     }
-
-
-
-
 }

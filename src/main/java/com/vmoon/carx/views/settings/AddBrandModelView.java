@@ -31,25 +31,22 @@ import org.springframework.stereotype.Component;
 @PageTitle("Add Brand Model View")
 @Route(value = "brand-model-form")
 @Uses(Icon.class)
-@RolesAllowed({"ADMIN","MANAGER"})
+@RolesAllowed({"ADMIN", "MANAGER"})
 @Component
 @Scope("prototype")
 public class AddBrandModelView extends Composite<VerticalLayout> {
 
+    private final CarModelService carModelService;
     @Getter
     Button saveButton;
-
     @Setter
     CarBrandDto carBrandDto;
     CarModelDto updateModel;
     TextField modelTextField;
     NumberField yearNumberField;
     BeanValidationBinder<CarModelDto> validationBinder;
-
     @Setter
     private boolean updateFlag;
-
-    private final CarModelService carModelService;
 
     public AddBrandModelView(CarModelService carModelService) {
         this.carModelService = carModelService;
@@ -63,12 +60,12 @@ public class AddBrandModelView extends Composite<VerticalLayout> {
         validationBinder = new BeanValidationBinder<>(CarModelDto.class);
 
         validationBinder.forField(modelTextField)
-                .withValidator(new BeanValidator(CarModelDto.class,"model"))
+                .withValidator(new BeanValidator(CarModelDto.class, "model"))
                 .asRequired("Car model is required!")
-                .bind(CarModelDto::getModel,CarModelDto::setModel);
+                .bind(CarModelDto::getModel, CarModelDto::setModel);
 
         validationBinder.forField(yearNumberField)
-                .withValidator(new BeanValidator(CarModelDto.class,"year"))
+                .withValidator(new BeanValidator(CarModelDto.class, "year"))
                 .asRequired("Production year is required")
                 .bind(
                         carModelDto -> (double) carModelDto.getYear(),
@@ -95,7 +92,6 @@ public class AddBrandModelView extends Composite<VerticalLayout> {
         saveButton.setText("Save");
         saveButton.setWidth("min-content");
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
 
         Button cancelButton = new Button();
         cancelButton.setText("Cancel");
@@ -130,9 +126,7 @@ public class AddBrandModelView extends Composite<VerticalLayout> {
     }
 
 
-
     public void saveModel() {
-
         if (validationBinder.validate().isOk()) {
 
             CarModelDto carModelDto = CarModelDto.builder()
@@ -146,16 +140,15 @@ public class AddBrandModelView extends Composite<VerticalLayout> {
 
             if (updateFlag) {
                 saveUpdatedModel();
-                Notifications.successNotification("Model of "+updateModel.getCarBrand().getBrand()+" updated successfully!").open();
+                Notifications.successNotification("Model of " + updateModel.getCarBrand().getBrand() + " updated successfully!").open();
             } else {
                 carModelService.saveModel(carModelDto);
-                Notifications.successNotification("Model of "+carBrandDto.getBrand()+" saved successfully!").open();
+                Notifications.successNotification("Model of " + carBrandDto.getBrand() + " saved successfully!").open();
             }
 
         } else {
             Notifications.errorNotification("Error saving brand model, complete all inputs!").open();
         }
-
     }
 
     public void setUpdateModel(CarModelDto carModelDto) {

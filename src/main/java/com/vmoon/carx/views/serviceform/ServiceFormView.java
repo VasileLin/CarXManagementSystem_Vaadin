@@ -36,29 +36,23 @@ import org.springframework.stereotype.Component;
 @Uses(Icon.class)
 @Component
 @Scope("prototype")
-@RolesAllowed({"ADMIN","MANAGER"})
+@RolesAllowed({"ADMIN", "MANAGER"})
 public class ServiceFormView extends Composite<VerticalLayout> {
 
+    private final ServicesService servicesService;
     NumberField priceField;
-
     TextField serviceNameTextField;
-
     @Getter
     Button saveButton;
-
     @Getter
     Button cancelButton;
-
     @Getter
     H3 h3;
-
     @Getter
     ServiceDto serviceDto;
-
     @Setter
     boolean updateFlag;
     BeanValidationBinder<ServiceDto> validationBinder;
-    private final ServicesService servicesService;
 
     public ServiceFormView(ServicesService servicesService) {
         this.servicesService = servicesService;
@@ -71,19 +65,19 @@ public class ServiceFormView extends Composite<VerticalLayout> {
         validationBinder = new BeanValidationBinder<>(ServiceDto.class);
 
         validationBinder.forField(serviceNameTextField)
-                .withValidator(new BeanValidator(ServiceDto.class,"name"))
+                .withValidator(new BeanValidator(ServiceDto.class, "name"))
                 .asRequired("Service name is required")
-                .bind(ServiceDto::getName,ServiceDto::setName);
+                .bind(ServiceDto::getName, ServiceDto::setName);
 
 
         validationBinder.forField(priceField)
-                .withValidator(new DoubleRangeValidator("Price is wrong",0.00,5000000.00))
+                .withValidator(new DoubleRangeValidator("Price is wrong", 0.00, 5000000.00))
                 .asRequired("Price is required")
-                .bind(ServiceDto::getPrice,ServiceDto::setPrice);
+                .bind(ServiceDto::getPrice, ServiceDto::setPrice);
 
     }
 
-    public void vaadinUI(){
+    public void vaadinUI() {
         VerticalLayout layoutColumn2 = new VerticalLayout();
 
         h3 = new H3();

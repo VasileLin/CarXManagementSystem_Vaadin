@@ -15,7 +15,7 @@ import com.vmoon.carx.security.AuthenticatedUser;
 @AnonymousAllowed
 @PageTitle("Login")
 @Route(value = "login")
-public class LoginView extends LoginOverlay implements BeforeEnterObserver{
+public class LoginView extends LoginOverlay implements BeforeEnterObserver {
     private final AuthenticatedUser authenticatedUser;
 
     public LoginView(AuthenticatedUser authenticatedUser) {

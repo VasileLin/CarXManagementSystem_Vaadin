@@ -49,25 +49,23 @@ import static com.vmoon.carx.utils.ExcelWorkBooks.createCustomersExcelWorkBook;
 @PageTitle("Customers")
 @Route(value = "customers-view", layout = MainLayout.class)
 @Uses(Icon.class)
-@RolesAllowed({"ADMIN","MANAGER","CASHIER"})
+@RolesAllowed({"ADMIN", "MANAGER", "CASHIER"})
 public class CustomersView extends Composite<VerticalLayout> {
 
     private final CustomerService customerService;
     private final CustomerFormView customerFormView;
-
-    @Getter
-    private Dialog dialog;
-
     Grid<CustomerDto> customersGrid;
     TextField searchCustomersField;
     DataProvider<CustomerDto, Void> customerDataProvider;
+    @Getter
+    private Dialog dialog;
 
 
     public CustomersView(CustomerService customerService, CustomerFormView customerFormView) {
         this.customerService = customerService;
         this.customerFormView = customerFormView;
         VerticalLayout layoutColumn2 = new VerticalLayout();
-        customersGrid = new Grid<>(CustomerDto.class,false);
+        customersGrid = new Grid<>(CustomerDto.class, false);
         customersGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         customersGrid.setWidth("100%");
         customersGrid.setHeight("555px");
@@ -143,7 +141,7 @@ public class CustomersView extends Composite<VerticalLayout> {
             Notifications.warningNotification("Search bar is empty!").open();
             customersGrid.setDataProvider(customerDataProvider);
             customersGrid.getDataProvider().refreshAll();
-        } else  {
+        } else {
             DataProvider<CustomerDto, Void> dataProvider = DataProvider.fromCallbacks(
                     query -> {
                         PageRequest pageRequest = PageRequest.of(
@@ -204,34 +202,34 @@ public class CustomersView extends Composite<VerticalLayout> {
         if (SecurityUtils.isUserAdmin()) {
             Grid.Column<CustomerDto> deleteColumn = grid.addColumn(new ComponentRenderer<>(customerDto -> {
                 Button deleteButton = new Button(new Icon(VaadinIcon.TRASH), buttonClickEvent -> confirmDeleteDialog(customerDto));
-                deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_SMALL);
+                deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
                 return deleteButton;
             })).setHeader("Actions");
 
-            grid.setColumnOrder(nameColumn,phoneColumn,emailColumn,carModelBrandColumn,carNumberColumn,deleteColumn);
+            grid.setColumnOrder(nameColumn, phoneColumn, emailColumn, carModelBrandColumn, carNumberColumn, deleteColumn);
         } else {
-            grid.setColumnOrder(nameColumn,phoneColumn,emailColumn,carModelBrandColumn,carNumberColumn);
+            grid.setColumnOrder(nameColumn, phoneColumn, emailColumn, carModelBrandColumn, carNumberColumn);
         }
 
 
         grid.addItemDoubleClickListener(event -> {
-           CustomerDto customerDto = event.getItem();
-           openEditDialog(customerDto);
+            CustomerDto customerDto = event.getItem();
+            openEditDialog(customerDto);
         });
 
 
         customerDataProvider = DataProvider.fromCallbacks(
-          query -> {
-              PageRequest pageRequest = PageRequest.of(
-                      query.getPage(),
-                      query.getPageSize(),
-                      query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
-              );
-              Page<CustomerDto> page = customerService.allCustomers(pageRequest);
-              return page.stream();
-          },
+                query -> {
+                    PageRequest pageRequest = PageRequest.of(
+                            query.getPage(),
+                            query.getPageSize(),
+                            query.getSortOrders().isEmpty() ? Sort.unsorted() : VaadinSpringDataHelpers.toSpringDataSort(query)
+                    );
+                    Page<CustomerDto> page = customerService.allCustomers(pageRequest);
+                    return page.stream();
+                },
 
-          query -> (int) customerService.countCustomers()
+                query -> (int) customerService.countCustomers()
         );
 
         grid.setDataProvider(customerDataProvider);
@@ -246,7 +244,7 @@ public class CustomersView extends Composite<VerticalLayout> {
 
     private void confirmDeleteDialog(CustomerDto customerDto) {
         ConfirmDialog dialog = new ConfirmDialog();
-        dialog.setHeader("Customer "+ customerDto.getName());
+        dialog.setHeader("Customer " + customerDto.getName());
         dialog.setText("Are you sure you want to delete this customer?");
         dialog.setCancelable(true);
 
@@ -278,7 +276,7 @@ public class CustomersView extends Composite<VerticalLayout> {
     private void configureExportButton(Button exportButton) {
         exportButton.addClickListener(event -> {
             String fileName = "customers.xlsx";
-            StreamResource resource = new StreamResource(fileName, ()-> {
+            StreamResource resource = new StreamResource(fileName, () -> {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
                 try (Workbook workbook = createCustomersExcelWorkBook(customersGrid.getLazyDataView().getItems().toList())) {
@@ -293,7 +291,7 @@ public class CustomersView extends Composite<VerticalLayout> {
             Anchor downloadLink = new Anchor(resource, "");
             downloadLink.getElement().setAttribute("download", true);
             downloadLink.getElement().setAttribute("href", resource);
-            downloadLink.getElement().setAttribute("style","display: none;");
+            downloadLink.getElement().setAttribute("style", "display: none;");
 
             UI.getCurrent().add(downloadLink);
             downloadLink.getElement().callJsFunction("click");

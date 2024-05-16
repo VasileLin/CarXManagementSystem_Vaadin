@@ -29,24 +29,20 @@ import org.springframework.stereotype.Component;
 @PageTitle("Add Brand View")
 @Route(value = "brand-form")
 @Uses(Icon.class)
-@RolesAllowed({"ADMIN","MANAGER"})
+@RolesAllowed({"ADMIN", "MANAGER"})
 @Component
 @Scope("prototype")
 public class AddBrandView extends Composite<VerticalLayout> {
 
+    private final CarBrandService brandService;
     TextField brandNameTextField;
     BeanValidationBinder<CarBrandDto> carBrandBeanValidationBinder;
-
     @Setter
     private CarBrandDto updateBrand;
-
     @Getter
     private Button saveButton;
-
     @Setter
     private boolean updateFlag;
-
-    private final CarBrandService brandService;
 
     public AddBrandView(CarBrandService brandService) {
         this.brandService = brandService;
@@ -102,11 +98,10 @@ public class AddBrandView extends Composite<VerticalLayout> {
 
     private void fieldsValidation() {
         carBrandBeanValidationBinder = new BeanValidationBinder<>(CarBrandDto.class);
-
         carBrandBeanValidationBinder.forField(brandNameTextField)
-                .withValidator(new BeanValidator(CarBrandDto.class,"brand"))
+                .withValidator(new BeanValidator(CarBrandDto.class, "brand"))
                 .asRequired("Brand name is required!")
-                .bind(CarBrandDto::getBrand,CarBrandDto::setBrand);
+                .bind(CarBrandDto::getBrand, CarBrandDto::setBrand);
     }
 
     public void saveBrand() {
@@ -118,12 +113,12 @@ public class AddBrandView extends Composite<VerticalLayout> {
                 brandService.saveBrand(carBrand);
                 DialogManager.closeAll();
                 Notifications.successNotification("Brand saved successfully!").open();
-            }else {
+            } else {
                 saveUpdatedBrand();
                 Notifications.successNotification("Brand updated successfully!").open();
             }
 
-        }else {
+        } else {
             Notifications.warningNotification("Invalid brand name!").open();
         }
     }

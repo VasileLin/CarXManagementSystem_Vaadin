@@ -46,7 +46,7 @@ public class DeletedCustomersView extends Composite<VerticalLayout> {
     public DeletedCustomersView(CustomerService customerService) {
         this.customerService = customerService;
         VerticalLayout layoutColumn2 = new VerticalLayout();
-        customersGrid = new Grid<>(CustomerDto.class,false);
+        customersGrid = new Grid<>(CustomerDto.class, false);
         customersGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         customersGrid.setWidth("100%");
         customersGrid.setHeight("555px");
@@ -104,7 +104,7 @@ public class DeletedCustomersView extends Composite<VerticalLayout> {
             Notifications.warningNotification("Search bar is empty!").open();
             customersGrid.setDataProvider(deletedCustomersDataProvider);
             customersGrid.getDataProvider().refreshAll();
-        } else  {
+        } else {
             DataProvider<CustomerDto, Void> dataProvider = DataProvider.fromCallbacks(
                     query -> {
                         PageRequest pageRequest = PageRequest.of(
@@ -164,11 +164,11 @@ public class DeletedCustomersView extends Composite<VerticalLayout> {
 
         Grid.Column<CustomerDto> recoveryColumn = grid.addColumn(new ComponentRenderer<>(customerDto -> {
             Button deleteButton = new Button(new Icon(VaadinIcon.RECYCLE), buttonClickEvent -> confirmRecoveryDialog(customerDto));
-            deleteButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS,ButtonVariant.LUMO_SMALL);
+            deleteButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
             return deleteButton;
         })).setHeader("Actions");
 
-        grid.setColumnOrder(nameColumn,phoneColumn,emailColumn,carModelBrandColumn,carNumberColumn,recoveryColumn);
+        grid.setColumnOrder(nameColumn, phoneColumn, emailColumn, carModelBrandColumn, carNumberColumn, recoveryColumn);
 
 
         deletedCustomersDataProvider = DataProvider.fromCallbacks(
@@ -197,7 +197,7 @@ public class DeletedCustomersView extends Composite<VerticalLayout> {
 
     private void confirmRecoveryDialog(CustomerDto customerDto) {
         ConfirmDialog dialog = new ConfirmDialog();
-        dialog.setHeader("Customer "+ customerDto.getName());
+        dialog.setHeader("Customer " + customerDto.getName());
         dialog.setText("Are you sure you want to recovery this customer?");
         dialog.setCancelable(true);
 

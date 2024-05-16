@@ -32,19 +32,18 @@ import java.util.List;
 
 @PageTitle("Brands")
 @Uses(Icon.class)
-@RolesAllowed({"ADMIN","MANAGER"})
+@RolesAllowed({"ADMIN", "MANAGER"})
 @Component
 @Scope("prototype")
 public class BrandsView extends Composite<VerticalLayout> {
 
     private final CarBrandService carBrandService;
     private final CarModelService carModelService;
-    private  AddBrandView addBrandContent;
-    private  AddBrandModelView addModelContent;
-
     ComboBox<CarBrandDto> brandComboBox;
     Grid<CarModelDto> carModelGrid;
     Dialog dialog;
+    private AddBrandView addBrandContent;
+    private AddBrandModelView addModelContent;
 
     public BrandsView(CarBrandService carBrandService, CarModelService carModelService) {
         this.carBrandService = carBrandService;
@@ -63,28 +62,13 @@ public class BrandsView extends Composite<VerticalLayout> {
         brandComboBox.addValueChangeListener(event -> updateModelGrid());
         setSelectSampleData(brandComboBox);
 
-        Button editBrandButton = new Button("Edit selected brand");
-        editBrandButton.addClassName("edit-button-align");
-        editBrandButton.addClickListener(event -> {
-
-            CarBrandDto selectedBrand = brandComboBox.getValue();
-            if (selectedBrand != null) {
-                openEditBrandDialog(selectedBrand);
-            } else {
-                Notifications.warningNotification("Please select a brand to edit.").open();
-            }
-        });
-
-        HorizontalLayout brandEditLayout = new HorizontalLayout(brandComboBox, editBrandButton);
-        brandEditLayout.setWidth("100%");
-        brandEditLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.BASELINE);
-        brandEditLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        HorizontalLayout brandEditLayout = getHorizontalLayout();
 
         H6 h6 = new H6();
         h6.setText("Models of selected brand");
         h6.setWidth("max-content");
 
-        carModelGrid = new Grid<>(CarModelDto.class,false);
+        carModelGrid = new Grid<>(CarModelDto.class, false);
         carModelGrid.setWidth("100%");
         carModelGrid.getStyle().set("flex-grow", "0");
         carModelGrid.addItemDoubleClickListener(event -> {
@@ -132,6 +116,26 @@ public class BrandsView extends Composite<VerticalLayout> {
         formLayout2Col.add(addModelButton);
     }
 
+    private HorizontalLayout getHorizontalLayout() {
+        Button editBrandButton = new Button("Edit selected brand");
+        editBrandButton.addClassName("edit-button-align");
+        editBrandButton.addClickListener(event -> {
+
+            CarBrandDto selectedBrand = brandComboBox.getValue();
+            if (selectedBrand != null) {
+                openEditBrandDialog(selectedBrand);
+            } else {
+                Notifications.warningNotification("Please select a brand to edit.").open();
+            }
+        });
+
+        HorizontalLayout brandEditLayout = new HorizontalLayout(brandComboBox, editBrandButton);
+        brandEditLayout.setWidth("100%");
+        brandEditLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.BASELINE);
+        brandEditLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        return brandEditLayout;
+    }
+
     private void openEditBrandDialog(CarBrandDto selectedBrand) {
         addBrandContent = new AddBrandView(carBrandService);
         dialog = new Dialog(addBrandContent);
@@ -171,9 +175,9 @@ public class BrandsView extends Composite<VerticalLayout> {
             addModelContent.setUpdateFlag(false);
             addModelContent.setCarBrandDto(brandComboBox.getValue());
             addModelContent.getSaveButton().addClickListener(event -> {
-                    addModelContent.saveModel();
-                    setSelectSampleData(brandComboBox);
-                    dialog.close();
+                addModelContent.saveModel();
+                setSelectSampleData(brandComboBox);
+                dialog.close();
             });
             DialogManager.registerDialog(dialog);
             dialog.open();

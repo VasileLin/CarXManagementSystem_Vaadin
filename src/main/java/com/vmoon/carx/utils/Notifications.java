@@ -24,10 +24,8 @@ public class Notifications {
 
         Icon icon = VaadinIcon.CHECK_CIRCLE.create();
 
-        Button viewBtn = new Button("Close", clickEvent -> notification.close());
-        viewBtn.getStyle().setMargin("0 0 0 var(--lumo-space-l)");
 
-        var layout = new HorizontalLayout(icon, new Text(message), viewBtn,
+        var layout = new HorizontalLayout(icon, new Text(message),
                 createCloseBtn(notification));
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
 
@@ -43,11 +41,9 @@ public class Notifications {
         notification.setPosition(Notification.Position.BOTTOM_END);
 
         Icon icon = VaadinIcon.WARNING.create();
-        Button retryBtn = new Button("Close",
-                clickEvent -> notification.close());
-        retryBtn.getStyle().setMargin("0 0 0 var(--lumo-space-l)");
 
-        var layout = new HorizontalLayout(icon, new Text(message), retryBtn,
+
+        var layout = new HorizontalLayout(icon, new Text(message),
                 createCloseBtn(notification));
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
 
@@ -63,11 +59,8 @@ public class Notifications {
         notification.setPosition(Notification.Position.BOTTOM_END);
 
         Icon icon = VaadinIcon.WARNING.create();
-        Button retryBtn = new Button("Close",
-                clickEvent -> notification.close());
-        retryBtn.getStyle().setMargin("0 0 0 var(--lumo-space-l)");
 
-        var layout = new HorizontalLayout(icon, new Text(message), retryBtn,
+        var layout = new HorizontalLayout(icon, new Text(message),
                 createCloseBtn(notification));
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
 

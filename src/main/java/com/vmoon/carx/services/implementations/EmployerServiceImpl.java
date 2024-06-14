@@ -8,6 +8,8 @@ import com.vmoon.carx.services.EmployerService;
 import jakarta.persistence.criteria.Predicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,13 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class EmployerServiceImpl implements EmployerService {
-
+    private static final Logger logger = LoggerFactory.getLogger(EmployerServiceImpl.class);
     private final EmployerRepository employerRepository;
 
 
     @Override
     public void saveEmployer(EmployerDto employee) {
         if (employee != null) {
+            logger.info("Saving employer: {}", employee);
             employerRepository.save(EmployerMapper.mapToEmployer(employee));
         }
     }
@@ -33,11 +36,13 @@ public class EmployerServiceImpl implements EmployerService {
 
     @Override
     public @NonNull Page<EmployerDto> allEmployers(@NonNull Pageable pageable) {
+        logger.info("All employers fetched successfully");
         return employerRepository.list(pageable).map(EmployerMapper::mapToEmployerDto);
     }
 
     @Override
     public @NonNull Page<EmployerDto> allDeletedEmployers(@NonNull Pageable pageable) {
+        logger.info("All deleted employers fetched successfully");
         return employerRepository.listDeleted(pageable).map(EmployerMapper::mapToEmployerDto);
     }
 

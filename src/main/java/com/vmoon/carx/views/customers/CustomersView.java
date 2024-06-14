@@ -36,6 +36,8 @@ import com.vmoon.carx.views.customerform.CustomerFormView;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.Getter;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -51,7 +53,7 @@ import static com.vmoon.carx.utils.ExcelWorkBooks.createCustomersExcelWorkBook;
 @Uses(Icon.class)
 @RolesAllowed({"ADMIN", "MANAGER", "CASHIER"})
 public class CustomersView extends Composite<VerticalLayout> {
-
+    private static final Logger logger = LoggerFactory.getLogger(CustomersView.class);
     private final CustomerService customerService;
     private final CustomerFormView customerFormView;
     Grid<CustomerDto> customersGrid;
@@ -283,6 +285,7 @@ public class CustomersView extends Composite<VerticalLayout> {
                     workbook.write(bos);
                 } catch (IOException e) {
                     Notifications.errorNotification("Error writing file").open();
+                    logger.error("Error writing customers.xlsx file {}", e.getMessage());
                 }
 
                 return new ByteArrayInputStream(bos.toByteArray());

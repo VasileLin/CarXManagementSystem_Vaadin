@@ -8,6 +8,8 @@ import com.vmoon.carx.services.CustomerService;
 import jakarta.persistence.criteria.Predicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -20,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class CustomerServiceImpl implements CustomerService {
-
+    private static final Logger logger = LoggerFactory.getLogger(CustomerServiceImpl.class);
     private final CustomerRepository customerRepository;
 
     @Override
@@ -48,6 +50,7 @@ public class CustomerServiceImpl implements CustomerService {
     public void saveCustomer(CustomerDto customer) {
         if (customer != null) {
             customerRepository.save(CustomerMapper.mapToCustomer(customer));
+            logger.info("Customer {} are successfully saved", customer.getName());
         }
     }
 

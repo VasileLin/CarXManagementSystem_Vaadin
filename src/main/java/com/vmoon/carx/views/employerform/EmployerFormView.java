@@ -36,12 +36,15 @@ import com.vmoon.carx.views.MainLayout;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @PageTitle("Employer Form")
 @Route(value = "employer-form", layout = MainLayout.class)
 @Uses(Icon.class)
 @RolesAllowed({"ADMIN", "MANAGER"})
 public class EmployerFormView extends Composite<VerticalLayout> {
+    private static final Logger logger = LoggerFactory.getLogger(EmployerFormView.class);
     private final RoleService roleService;
     private final EmployerService employerService;
     TextField fullName;
@@ -188,14 +191,13 @@ public class EmployerFormView extends Composite<VerticalLayout> {
             try {
                 if (!updateFlag) {
                     employerService.saveEmployer(getEmployerToSave());
-                    Notifications.successNotification("Employer successfully saved").open();
                     UI.getCurrent().navigate("employers-view");
                 } else {
                     employerService.saveEmployer(getEmployerToUpdate());
-                    Notifications.successNotification("Employer successfully updated").open();
                 }
 
             } catch (Exception e) {
+                logger.error("Error saving employer {}", e.getMessage());
                 Notifications.errorNotification("Error saving employer: " + e.getMessage()).open();
             }
         } else {

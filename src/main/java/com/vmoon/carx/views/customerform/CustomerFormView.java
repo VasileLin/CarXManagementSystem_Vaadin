@@ -34,6 +34,8 @@ import com.vmoon.carx.views.MainLayout;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.Getter;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -46,6 +48,7 @@ import java.util.List;
 @Scope("prototype")
 @RolesAllowed({"ADMIN","MANAGER","CASHIER"})
 public class CustomerFormView extends Composite<VerticalLayout> {
+    private static final Logger logger = LoggerFactory.getLogger(CustomerFormView.class);
     TextField nameField;
     TextField phoneTextField;
     EmailField emailField;
@@ -196,13 +199,12 @@ public class CustomerFormView extends Composite<VerticalLayout> {
             try {
                 if (!updateFlag) {
                     customerService.saveCustomer(getCustomerToSave());
-                    Notifications.successNotification("Customer successfully saved").open();
                     UI.getCurrent().navigate("customers-view");
                 } else {
                     customerService.saveCustomer(getCustomerToUpdate());
-                    Notifications.successNotification("Customer successfully updated").open();
                 }
             } catch (Exception e) {
+                logger.error("Error while saving employer", e);
                 Notifications.errorNotification("Error saving customer: " + e.getMessage()).open();
             }
         } else {

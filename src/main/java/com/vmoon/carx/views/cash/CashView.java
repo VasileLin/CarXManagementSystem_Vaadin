@@ -31,29 +31,37 @@ import com.vmoon.carx.dto.*;
 import com.vmoon.carx.enums.Status;
 import com.vmoon.carx.services.*;
 import com.vmoon.carx.utils.Generators;
+import com.vmoon.carx.utils.MailTools;
 import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.utils.jasper.ReceiptGenerator;
 import com.vmoon.carx.views.MainLayout;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.mail.MessagingException;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+
 @PageTitle("Cash")
 @Route(value = "cash-view", layout = MainLayout.class)
 @Uses(Icon.class)
 @RolesAllowed({"ADMIN", "CASHIER"})
 public class CashView extends Composite<VerticalLayout> {
+    private static final Logger logger = LoggerFactory.getLogger(CashView.class);
     private final CustomerService customerService;
     private final ServicesService servicesService;
     private final CashService cashService;
     private final GoodsService goodsService;
     private final CompanyService companyService;
+    private final MailTools mailTools;
     private Double servicesTotalPrice = 0.00;
     private Double goodsTotalPrice = 0.00;
     private Double totalPrice = 0.00;
@@ -70,12 +78,14 @@ public class CashView extends Composite<VerticalLayout> {
     Paragraph priceText;
     File directory;
 
-    public CashView(CustomerService customerService, ServicesService servicesService, CashService cashService, GoodsService goodsService, CompanyService companyService) {
+
+    public CashView(CustomerService customerService, ServicesService servicesService, CashService cashService, GoodsService goodsService, CompanyService companyService, MailTools mailTools) {
         this.customerService = customerService;
         this.servicesService = servicesService;
         this.cashService = cashService;
         this.goodsService = goodsService;
         this.companyService = companyService;
+        this.mailTools = mailTools;
 
         vaadinUI();
     }
@@ -379,6 +389,7 @@ public class CashView extends Composite<VerticalLayout> {
     private void generateReceipt() {
         List<ServiceDto> selectedServices = new ArrayList<>(multiSelectComboBox.getValue());
         List<GoodsDto> selectedGoods = new ArrayList<>(multiSelectGoodsComboBox.getValue());
+        String customerEmail = customerComboBox.getValue().getEmail();
         CompanyDto companyDto = companyService.getAllCompanies().get(0);
 
         JRBeanCollectionDataSource servicesDataSource = new JRBeanCollectionDataSource(selectedServices);
@@ -400,8 +411,17 @@ public class CashView extends Composite<VerticalLayout> {
         parameters.put("details", infoTextArea.getValue());
         parameters.put("logo", url);
 
-        ReceiptGenerator.cashReceiptGenerator(parameters, directory);
-
+        byte[] pdfContent = ReceiptGenerator.cashReceiptGenerator(parameters, directory);
+        if (pdfContent != null) {
+            try {
+                logger.info("Trying to send email to {}", customerEmail);
+                mailTools.sendEmailWithAttachment(customerEmail, pdfContent);
+                logger.info("Email sent successfully to {}", customerEmail);
+            } catch (MessagingException | IOException e) {
+                logger.error("Failed to send email to {}: {}", customerEmail, e.getMessage(), e);
+                Notification.show("Failed to send email: " + e.getMessage(), 5000, Notification.Position.MIDDLE);
+            }
+        }
     }
 
 

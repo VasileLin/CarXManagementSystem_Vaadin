@@ -2,23 +2,15 @@ package com.vmoon.carx.mappers;
 
 import com.vmoon.carx.dto.ServiceDto;
 import com.vmoon.carx.entities.Service;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Component;
 
-@Component
-public class ServiceMapper {
-    public static ServiceDto toServiceDto(Service service) {
-        return ServiceDto.builder()
-                .id(service.getId())
-                .name(service.getName())
-                .price(service.getPrice())
-                .build();
-    }
+@Mapper
+public interface ServiceMapper {
+     ServiceMapper INSTANCE = Mappers.getMapper(ServiceMapper.class);
 
-    public static Service toService(ServiceDto serviceDto) {
-        return Service.builder()
-                .id(serviceDto.getId())
-                .name(serviceDto.getName())
-                .price(serviceDto.getPrice())
-                .build();
-    }
+     ServiceDto toServiceDto(Service service);
+
+     Service toService(ServiceDto serviceDto);
 }

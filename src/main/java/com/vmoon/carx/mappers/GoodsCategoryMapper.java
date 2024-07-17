@@ -2,22 +2,15 @@ package com.vmoon.carx.mappers;
 
 import com.vmoon.carx.dto.GoodsCategoryDto;
 import com.vmoon.carx.entities.GoodsCategory;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-@Component
-public class GoodsCategoryMapper {
+@Mapper
+public interface GoodsCategoryMapper {
 
-    public static GoodsCategoryDto toGoodsCategoryDto(GoodsCategory goodsCategory) {
-           return GoodsCategoryDto.builder()
-                .id(goodsCategory.getId())
-                .name(goodsCategory.getName())
-                .build();
-    }
+    GoodsCategoryMapper INSTANCE = Mappers.getMapper(GoodsCategoryMapper.class);
 
-    public static GoodsCategory toGoods(GoodsCategoryDto category) {
-        return GoodsCategory.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .build();
-    }
+    GoodsCategoryDto toGoodsCategoryDto(GoodsCategory goodsCategory);
+
+    GoodsCategory toGoods(GoodsCategoryDto category);
 }

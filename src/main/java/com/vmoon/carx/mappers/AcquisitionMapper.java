@@ -2,28 +2,14 @@ package com.vmoon.carx.mappers;
 
 import com.vmoon.carx.dto.AcquisitionDto;
 import com.vmoon.carx.entities.Acquisition;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Component;
 
-@Component
-public class AcquisitionMapper {
+@Mapper
+public interface AcquisitionMapper {
 
-    public static AcquisitionDto toAcquisitionDto(Acquisition acquisition) {
-
-
-        return AcquisitionDto.builder()
-                .id(acquisition.getId())
-                .totalPrice(acquisition.getTotalPrice())
-                .quantity(acquisition.getQuantity())
-                .build();
-    }
-
-    public static Acquisition toAcquisition(AcquisitionDto acquisitionDto) {
-
-        return Acquisition.builder()
-                .id(acquisitionDto.getId())
-                .totalPrice(acquisitionDto.getTotalPrice())
-                .date(acquisitionDto.getDate())
-                .quantity(acquisitionDto.getQuantity())
-                .build();
-    }
+    AcquisitionMapper INSTANCE = Mappers.getMapper(AcquisitionMapper.class);
+    AcquisitionDto toAcquisitionDto(Acquisition acquisition);
+    Acquisition toAcquisition(AcquisitionDto acquisitionDto);
 }

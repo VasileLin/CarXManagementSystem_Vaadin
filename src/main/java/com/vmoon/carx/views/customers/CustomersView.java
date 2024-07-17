@@ -238,9 +238,10 @@ public class CustomersView extends Composite<VerticalLayout> {
     }
 
     public void deleteCustomer(CustomerDto customerDto) {
-        customerDto.setDeleted(true);
+        customerDto.setIsDeleted(true);
         customerService.saveCustomer(customerDto);
         Notifications.successNotification("Customer are successfully deleted!").open();
+        logger.info("Customer {} is successfully deleted!", customerDto.getName());
         customersGrid.getDataProvider().refreshAll();
     }
 

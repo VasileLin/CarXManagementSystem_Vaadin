@@ -2,38 +2,16 @@ package com.vmoon.carx.mappers;
 
 import com.vmoon.carx.dto.CarBrandDto;
 import com.vmoon.carx.entities.CarBrand;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Context;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-@Component
-public class CarBrandMapper {
+@Mapper
+public interface CarBrandMapper {
 
-    public static CarBrandDto toCarBrandDtoWithModels(CarBrand carBrand) {
-        CarBrandDto carBrandDto = CarBrandDto.builder()
-                .id(carBrand.getId())
-                .brand(carBrand.getBrand())
-                .build();
+    CarBrandMapper INSTANCE = Mappers.getMapper(CarBrandMapper.class);
 
-        if (carBrand.getCarModels() != null) {
-            carBrandDto.setCarModels(carBrand.getCarModels()
-                    .stream()
-                    .map(CarModelMapper::toCarModelDto)
-                    .toList());
-        }
+    CarBrandDto toCarBrandDtoWithModels(CarBrand carBrand,@Context CycleAvoidingMappingContext context);
 
-        return carBrandDto;
-    }
-
-    public static CarBrandDto toCarBrandDto(CarBrand carBrand) {
-        return CarBrandDto.builder()
-                .id(carBrand.getId())
-                .brand(carBrand.getBrand())
-                .build();
-    }
-
-    public static CarBrand toCarBrand(CarBrandDto carBrandDto) {
-        return CarBrand.builder()
-                .id(carBrandDto.getId())
-                .brand(carBrandDto.getBrand())
-                .build();
-    }
+    CarBrand toCarBrand(CarBrandDto carBrandDto,@Context CycleAvoidingMappingContext context);
 }

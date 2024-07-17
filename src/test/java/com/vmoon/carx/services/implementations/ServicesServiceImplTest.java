@@ -71,7 +71,7 @@ class ServicesServiceImplTest {
                 .price(124d)
                 .build();
 
-        Service savedService = ServiceMapper.toService(serviceDto);
+        Service savedService = ServiceMapper.INSTANCE.toService(serviceDto);
         when(serviceRepository.save(any(Service.class))).thenReturn(savedService);
         //Act
         servicesService.saveService(serviceDto);

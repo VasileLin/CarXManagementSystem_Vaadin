@@ -202,7 +202,7 @@ public class DeletedEmployerView extends Composite<VerticalLayout> {
     }
 
     private void recoverEmployer(EmployerDto employerDto) {
-        employerDto.setDeleted(false);
+        employerDto.setIsDeleted(false);
         employerService.saveEmployer(employerDto);
         Notifications.successNotification("Employer are successfully recovered!").open();
         employersGrid.getDataProvider().refreshAll();

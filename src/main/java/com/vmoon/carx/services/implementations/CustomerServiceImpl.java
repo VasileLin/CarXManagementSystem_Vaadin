@@ -3,6 +3,7 @@ package com.vmoon.carx.services.implementations;
 import com.vmoon.carx.dto.CustomerDto;
 import com.vmoon.carx.entities.Customer;
 import com.vmoon.carx.mappers.CustomerMapper;
+import com.vmoon.carx.mappers.CycleAvoidingMappingContext;
 import com.vmoon.carx.repositories.CustomerRepository;
 import com.vmoon.carx.services.CustomerService;
 import jakarta.persistence.criteria.Predicate;
@@ -28,29 +29,28 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public @NonNull Page<CustomerDto> allCustomers(@NonNull Pageable pageable) {
         return customerRepository.findAll(pageable)
-                .map(CustomerMapper::mapToCustomerDto);
+                .map(e -> CustomerMapper.INSTANCE.mapToCustomerDto(e,new CycleAvoidingMappingContext()));
     }
 
     @Override
     public @NonNull Page<CustomerDto> allDeletedCustomers(@NonNull Pageable pageable) {
         return customerRepository.findAllDeleted(pageable)
-                .map(CustomerMapper::mapToCustomerDto);
+                .map(e -> CustomerMapper.INSTANCE.mapToCustomerDto(e,new CycleAvoidingMappingContext()));
     }
 
     @Override
     public List<CustomerDto> listCustomers() {
         return customerRepository.findAll()
                 .stream()
-                .map(CustomerMapper::mapToCustomerDto)
-                .filter(customerDto -> !customerDto.isDeleted())
+                .map(e -> CustomerMapper.INSTANCE.mapToCustomerDto(e,new CycleAvoidingMappingContext()))
+                .filter(customerDto -> !customerDto.getIsDeleted())
                 .toList();
     }
 
     @Override
     public void saveCustomer(CustomerDto customer) {
         if (customer != null) {
-            customerRepository.save(CustomerMapper.mapToCustomer(customer));
-            logger.info("Customer {} are successfully saved", customer.getName());
+            customerRepository.save(CustomerMapper.INSTANCE.mapToCustomer(customer,new CycleAvoidingMappingContext()));
         }
     }
 
@@ -68,14 +68,14 @@ public class CustomerServiceImpl implements CustomerService {
     public Page<CustomerDto> searchCustomers(String value, Pageable pageable) {
         Specification<Customer> specification = textInAllColumns(value);
         Page<Customer> page = customerRepository.findAll(specification, pageable);
-        return page.map(CustomerMapper::mapToCustomerDto);
+        return page.map(e -> CustomerMapper.INSTANCE.mapToCustomerDto(e,new CycleAvoidingMappingContext()));
     }
 
     @Override
     public Page<CustomerDto> searchDeletedCustomers(String value, Pageable pageable) {
         Specification<Customer> specification = textInAllColumnsDeleted(value);
         Page<Customer> page = customerRepository.findAll(specification, pageable);
-        return page.map(CustomerMapper::mapToCustomerDto);
+        return page.map(e -> CustomerMapper.INSTANCE.mapToCustomerDto(e,new CycleAvoidingMappingContext()));
     }
 
     @Override

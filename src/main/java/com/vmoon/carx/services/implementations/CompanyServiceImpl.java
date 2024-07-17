@@ -21,7 +21,7 @@ public class CompanyServiceImpl implements CompanyService {
         List<Company> companies = companyRepository.findAll();
 
         if (companies.isEmpty()) {
-            companyRepository.save(CompanyMapper.toCompany(companyDto));
+            companyRepository.save(CompanyMapper.INSTANCE.toCompany(companyDto));
         } else {
             Company company = companies.get(0);
             company.setName(companyDto.getName());
@@ -35,7 +35,7 @@ public class CompanyServiceImpl implements CompanyService {
     public List<CompanyDto> getAllCompanies() {
         return companyRepository.findAll()
                 .stream()
-                .map(CompanyMapper::toCompanyDto)
+                .map(CompanyMapper.INSTANCE::toCompanyDto)
                 .toList();
     }
 }

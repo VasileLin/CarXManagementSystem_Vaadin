@@ -57,6 +57,7 @@ public class InfoCashView extends Composite<VerticalLayout> {
         customerTextField = new TextField();
         customerTextField.setLabel("Customer");
         customerTextField.setWidth("100%");
+        customerTextField.setReadOnly(true);
         Hr hr = new Hr();
         FormLayout formLayout2Col = new FormLayout();
         H5 h5 = new H5();
@@ -78,10 +79,13 @@ public class InfoCashView extends Composite<VerticalLayout> {
         formLayout3Col.setResponsiveSteps(new ResponsiveStep("0", 1), new ResponsiveStep("250px", 2), new ResponsiveStep("500px", 3));
         transactionTextField.setLabel("Transaction number");
         transactionTextField.setWidth("min-content");
+        transactionTextField.setReadOnly(true);
         datePicker.setLabel("Date");
         datePicker.setWidth("min-content");
+        datePicker.setReadOnly(true);
         totalPriceTextField.setLabel("Total price");
         totalPriceTextField.setWidth("min-content");
+        totalPriceTextField.setReadOnly(true);
         layoutColumn2.setAlignSelf(FlexComponent.Alignment.START, formLayout2Col);
         formLayout2Col.setWidth("100%");
         h5.setText("Provided services");
@@ -95,6 +99,7 @@ public class InfoCashView extends Composite<VerticalLayout> {
         goodsGrid.getStyle().set("flex-grow", "0");
         infoTextArea.setLabel("Cash details");
         infoTextArea.setWidth("100%");
+        infoTextArea.setReadOnly(true);
         h3.setText("Cash details");
         h3.setWidth("100%");
         getContent().add(layoutColumn2);

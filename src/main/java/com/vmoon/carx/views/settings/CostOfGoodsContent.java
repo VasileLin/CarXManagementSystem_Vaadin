@@ -323,7 +323,9 @@ public class CostOfGoodsContent extends Composite<VerticalLayout> {
 
         goodsRegistrationView.getSaveButton().addClickListener(event -> {
             double setStock = goodsRegistrationView.getStockField().getValue();
-            acquisitionService.saveAcquisition(GoodsMapper.toAcquisitionDto(goodDto));
+            AcquisitionDto acquisitionDto = GoodsMapper.INSTANCE.toAcquisitionDto(goodDto);
+            acquisitionDto.setTotalPrice(goodDto.getCost() * goodDto.getStock());
+            acquisitionService.saveAcquisition(acquisitionDto);
 
             goodsRegistrationView.getStockField().setValue(actualStock + setStock);
             goodsService.saveGood(goodsRegistrationView.getGoodToUpdate());

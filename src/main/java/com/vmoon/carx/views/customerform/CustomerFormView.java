@@ -198,7 +198,9 @@ public class CustomerFormView extends Composite<VerticalLayout> {
         if (validationBinder.validate().isOk()) {
             try {
                 if (!updateFlag) {
-                    customerService.saveCustomer(getCustomerToSave());
+                    CustomerDto customerToSave = getCustomerToSave();
+                    customerService.saveCustomer(customerToSave);
+                    logger.info("Customer {} are successfully saved", customerToSave.getName());
                     UI.getCurrent().navigate("customers-view");
                 } else {
                     customerService.saveCustomer(getCustomerToUpdate());

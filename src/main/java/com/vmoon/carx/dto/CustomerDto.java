@@ -25,5 +25,5 @@ public class CustomerDto {
     @NotEmpty(message = "Enter an valid email")
     private String email;
     private CarBrandDto carBrand;
-    private boolean isDeleted;
+    private Boolean isDeleted;
 }

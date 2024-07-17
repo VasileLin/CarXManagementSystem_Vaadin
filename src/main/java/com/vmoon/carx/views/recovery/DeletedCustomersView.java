@@ -189,7 +189,7 @@ public class DeletedCustomersView extends Composite<VerticalLayout> {
     }
 
     public void recoveryCustomer(CustomerDto customerDto) {
-        customerDto.setDeleted(false);
+        customerDto.setIsDeleted(false);
         customerService.saveCustomer(customerDto);
         customersGrid.getDataProvider().refreshAll();
         Notifications.successNotification("Customer are successfully recovered!").open();

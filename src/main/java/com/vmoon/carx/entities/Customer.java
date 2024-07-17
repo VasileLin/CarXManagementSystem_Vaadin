@@ -28,6 +28,6 @@ public class Customer {
     @JoinColumn(name = "model_id",nullable = false)
     private CarModel carModel;
 
-    private boolean isDeleted;
+    private Boolean isDeleted;
 
 }

@@ -21,18 +21,18 @@ public class ServicesServiceImpl implements ServicesService {
 
     @Override
     public @NonNull Page<ServiceDto> allServices(@NonNull Pageable pageable) {
-        return serviceRepository.findAll(pageable).map(ServiceMapper::toServiceDto);
+        return serviceRepository.findAll(pageable).map(ServiceMapper.INSTANCE::toServiceDto);
     }
 
     @Override
     public List<ServiceDto> allServices() {
-        return serviceRepository.findAll().stream().map(ServiceMapper::toServiceDto).toList();
+        return serviceRepository.findAll().stream().map(ServiceMapper.INSTANCE::toServiceDto).toList();
     }
 
     @Override
     public void saveService(ServiceDto serviceDto) {
         if (serviceDto != null) {
-            serviceRepository.save(ServiceMapper.toService(serviceDto));
+            serviceRepository.save(ServiceMapper.INSTANCE.toService(serviceDto));
         }
     }
 
@@ -45,7 +45,7 @@ public class ServicesServiceImpl implements ServicesService {
     public Page<ServiceDto> searchService(String value, Pageable pageable) {
         Specification<Service> spec = textInAllColumns(value);
         Page<Service> page = serviceRepository.findAll(spec, pageable);
-        return page.map(ServiceMapper::toServiceDto);
+        return page.map(ServiceMapper.INSTANCE::toServiceDto);
     }
 
     @Override

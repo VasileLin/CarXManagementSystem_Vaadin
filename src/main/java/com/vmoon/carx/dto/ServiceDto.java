@@ -13,6 +13,7 @@ public class ServiceDto {
     private Long id;
     private String name;
     private Double price;
+    private Boolean isDeleted;
 
 
     @Override

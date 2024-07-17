@@ -163,7 +163,7 @@ public class MainLayout extends AppLayout {
 
     private void openSettingsDialog() {
         Dialog dialog = new Dialog(userFormView);
-        userFormView.setUpdateUser(UserMapper.mapToUserDto(Objects.requireNonNull(authenticatedUser.get().orElse(null))));
+        userFormView.setUpdateUser(UserMapper.INSTANCE.mapToUserDto(Objects.requireNonNull(authenticatedUser.get().orElse(null))));
         userFormView.setUpdateFlag(true);
         userFormView.getH3().setText("My Profile");
         userFormView.getSaveButton().setText("Update");

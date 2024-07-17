@@ -10,8 +10,6 @@ public interface UserService {
 
     UserEntity update(UserDto entity);
 
-    UserEntity updateSelf(UserDto entity);
-
     UserEntity add(UserDto entity);
 
     Page<UserDto> list(Pageable pageable);

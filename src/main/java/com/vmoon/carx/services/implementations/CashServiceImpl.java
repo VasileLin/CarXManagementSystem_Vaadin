@@ -4,6 +4,7 @@ import com.vmoon.carx.dto.CashDto;
 import com.vmoon.carx.dto.CashGridDto;
 import com.vmoon.carx.entities.Cash;
 import com.vmoon.carx.mappers.CashMapper;
+import com.vmoon.carx.mappers.CycleAvoidingMappingContext;
 import com.vmoon.carx.repositories.CashRepository;
 import com.vmoon.carx.services.CashService;
 import lombok.RequiredArgsConstructor;
@@ -26,13 +27,13 @@ public class CashServiceImpl implements CashService {
     @Override
     public void saveCash(CashDto customer) {
         if (customer != null) {
-            cashRepository.save(CashMapper.toCash(customer));
+            cashRepository.save(CashMapper.INSTANCE.toCash(customer,new CycleAvoidingMappingContext()));
         }
     }
 
     @Override
     public Page<CashGridDto> allCashDate(PageRequest pageRequest, LocalDate fromValue, LocalDate toValue) {
-        return cashRepository.findAllByDate(pageRequest, fromValue, toValue).map(CashMapper::toCashGridDto);
+        return cashRepository.findAllByDate(pageRequest, fromValue, toValue).map(e -> CashMapper.INSTANCE.toCashGridDto(e,new CycleAvoidingMappingContext()));
     }
 
     @Override
@@ -42,14 +43,14 @@ public class CashServiceImpl implements CashService {
 
     @Override
     public CashDto getCashByTransactionNo(String transactionNo) {
-        return CashMapper.toCashDto(cashRepository.getCashByTransactionNo(transactionNo));
+        return CashMapper.INSTANCE.toCashDto(cashRepository.getCashByTransactionNo(transactionNo),new CycleAvoidingMappingContext());
     }
 
     @Override
     public Page<CashGridDto> searchCash(String value, Pageable pageable) {
         Specification<Cash> specification = textInAllColumns(value);
         Page<Cash> page = cashRepository.findAll(specification, pageable);
-        return page.map(CashMapper::toCashGridDto);
+        return page.map(e -> CashMapper.INSTANCE.toCashGridDto(e,new CycleAvoidingMappingContext()));
     }
 
     private Specification<Cash> textInAllColumns(String text) {

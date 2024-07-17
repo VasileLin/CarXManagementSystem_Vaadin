@@ -2,26 +2,15 @@ package com.vmoon.carx.mappers;
 
 import com.vmoon.carx.dto.CompanyDto;
 import com.vmoon.carx.entities.Company;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-@Component
-public class CompanyMapper {
+@Mapper
+public interface CompanyMapper {
 
-    public static CompanyDto toCompanyDto(Company company) {
-        return CompanyDto.builder()
-                .id(company.getId())
-                .name(company.getName())
-                .address(company.getAddress())
-                .iban(company.getIban())
-                .build();
-    }
+    CompanyMapper INSTANCE = Mappers.getMapper(CompanyMapper.class);
 
-    public static Company toCompany(CompanyDto companyDto) {
-        return Company.builder()
-                .id(companyDto.getId())
-                .name(companyDto.getName())
-                .address(companyDto.getAddress())
-                .iban(companyDto.getIban())
-                .build();
-    }
+    CompanyDto toCompanyDto(Company company);
+
+    Company toCompany(CompanyDto companyDto);
 }

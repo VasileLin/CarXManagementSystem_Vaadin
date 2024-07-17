@@ -115,7 +115,7 @@ public class DeletedUsersView extends Composite<VerticalLayout> {
     }
 
     private void recoverUser(UserDto userDto) {
-        userDto.setDeleted(false);
+        userDto.setIsDeleted(false);
         userService.update(userDto);
         Notifications.successNotification("User are successfully recovered!").open();
         usersGrid.getDataProvider().refreshAll();

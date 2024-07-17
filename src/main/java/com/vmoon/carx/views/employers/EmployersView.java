@@ -240,7 +240,7 @@ public class EmployersView extends Composite<VerticalLayout> {
     }
 
     private void deleteEmployer(EmployerDto employerDto) {
-        employerDto.setDeleted(true);
+        employerDto.setIsDeleted(true);
         employerService.saveEmployer(employerDto);
         Notifications.successNotification("Employer are successfully deleted!").open();
         employersGrid.getDataProvider().refreshAll();

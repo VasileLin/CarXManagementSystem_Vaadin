@@ -28,7 +28,7 @@ public class EmployerServiceImpl implements EmployerService {
     public void saveEmployer(EmployerDto employee) {
         if (employee != null) {
             logger.info("Saving employer: {}", employee);
-            employerRepository.save(EmployerMapper.mapToEmployer(employee));
+            employerRepository.save(EmployerMapper.INSTANCE.mapToEmployer(employee));
         }
     }
 
@@ -37,13 +37,13 @@ public class EmployerServiceImpl implements EmployerService {
     @Override
     public @NonNull Page<EmployerDto> allEmployers(@NonNull Pageable pageable) {
         logger.info("All employers fetched successfully");
-        return employerRepository.list(pageable).map(EmployerMapper::mapToEmployerDto);
+        return employerRepository.list(pageable).map(EmployerMapper.INSTANCE::mapToEmployerDto);
     }
 
     @Override
     public @NonNull Page<EmployerDto> allDeletedEmployers(@NonNull Pageable pageable) {
         logger.info("All deleted employers fetched successfully");
-        return employerRepository.listDeleted(pageable).map(EmployerMapper::mapToEmployerDto);
+        return employerRepository.listDeleted(pageable).map(EmployerMapper.INSTANCE::mapToEmployerDto);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class EmployerServiceImpl implements EmployerService {
     public Page<EmployerDto> searchEmployers(String searchText, Pageable pageable,boolean isDeleted) {
         Specification<Employer> spec = textInAllColumns(searchText,isDeleted);
         Page<Employer> page = employerRepository.findAll(spec, pageable);
-        return page.map(EmployerMapper::mapToEmployerDto);
+        return page.map(EmployerMapper.INSTANCE::mapToEmployerDto);
     }
 
     @Override

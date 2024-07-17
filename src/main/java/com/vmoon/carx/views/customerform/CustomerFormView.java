@@ -238,6 +238,7 @@ public class CustomerFormView extends Composite<VerticalLayout> {
                 .carNumber(carNumberTextField.getValue())
                 .carModel(carModelComboBox.getValue())
                 .carBrand(brandComboBox.getValue())
+                .isDeleted(false)
                 .build();
     }
 
@@ -249,6 +250,7 @@ public class CustomerFormView extends Composite<VerticalLayout> {
                 .carNumber(carNumberTextField.getValue())
                 .carModel(carModelComboBox.getValue())
                 .carBrand(brandComboBox.getValue())
+                .isDeleted(false)
                 .build();
     }
 
@@ -261,7 +263,6 @@ public class CustomerFormView extends Composite<VerticalLayout> {
         brandComboBox.setValue(customerDto.getCarBrand());
         carModelComboBox.setItems(customerDto.getCarModel());
         carModelComboBox.setValue(customerDto.getCarModel());
-
         this.customerDto = customerDto;
     }
 }

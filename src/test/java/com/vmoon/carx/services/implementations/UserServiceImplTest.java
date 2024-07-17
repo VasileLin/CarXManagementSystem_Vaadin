@@ -53,7 +53,7 @@ class UserServiceImplTest {
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername(userDto.getUsername());
         userEntity.setPassword("encodedPassword");
-        userEntity.setRoles(userDto.getRoles().stream().map(RoleMapper::mapToRole).collect(Collectors.toSet()));
+        userEntity.setRoles(userDto.getRoles().stream().map(RoleMapper.INSTANCE::mapToRole).collect(Collectors.toSet()));
 
         when(passwordEncoder.encode(userDto.getPassword())).thenReturn("encodedPassword");
         when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
@@ -81,9 +81,9 @@ class UserServiceImplTest {
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername(userDto.getUsername());
         userEntity.setPassword("encodedPassword");
-        userEntity.setRoles(userDto.getRoles().stream().map(RoleMapper::mapToRole).collect(Collectors.toSet()));
+        userEntity.setRoles(userDto.getRoles().stream().map(RoleMapper.INSTANCE::mapToRole).collect(Collectors.toSet()));
 
-        userEntity = UserMapper.mapToUser(userDto);
+        userEntity = UserMapper.INSTANCE.mapToUser(userDto);
 
         when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
 
@@ -134,14 +134,14 @@ class UserServiceImplTest {
         user.setId(1);
         user.setUsername("jackson");
         user.setPassword("password");
-        user.setDeleted(true);
+        user.setIsDeleted(true);
         user.setRoles(new HashSet<>());
 
         UserEntity user1 = new UserEntity();
         user1.setId(1);
         user1.setUsername("jackson1");
         user1.setPassword("password");
-        user1.setDeleted(true);
+        user1.setIsDeleted(true);
         user1.setRoles(new HashSet<>());
 
 
@@ -157,8 +157,8 @@ class UserServiceImplTest {
         verify(userRepository, times(1)).findAllDeleted(pageable);
         assertEquals("jackson", result.getContent().get(0).getUsername());
         assertEquals("jackson1", result.getContent().get(1).getUsername());
-        assertTrue(result.getContent().get(0).isDeleted());
-        assertTrue(result.getContent().get(1).isDeleted());
+        assertTrue(result.getContent().get(0).getIsDeleted());
+        assertTrue(result.getContent().get(1).getIsDeleted());
     }
 
     @Test
@@ -168,7 +168,7 @@ class UserServiceImplTest {
         user.setId(1);
         user.setUsername("jackson");
         user.setPassword("password");
-        user.setDeleted(true);
+        user.setIsDeleted(true);
         user.setRoles(new HashSet<>());
         when(userRepository.findByUsername(user.getUsername())).thenReturn(user);
 

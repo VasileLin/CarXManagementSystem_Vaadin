@@ -2,6 +2,7 @@ package com.vmoon.carx.services.implementations;
 
 import com.vmoon.carx.dto.CarBrandDto;
 import com.vmoon.carx.mappers.CarBrandMapper;
+import com.vmoon.carx.mappers.CycleAvoidingMappingContext;
 import com.vmoon.carx.repositories.CarBrandRepository;
 import com.vmoon.carx.services.CarBrandService;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +21,14 @@ public class CarBrandsService implements CarBrandService {
     public List<CarBrandDto> allBrands() {
         return carBrandRepository.findAll()
                 .stream()
-                .map(CarBrandMapper::toCarBrandDtoWithModels)
+                .map(e -> CarBrandMapper.INSTANCE.toCarBrandDtoWithModels(e, new CycleAvoidingMappingContext()))
                 .toList();
     }
 
     @Override
     public void saveBrand(CarBrandDto carBrandDto) {
         if (carBrandDto != null) {
-            carBrandRepository.save(CarBrandMapper.toCarBrand(carBrandDto));
+            carBrandRepository.save(CarBrandMapper.INSTANCE.toCarBrand(carBrandDto, new CycleAvoidingMappingContext()));
         }
     }
 

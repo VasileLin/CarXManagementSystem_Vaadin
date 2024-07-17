@@ -2,6 +2,9 @@ package com.vmoon.carx.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
+
+import java.util.Objects;
 
 @Entity
 @Table(name = "car_model")

@@ -186,7 +186,7 @@ public class UsersView extends Composite<VerticalLayout> {
         if (authUser.getId() == userDto.getId()) {
             Notifications.errorNotification("You cannot delete current logged user!").open();
         } else {
-            userDto.setDeleted(true);
+            userDto.setIsDeleted(true);
             userService.update(userDto);
             Notifications.successNotification("User are successfully deleted!").open();
             usersGrid.getDataProvider().refreshAll();

@@ -223,7 +223,7 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
                     .category(categoryComboBox.getValue())
                     .build();
             try {
-                acquisitionService.saveAcquisition(GoodsMapper.toAcquisitionDto(goodDto));
+                acquisitionService.saveAcquisition(GoodsMapper.INSTANCE.toAcquisitionDto(goodDto));
                 GoodsDto savedGood = goodsService.saveGood(goodDto);
                 savedGood.setCompatibleModels(carModelMultiSelect.getValue());
                 savedGood.setCategory(categoryComboBox.getValue());

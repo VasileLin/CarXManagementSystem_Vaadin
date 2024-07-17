@@ -155,6 +155,7 @@ public class ServiceFormView extends Composite<VerticalLayout> {
                 .id(serviceDto.getId())
                 .name(serviceNameTextField.getValue())
                 .price(priceField.getValue())
+                .isDeleted(false)
                 .build();
     }
 
@@ -162,6 +163,7 @@ public class ServiceFormView extends Composite<VerticalLayout> {
         return ServiceDto.builder()
                 .name(serviceNameTextField.getValue())
                 .price(priceField.getValue())
+                .isDeleted(false)
                 .build();
     }
 

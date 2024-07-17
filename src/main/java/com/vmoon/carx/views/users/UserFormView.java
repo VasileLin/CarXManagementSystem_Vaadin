@@ -54,8 +54,6 @@ public class UserFormView extends Composite<VerticalLayout> {
     H3 h3;
     @Setter
     private boolean updateFlag;
-    @Setter
-    private boolean isAdminFlag;
     @Getter
     Button saveButton;
     @Getter
@@ -140,13 +138,8 @@ public class UserFormView extends Composite<VerticalLayout> {
                     userService.add(getUserToSave());
                     Notifications.successNotification("User added successfully!").open();
                 } else {
-
-                    if (isAdminFlag) {
-                        userService.update(getUserToUpdate());
-                        Notifications.successNotification("User updated successfully!").open();
-                    }else {
-                        userService.updateSelf(getUserToUpdate());
-                    }
+                    userService.update(getUserToUpdate());
+                    Notifications.successNotification("User updated successfully!").open();
                 }
             }
         } catch (Exception e) {
@@ -159,6 +152,7 @@ public class UserFormView extends Composite<VerticalLayout> {
                 .username(usernameTextField.getValue())
                 .password(passwordTextField.getValue())
                 .roles(userRoleComboBox.getSelectedItems())
+                .isDeleted(false)
                 .build();
     }
 
@@ -168,6 +162,7 @@ public class UserFormView extends Composite<VerticalLayout> {
                 .username(usernameTextField.getValue())
                 .password(passwordTextField.getValue())
                 .roles(userRoleComboBox.getSelectedItems())
+                .isDeleted(false)
                 .build();
     }
 

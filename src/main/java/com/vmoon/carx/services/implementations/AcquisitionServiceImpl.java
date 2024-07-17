@@ -15,6 +15,6 @@ public class AcquisitionServiceImpl implements AcquisitionService {
 
     @Override
     public void saveAcquisition(AcquisitionDto acquisition) {
-        acquisitionRepository.save(AcquisitionMapper.toAcquisition(acquisition));
+        acquisitionRepository.save(AcquisitionMapper.INSTANCE.toAcquisition(acquisition));
     }
 }

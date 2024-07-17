@@ -19,7 +19,7 @@ public class Service {
     private Long id;
     private String name;
     private Double price;
-    private boolean isDeleted;
+    private Boolean isDeleted;
 
     @ManyToMany(mappedBy = "services")
     private List<Cash> cashes = new ArrayList<>();

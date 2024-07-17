@@ -214,6 +214,7 @@ public class EmployerFormView extends Composite<VerticalLayout> {
                 .address(address.getValue())
                 .dateOfBirth(dateOfBirthPicker.getValue())
                 .role(roleSelect.getValue())
+                .isDeleted(false)
                 .build();
     }
 
@@ -237,6 +238,7 @@ public class EmployerFormView extends Composite<VerticalLayout> {
                 .address(address.getValue())
                 .dateOfBirth(dateOfBirthPicker.getValue())
                 .role(roleSelect.getValue())
+                .isDeleted(false)
                 .build();
     }
 

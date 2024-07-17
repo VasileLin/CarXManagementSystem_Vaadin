@@ -1,15 +1,13 @@
 package com.vmoon.carx.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "users")
@@ -20,7 +18,7 @@ public class UserEntity {
     private int id;
     private String username;
     private String password;
-    private boolean isDeleted;
+    private Boolean isDeleted;
 
     @BatchSize(size = 10)
     @ManyToMany

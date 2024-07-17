@@ -4,6 +4,7 @@ import com.vmoon.carx.dto.GoodsDto;
 import com.vmoon.carx.entities.CarBrand;
 import com.vmoon.carx.entities.CarModel;
 import com.vmoon.carx.entities.Goods;
+import com.vmoon.carx.mappers.CycleAvoidingMappingContext;
 import com.vmoon.carx.mappers.GoodsMapper;
 import com.vmoon.carx.repositories.GoodsRepository;
 import com.vmoon.carx.services.GoodsService;
@@ -32,13 +33,15 @@ public class GoodsServiceImpl implements GoodsService {
 
     @Override
     public @NonNull List<GoodsDto> allGoods() {
-        return goodsRepository.findAll().stream().map(GoodsMapper::toGoodsDto).toList();
+        return goodsRepository.findAll().stream().map(e -> GoodsMapper.INSTANCE.toGoodsDto(e,new CycleAvoidingMappingContext())).toList();
     }
 
     @Override
     public GoodsDto saveGood(GoodsDto goodsDto) {
         if (goodsDto != null) {
-          return GoodsMapper.toGoodsDto(goodsRepository.save(GoodsMapper.toGoods(goodsDto)));
+          return GoodsMapper.INSTANCE.toGoodsDto(
+                  goodsRepository.save(GoodsMapper.INSTANCE.toGoods(goodsDto,new CycleAvoidingMappingContext()))
+                  ,new CycleAvoidingMappingContext());
         }
         return null;
     }
@@ -51,7 +54,7 @@ public class GoodsServiceImpl implements GoodsService {
     @Override
     public Page<GoodsDto> searchGoods(int categoryId, int brandId, String searchText, Pageable pageable) {
         Specification<Goods> combinedSpec = byCategoryBrandAndText(categoryId, brandId, searchText);
-        return goodsRepository.findAll(combinedSpec, pageable).map(GoodsMapper::toGoodsDto);
+        return goodsRepository.findAll(combinedSpec, pageable).map(e -> GoodsMapper.INSTANCE.toGoodsDto(e,new CycleAvoidingMappingContext()));
 
     }
 
@@ -78,7 +81,7 @@ public class GoodsServiceImpl implements GoodsService {
     @Override
     public Page<GoodsDto> allGoodsDate(PageRequest pageRequest, LocalDate fromValue, LocalDate toValue) {
         return goodsRepository.findAllByDate(pageRequest,fromValue,toValue)
-                .map(GoodsMapper::toGoodsDto);
+                .map(e -> GoodsMapper.INSTANCE.toGoodsDto(e,new CycleAvoidingMappingContext()));
     }
 
     @Override
@@ -89,7 +92,7 @@ public class GoodsServiceImpl implements GoodsService {
     @Override
     public Page<GoodsDto> fetchGoodsForCategoryAndBrand(int categoryId, int brandId,PageRequest pageRequest) {
         return goodsRepository.findAllByCategoryIdAndCarBrandId(categoryId,brandId,pageRequest)
-         .map(GoodsMapper::toGoodsDto);
+         .map(e -> GoodsMapper.INSTANCE.toGoodsDto(e,new CycleAvoidingMappingContext()));
     }
 
     public static Specification<Goods> byCategoryBrandAndText(int categoryId, int brandId, String searchText) {

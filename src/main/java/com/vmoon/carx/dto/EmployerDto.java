@@ -28,6 +28,6 @@ public class EmployerDto {
     private String email;
     @NotNull(message = "Chose role of employer")
     private RoleDto role;
-    private boolean isDeleted;
+    private Boolean isDeleted;
 
 }

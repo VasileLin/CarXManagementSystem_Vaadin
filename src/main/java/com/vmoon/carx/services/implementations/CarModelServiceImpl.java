@@ -2,6 +2,7 @@ package com.vmoon.carx.services.implementations;
 
 import com.vmoon.carx.dto.CarModelDto;
 import com.vmoon.carx.mappers.CarModelMapper;
+import com.vmoon.carx.mappers.CycleAvoidingMappingContext;
 import com.vmoon.carx.repositories.CarModelRepository;
 import com.vmoon.carx.services.CarModelService;
 import org.springframework.stereotype.Service;
@@ -23,14 +24,14 @@ public class CarModelServiceImpl implements CarModelService {
     public List<CarModelDto> getCarModelsByBrandId(int brandId) {
         return carModelRepository.findAllByCarBrandId(brandId)
                 .stream()
-                .map(CarModelMapper::toCarModelDto)
+                .map(e ->CarModelMapper.INSTANCE.toCarModelDto(e,new CycleAvoidingMappingContext()))
                 .toList();
     }
 
     @Override
     public void saveModel(CarModelDto carModelDto) {
         if (carModelDto != null) {
-            carModelRepository.save(CarModelMapper.toCarModel(carModelDto));
+            carModelRepository.save(CarModelMapper.INSTANCE.toCarModel(carModelDto,new CycleAvoidingMappingContext()));
         }
     }
 }

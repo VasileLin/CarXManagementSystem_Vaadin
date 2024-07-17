@@ -17,7 +17,7 @@ public class UserDto {
     @NotEmpty
     private String username;
     private String password;
-    private boolean isDeleted;
+    private Boolean isDeleted;
     @NotNull
     private Set<RoleDto> roles;
 }

@@ -210,13 +210,13 @@ public class ServiceView extends Composite<VerticalLayout> {
 
     private void configureExportButton(Button exportButton) {
         exportButton.addClickListener(event -> {
+            UI currentUI = UI.getCurrent();
             String fileName = "services.xlsx";
             StreamResource resource = new StreamResource(fileName, () -> {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-                try (Workbook workbook = createServicesExcelWorkBook(servicesService.allServices())) {
+                try (Workbook workbook = createServicesExcelWorkBook(servicesGrid.getLazyDataView().getItems().toList())) {
                     workbook.write(bos);
-                    Notifications.UploadSuccessNotification(fileName).open();
                 } catch (IOException e) {
                     Notifications.errorNotification("Error writing file").open();
                 }
@@ -228,8 +228,9 @@ public class ServiceView extends Composite<VerticalLayout> {
             downloadLink.getElement().setAttribute("download", true);
             downloadLink.getElement().setAttribute("href", resource);
             downloadLink.getElement().setAttribute("style", "display: none;");
-            UI.getCurrent().add(downloadLink);
+            currentUI.add(downloadLink);
             downloadLink.getElement().callJsFunction("click");
+            Notifications.UploadSuccessNotification(fileName).open();
         });
     }
 

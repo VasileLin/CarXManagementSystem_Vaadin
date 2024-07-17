@@ -21,7 +21,7 @@ public class GoodsCategoryServiceImpl implements GoodsCategoryService {
     public List<GoodsCategoryDto> getAllCategories() {
         return goodsCategoryRepository.findAll()
                 .stream()
-                .map(GoodsCategoryMapper::toGoodsCategoryDto)
+                .map(GoodsCategoryMapper.INSTANCE::toGoodsCategoryDto)
                 .toList();
     }
 

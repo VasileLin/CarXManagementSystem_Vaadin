@@ -4,7 +4,6 @@ import com.vmoon.carx.dto.ServiceDto;
 import com.vmoon.carx.entities.Service;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import org.springframework.stereotype.Component;
 
 @Mapper
 public interface ServiceMapper {

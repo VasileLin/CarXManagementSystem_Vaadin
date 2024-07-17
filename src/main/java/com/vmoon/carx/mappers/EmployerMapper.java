@@ -4,7 +4,6 @@ import com.vmoon.carx.dto.EmployerDto;
 import com.vmoon.carx.entities.Employer;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
-import org.springframework.stereotype.Component;
 
 @Mapper
 public interface EmployerMapper {

@@ -196,6 +196,7 @@ public class EmployersView extends Composite<VerticalLayout> {
         if (SecurityUtils.isUserAdmin()) {
             Grid.Column<EmployerDto> deleteColumn = employerDtoGrid.addColumn(new ComponentRenderer<>(employerDto -> {
                 Button deleteButton = new Button(new Icon(VaadinIcon.TRASH), buttonClickEvent -> confirmDeleteDialog(employerDto));
+                deleteButton.setTooltipText("Delete Employer");
                 deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
                 return deleteButton;
             })).setHeader("Actions");

@@ -163,9 +163,10 @@ public class DeletedCustomersView extends Composite<VerticalLayout> {
                 .setSortProperty("email");
 
         Grid.Column<CustomerDto> recoveryColumn = grid.addColumn(new ComponentRenderer<>(customerDto -> {
-            Button deleteButton = new Button(new Icon(VaadinIcon.RECYCLE), buttonClickEvent -> confirmRecoveryDialog(customerDto));
-            deleteButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
-            return deleteButton;
+            Button recoveryButton = new Button(new Icon(VaadinIcon.RECYCLE), buttonClickEvent -> confirmRecoveryDialog(customerDto));
+            recoveryButton.setTooltipText("Recovery Customer");
+            recoveryButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
+            return recoveryButton;
         })).setHeader("Actions");
 
         grid.setColumnOrder(nameColumn, phoneColumn, emailColumn, carModelBrandColumn, carNumberColumn, recoveryColumn);

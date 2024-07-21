@@ -9,6 +9,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -41,12 +42,13 @@ public class UsersView extends Composite<VerticalLayout> {
     private final RoleService roleService;
     private final AuthenticatedUser authenticatedUser;
     Grid<UserDto> usersGrid;
+    UserEntity authUser;
 
     public UsersView(UserService userService, RoleService roleService, AuthenticatedUser authenticatedUser) {
         this.userService = userService;
         this.roleService = roleService;
         this.authenticatedUser = authenticatedUser;
-
+        authUser = authenticatedUser.get().orElseThrow();
         createUI();
     }
 
@@ -142,14 +144,22 @@ public class UsersView extends Composite<VerticalLayout> {
                 .setSortable(true)
                 .setSortProperty("roles");
 
-        Grid.Column<UserDto> deleteColumn = usersGrid.addColumn(new ComponentRenderer<>(userDto -> {
+        Grid.Column<UserDto> actionsColumn = usersGrid.addColumn(new ComponentRenderer<>(userDto -> {
+            HorizontalLayout layout = new HorizontalLayout();
+
             Button deleteButton = new Button(new Icon(VaadinIcon.TRASH), buttonClickEvent -> confirmDeleteDialog(userDto));
-            deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_SMALL);
-            return deleteButton;
+            deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
+            deleteButton.setTooltipText("Delete user");
+
+            Button resetButton = new Button(new Icon(VaadinIcon.RECYCLE), buttonClickEvent -> confirmResetDialog(userDto));
+            resetButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
+            resetButton.setTooltipText("Reset user");
+            layout.add(deleteButton, resetButton);
+            return layout;
         })).setHeader("Actions");
 
 
-        usersGrid.setColumnOrder(idColumn,usernameColumn,rolesColumn,deleteColumn);
+        usersGrid.setColumnOrder(idColumn,usernameColumn,rolesColumn,actionsColumn);
 
 
         DataProvider<UserDto, Void> dataProvider = DataProvider.fromCallbacks(
@@ -169,6 +179,21 @@ public class UsersView extends Composite<VerticalLayout> {
         usersGrid.setDataProvider(dataProvider);
     }
 
+    private void confirmResetDialog(UserDto userDto) {
+        ConfirmDialog dialog = new ConfirmDialog();
+        dialog.setHeader("User "+ userDto.getUsername());
+        dialog.setText("Are you sure you want to reset password for this user?\nDefault password 'Parola123++'");
+        dialog.setCancelable(true);
+
+        dialog.setConfirmText("Reset");
+        dialog.setConfirmButtonTheme("success primary");
+        dialog.addConfirmListener(event -> resetPasswordUser(userDto));
+        dialog.setCancelText("No");
+        dialog.setCancelButtonTheme("warning primary");
+        dialog.addCancelListener(event -> dialog.close());
+        dialog.open();
+    }
+
     private void confirmDeleteDialog(UserDto userDto) {
         ConfirmDialog dialog = new ConfirmDialog();
         dialog.setHeader("User "+ userDto.getUsername());
@@ -181,8 +206,13 @@ public class UsersView extends Composite<VerticalLayout> {
         dialog.open();
     }
 
+    private void resetPasswordUser(UserDto userDto) {
+        userService.update(userDto);
+        Notifications.successNotification("Password are successfully reset!").open();
+        usersGrid.getDataProvider().refreshAll();
+    }
+
     private void deleteUser(UserDto userDto) {
-        UserEntity authUser = authenticatedUser.get().orElseThrow();
         if (authUser.getId() == userDto.getId()) {
             Notifications.errorNotification("You cannot delete current logged user!").open();
         } else {

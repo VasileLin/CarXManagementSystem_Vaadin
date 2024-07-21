@@ -6,6 +6,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -238,7 +239,7 @@ public class CashView extends Composite<VerticalLayout> {
         Grid.Column<ServiceDto> saveColumn = serviceGrid.addColumn(new ComponentRenderer<>(service -> {
             Button openDialogButton = new Button(new Icon(VaadinIcon.BOOK_DOLLAR));
             openDialogButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
-
+            openDialogButton.setTooltipText("Change price of service");
             openDialogButton.addClickListener(e -> {
                 currentService.set(service);
                 priceField.setValue(String.valueOf(currentService.get().getPrice()));
@@ -304,16 +305,15 @@ public class CashView extends Composite<VerticalLayout> {
 
 
         Grid.Column<GoodsDto> saveColumn = costOfGoodsGrid.addColumn(new ComponentRenderer<>(cost -> {
-            Button savingButton = new Button(new Icon(VaadinIcon.BOOK_DOLLAR));
-            savingButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
-
-            savingButton.addClickListener(e -> {
+            Button changeCostButton = new Button(new Icon(VaadinIcon.BOOK_DOLLAR));
+            changeCostButton.setTooltipText("Change quantity");
+            changeCostButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
+            changeCostButton.addClickListener(e -> {
                 currentCost.set(cost);
                 quantityField.setValue(String.valueOf(cost.getQuantity()));
                 quantityDialog.open();
             });
-
-            return savingButton;
+            return changeCostButton;
         })).setHeader("Actions");
 
 
@@ -374,7 +374,6 @@ public class CashView extends Composite<VerticalLayout> {
 
                 Notifications.successNotification("Cash successfully registered!").open();
                 generateReceipt();
-                UI.getCurrent().getPage().reload();
 
             } else {
                 Notifications.warningNotification("Quantity must be greater than zero!").open();
@@ -382,6 +381,21 @@ public class CashView extends Composite<VerticalLayout> {
 
         } catch (Exception e) {
             Notifications.errorNotification("Error saving cash :" + e.getMessage()).open();
+        }
+    }
+
+
+    private void sendReceipt(String customerEmail,byte[] pdfContent) {
+        if (pdfContent != null) {
+            try {
+                logger.info("Trying to send email to {}", customerEmail);
+                mailTools.sendEmailWithAttachment(customerEmail, pdfContent);
+                logger.info("Email sent successfully to {}", customerEmail);
+            } catch (MessagingException | IOException e) {
+                logger.error("Failed to send email to {}: {}", customerEmail, e.getMessage(), e);
+                Notification.show("Failed to send email: " + e.getMessage(), 5000, Notification.Position.MIDDLE);
+            }
+            UI.getCurrent().getPage().reload();
         }
     }
 
@@ -412,16 +426,20 @@ public class CashView extends Composite<VerticalLayout> {
         parameters.put("logo", url);
 
         byte[] pdfContent = ReceiptGenerator.cashReceiptGenerator(parameters, directory);
-        if (pdfContent != null) {
-            try {
-                logger.info("Trying to send email to {}", customerEmail);
-                mailTools.sendEmailWithAttachment(customerEmail, pdfContent);
-                logger.info("Email sent successfully to {}", customerEmail);
-            } catch (MessagingException | IOException e) {
-                logger.error("Failed to send email to {}: {}", customerEmail, e.getMessage(), e);
-                Notification.show("Failed to send email: " + e.getMessage(), 5000, Notification.Position.MIDDLE);
-            }
-        }
+
+        ConfirmDialog dialog = new ConfirmDialog();
+        dialog.setHeader("Generate receipt");
+        dialog.setText("Send receipt at customer email address? \n "+customerEmail);
+        dialog.setCancelable(true);
+
+        dialog.setConfirmText("Yes");
+        dialog.setConfirmButtonTheme("success primary");
+        dialog.addConfirmListener(event -> sendReceipt(customerEmail,pdfContent));
+        dialog.setCancelText("No");
+        dialog.setCancelButtonTheme("warning primary");
+        dialog.addCancelListener(event -> UI.getCurrent().getPage().reload());
+        dialog.open();
+
     }
 
 

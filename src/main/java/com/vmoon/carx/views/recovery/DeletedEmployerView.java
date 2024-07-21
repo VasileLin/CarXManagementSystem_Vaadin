@@ -165,9 +165,10 @@ public class DeletedEmployerView extends Composite<VerticalLayout> {
                 .setSortProperty("role");
 
         Grid.Column<EmployerDto> recoveryColumn = employerDtoGrid.addColumn(new ComponentRenderer<>(employerDto -> {
-            Button deleteButton = new Button(new Icon(VaadinIcon.RECYCLE), buttonClickEvent -> confirmRecoveryDialog(employerDto));
-            deleteButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
-            return deleteButton;
+            Button recoveryButton = new Button(new Icon(VaadinIcon.RECYCLE), buttonClickEvent -> confirmRecoveryDialog(employerDto));
+            recoveryButton.setTooltipText("Recovery Employer");
+            recoveryButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
+            return recoveryButton;
         })).setHeader("Actions");
 
         employerDtoGrid.setColumnOrder(fullNameColumn, dateOfBirthColumn, addressColumn, emailColumn, phoneColumn, roleColumn, recoveryColumn);

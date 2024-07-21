@@ -25,6 +25,7 @@ import com.vmoon.carx.views.customers.CustomersView;
 import com.vmoon.carx.views.employers.EmployersView;
 import com.vmoon.carx.views.recovery.DeletedCustomersView;
 import com.vmoon.carx.views.recovery.DeletedEmployerView;
+import com.vmoon.carx.views.recovery.DeletedServicesView;
 import com.vmoon.carx.views.recovery.DeletedUsersView;
 import com.vmoon.carx.views.reports.ReportsView;
 import com.vmoon.carx.views.service.ServiceView;
@@ -124,6 +125,10 @@ public class MainLayout extends AppLayout {
 
         if (accessChecker.hasAccess(DeletedUsersView.class)) {
             nav.addItem(new SideNavItem("Deleted users", DeletedUsersView.class, LineAwesomeIcon.USER_NINJA_SOLID.create()));
+        }
+
+        if (accessChecker.hasAccess(DeletedServicesView.class)) {
+            nav.addItem(new SideNavItem("Deleted services", DeletedServicesView.class, LineAwesomeIcon.SERVICESTACK.create()));
         }
 
         return nav;

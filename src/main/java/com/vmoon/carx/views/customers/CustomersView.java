@@ -204,6 +204,7 @@ public class CustomersView extends Composite<VerticalLayout> {
         if (SecurityUtils.isUserAdmin()) {
             Grid.Column<CustomerDto> deleteColumn = grid.addColumn(new ComponentRenderer<>(customerDto -> {
                 Button deleteButton = new Button(new Icon(VaadinIcon.TRASH), buttonClickEvent -> confirmDeleteDialog(customerDto));
+                deleteButton.setTooltipText("Delete Customer");
                 deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
                 return deleteButton;
             })).setHeader("Actions");

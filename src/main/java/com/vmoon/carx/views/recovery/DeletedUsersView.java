@@ -79,9 +79,10 @@ public class DeletedUsersView extends Composite<VerticalLayout> {
                 .setSortProperty("roles");
 
         Grid.Column<UserDto> recoveryColumn = usersGrid.addColumn(new ComponentRenderer<>(userDto -> {
-            Button deleteButton = new Button(new Icon(VaadinIcon.RECYCLE), buttonClickEvent -> confirmRecoveryDialog(userDto));
-            deleteButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
-            return deleteButton;
+            Button recoveryButton = new Button(new Icon(VaadinIcon.RECYCLE), buttonClickEvent -> confirmRecoveryDialog(userDto));
+            recoveryButton.setTooltipText("Recovery User");
+            recoveryButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
+            return recoveryButton;
         })).setHeader("Actions");
 
         usersGrid.setColumnOrder(idColumn, usernameColumn, rolesColumn, recoveryColumn);

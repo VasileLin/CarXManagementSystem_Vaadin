@@ -4,6 +4,7 @@ import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
@@ -19,18 +20,23 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
+import com.vmoon.carx.dto.CustomerDto;
 import com.vmoon.carx.dto.ServiceDto;
 import com.vmoon.carx.services.ServicesService;
 import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.views.MainLayout;
+import com.vmoon.carx.views.customers.CustomersView;
 import com.vmoon.carx.views.serviceform.ServiceFormView;
 import jakarta.annotation.security.RolesAllowed;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -49,6 +55,7 @@ public class ServiceView extends Composite<VerticalLayout> {
 
     private final ServicesService servicesService;
     private final ServiceFormView serviceFormView;
+    private static final Logger logger = LoggerFactory.getLogger(ServiceView.class);
     Grid<ServiceDto> servicesGrid;
     Dialog dialog;
     TextField searchServicesField;
@@ -166,7 +173,14 @@ public class ServiceView extends Composite<VerticalLayout> {
                 .setSortable(true)
                 .setSortProperty("price");
 
-        grid.setColumnOrder(idColumn, nameColumn, priceColumn);
+        Grid.Column<ServiceDto> deleteColumn = grid.addColumn(new ComponentRenderer<>(serviceDto -> {
+            Button deleteButton = new Button(new Icon(VaadinIcon.TRASH), buttonClickEvent -> confirmDeleteDialog(serviceDto));
+            deleteButton.setTooltipText("Delete Service");
+            deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
+            return deleteButton;
+        })).setHeader("Actions");
+
+        grid.setColumnOrder(idColumn, nameColumn, priceColumn,deleteColumn);
 
         grid.addItemDoubleClickListener(event -> {
             ServiceDto serviceDto = event.getItem();
@@ -187,6 +201,29 @@ public class ServiceView extends Composite<VerticalLayout> {
         );
 
         grid.setDataProvider(dataProvider);
+    }
+
+    private void confirmDeleteDialog(ServiceDto serviceDto) {
+        ConfirmDialog dialog = new ConfirmDialog();
+        dialog.setHeader("Service " + serviceDto.getName());
+        dialog.setText("Are you sure you want to delete this service?");
+        dialog.setCancelable(true);
+
+        dialog.setConfirmText("Delete");
+        dialog.setConfirmButtonTheme("error primary");
+        dialog.addConfirmListener(event -> deleteService(serviceDto));
+        dialog.setCancelText("No");
+        dialog.setCancelButtonTheme("warning primary");
+        dialog.addCancelListener(event -> dialog.close());
+        dialog.open();
+    }
+
+    private void deleteService(ServiceDto serviceDto) {
+        serviceDto.setIsDeleted(true);
+        servicesService.saveService(serviceDto);
+        Notifications.successNotification("Service successfully deleted!").open();
+        logger.info("Service {} successfully deleted!", serviceDto.getName());
+        servicesGrid.getDataProvider().refreshAll();
     }
 
     private void openEditDialog(ServiceDto serviceDto) {

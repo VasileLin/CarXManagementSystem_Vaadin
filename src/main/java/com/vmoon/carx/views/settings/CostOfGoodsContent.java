@@ -273,7 +273,7 @@ public class CostOfGoodsContent extends Composite<VerticalLayout> {
         Grid.Column<GoodsDto> actionColumn = grid.addColumn(new ComponentRenderer<>(
                 good -> {
                     Button buyButton = new Button(new Icon(VaadinIcon.DOLLAR), buttonClickEvent -> openAcquisitionDialog(good));
-
+                    buyButton.setTooltipText("Buy selected good");
                     buyButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
                     return buyButton;
                 })).setHeader("Actions");
@@ -294,6 +294,7 @@ public class CostOfGoodsContent extends Composite<VerticalLayout> {
         goodsRegistrationView.setUpdateFlag(true);
 
         goodsRegistrationView.getCancelButton().addClickListener(event -> dialog.close());
+        goodsRegistrationView.getStockField().setReadOnly(true);
         goodsRegistrationView.getSaveButton().addClickListener(event -> {
             goodsService.saveGood(goodsRegistrationView.getGoodToUpdate());
             Notifications.successNotification("Good updated successfully!").open();

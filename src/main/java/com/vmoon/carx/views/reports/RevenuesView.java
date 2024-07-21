@@ -183,6 +183,7 @@ public class RevenuesView extends Composite<VerticalLayout> {
                 }
             });
             saveButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
+            saveButton.setTooltipText("Download receipt");
             return saveButton;
         })).setHeader("Actions");
 

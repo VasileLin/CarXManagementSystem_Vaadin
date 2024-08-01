@@ -179,7 +179,7 @@ public class MainLayout extends AppLayout {
 
         userFormView.getSaveButton().addClickListener(event -> {
             if (userFormView.getValidationBinder().validate().isOk()) {
-                userFormView.saveUser();
+                userFormView.updateSelf();
                 dialog.close();
                 authenticatedUser.logout();
                 Notifications.successNotification("Data successfully updated,login with updated credentials!");

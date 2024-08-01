@@ -74,7 +74,7 @@ public class CostOfGoodsContent extends Composite<VerticalLayout> {
         flexLayout.setWidthFull();
 
         Accordion accordion = new Accordion();
-        accordion.setHeight("500px");
+        accordion.setHeight("450px");
         accordion.getStyle().set("flex-grow", "1");
         accordion.getStyle().set("overflow-y", "auto");
         setAccordionCategoryData(accordion);
@@ -88,7 +88,7 @@ public class CostOfGoodsContent extends Composite<VerticalLayout> {
         searchGoods.addValueChangeListener(event -> searchGoodsByCategoryAndBrand(event.getValue().trim()));
 
         goodsDtoGrid = new Grid<>(GoodsDto.class, false);
-        goodsDtoGrid.setHeight("500px");
+        goodsDtoGrid.setHeight("400px");
         goodsDtoGrid.getStyle().set("flex-grow", "6");
         setGridSampleData(goodsDtoGrid);
 

@@ -85,7 +85,7 @@ public class CostOfGoodsView extends Composite<VerticalLayout> {
         exportCostsButton.setPrefixComponent(new Icon(VaadinIcon.DOWNLOAD));
         configureCostsExportButton(exportCostsButton);
         goodsGrid.setWidth("100%");
-        goodsGrid.setHeight("600px");
+        goodsGrid.setHeight("450px");
         goodsGrid.getStyle().set("flex-grow", "0");
         setGoodsGridSampleData(goodsGrid);
         getContent().add(layoutRow);

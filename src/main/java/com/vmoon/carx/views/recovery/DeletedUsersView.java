@@ -48,6 +48,7 @@ public class DeletedUsersView extends Composite<VerticalLayout> {
         layoutColumn2.setWidth("100%");
         layoutColumn2.getStyle().set("flex-grow", "1");
         usersGrid.setWidth("100%");
+        usersGrid.setHeight("450px");
         usersGrid.getStyle().set("flex-grow", "0");
         setUsersGridData(usersGrid);
         getContent().add(layoutColumn2);

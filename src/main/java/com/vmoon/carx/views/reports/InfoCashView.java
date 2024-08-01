@@ -96,6 +96,7 @@ public class InfoCashView extends Composite<VerticalLayout> {
         servicesGrid.setWidth("100%");
         servicesGrid.getStyle().set("flex-grow", "0");
         goodsGrid.setWidth("100%");
+        goodsGrid.setHeight("450px");
         goodsGrid.getStyle().set("flex-grow", "0");
         infoTextArea.setLabel("Cash details");
         infoTextArea.setWidth("100%");

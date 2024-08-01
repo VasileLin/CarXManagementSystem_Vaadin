@@ -38,6 +38,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(entity.getUsername());
         user.setPassword(passwordEncoder.encode(entity.getPassword()));
         user.setRoles(entity.getRoles().stream().map(RoleMapper.INSTANCE::mapToRole).collect(Collectors.toSet()));
+        user.setIsDeleted(entity.getIsDeleted());
 
         return userRepository.save(user);
     }
@@ -45,6 +46,13 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public @NonNull UserEntity update(@NonNull UserDto entity) {
         return userRepository.save(UserMapper.INSTANCE.mapToUser(entity));
+    }
+
+    @Override
+    public void updateSelf(UserDto entity) {
+        UserEntity entityUpdate = UserMapper.INSTANCE.mapToUser(entity);
+        entityUpdate.setPassword(passwordEncoder.encode(entity.getPassword()));
+        userRepository.save(entityUpdate);
     }
 
     @Transactional

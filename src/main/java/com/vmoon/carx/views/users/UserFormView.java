@@ -147,6 +147,16 @@ public class UserFormView extends Composite<VerticalLayout> {
         }
     }
 
+    public void updateSelf() {
+        try {
+            if (validationBinder.validate().isOk()) {
+                userService.updateSelf(getUserToUpdate());
+            }
+        } catch (Exception e) {
+            Notifications.errorNotification("Error while updating data -> " + e.getMessage()).open();
+        }
+    }
+
     private UserDto getUserToSave(){
         return UserDto.builder()
                 .username(usernameTextField.getValue())

@@ -21,10 +21,7 @@ import com.vaadin.flow.data.validator.BeanValidator;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import com.vmoon.carx.dto.CarBrandDto;
-import com.vmoon.carx.dto.CarModelDto;
-import com.vmoon.carx.dto.GoodsCategoryDto;
-import com.vmoon.carx.dto.GoodsDto;
+import com.vmoon.carx.dto.*;
 import com.vmoon.carx.mappers.GoodsMapper;
 import com.vmoon.carx.services.AcquisitionService;
 import com.vmoon.carx.services.CarBrandService;
@@ -223,7 +220,9 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
                     .category(categoryComboBox.getValue())
                     .build();
             try {
-                acquisitionService.saveAcquisition(GoodsMapper.INSTANCE.toAcquisitionDto(goodDto));
+                AcquisitionDto acquisitionDto = GoodsMapper.INSTANCE.toAcquisitionDto(goodDto);
+                acquisitionDto.setTotalPrice(goodDto.getStock()*goodDto.getCost());
+                acquisitionService.saveAcquisition(acquisitionDto);
                 GoodsDto savedGood = goodsService.saveGood(goodDto);
                 savedGood.setCompatibleModels(carModelMultiSelect.getValue());
                 savedGood.setCategory(categoryComboBox.getValue());

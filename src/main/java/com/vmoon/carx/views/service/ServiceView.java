@@ -26,12 +26,10 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
-import com.vmoon.carx.dto.CustomerDto;
 import com.vmoon.carx.dto.ServiceDto;
 import com.vmoon.carx.services.ServicesService;
 import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.views.MainLayout;
-import com.vmoon.carx.views.customers.CustomersView;
 import com.vmoon.carx.views.serviceform.ServiceFormView;
 import jakarta.annotation.security.RolesAllowed;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -74,7 +72,7 @@ public class ServiceView extends Composite<VerticalLayout> {
         servicesGrid = new Grid<>(ServiceDto.class, false);
         servicesGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         servicesGrid.setWidth("100%");
-        servicesGrid.setHeight("555px");
+        servicesGrid.setHeight("450px");
         servicesGrid.getStyle().set("flex-grow", "0");
         setGridSampleData(servicesGrid);
 

@@ -68,7 +68,7 @@ public class RevenuesView extends Composite<VerticalLayout> {
 
         cashGrid = new Grid<>(CashGridDto.class, false);
         cashGrid.setWidth("100%");
-        cashGrid.setHeight("600px");
+        cashGrid.setHeight("450px");
         cashGrid.getStyle().set("flex-grow", "0");
         cashGrid.addItemDoubleClickListener(item -> openInfoDialog(cashService.getCashByTransactionNo(item.getItem().getTransactionNo())));
         setCashGridSampleData(cashGrid);

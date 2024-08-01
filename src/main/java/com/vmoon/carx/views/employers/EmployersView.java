@@ -70,7 +70,7 @@ public class EmployersView extends Composite<VerticalLayout> {
         employersGrid = new Grid<>(EmployerDto.class, false);
         employersGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         employersGrid.setWidth("100%");
-        employersGrid.setHeight("555px");
+        employersGrid.setHeight("450px");
         employersGrid.getStyle().set("flex-grow", "0");
         setGridSampleData(employersGrid);
 

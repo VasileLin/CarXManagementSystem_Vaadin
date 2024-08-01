@@ -49,7 +49,7 @@ public class DeletedServicesView extends Composite<VerticalLayout> {
         servicesGrid = new Grid<>(ServiceDto.class, false);
         servicesGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         servicesGrid.setWidth("100%");
-        servicesGrid.setHeight("555px");
+        servicesGrid.setHeight("450px");
         servicesGrid.getStyle().set("flex-grow", "0");
         setGridSampleData(servicesGrid);
 

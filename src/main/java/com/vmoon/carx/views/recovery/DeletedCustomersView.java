@@ -49,7 +49,7 @@ public class DeletedCustomersView extends Composite<VerticalLayout> {
         customersGrid = new Grid<>(CustomerDto.class, false);
         customersGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         customersGrid.setWidth("100%");
-        customersGrid.setHeight("555px");
+        customersGrid.setHeight("450px");
         customersGrid.getStyle().set("flex-grow", "0");
         setGridSampleData(customersGrid);
 

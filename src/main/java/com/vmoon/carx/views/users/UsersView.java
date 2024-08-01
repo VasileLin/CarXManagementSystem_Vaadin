@@ -24,6 +24,7 @@ import com.vmoon.carx.services.UserService;
 import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.views.MainLayout;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,16 +39,16 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 public class UsersView extends Composite<VerticalLayout> {
 
+    @Value("${app.user.default-password}")
+    private String hashedPassword;
     private final UserService userService;
     private final RoleService roleService;
-    private final AuthenticatedUser authenticatedUser;
     Grid<UserDto> usersGrid;
     UserEntity authUser;
 
     public UsersView(UserService userService, RoleService roleService, AuthenticatedUser authenticatedUser) {
         this.userService = userService;
         this.roleService = roleService;
-        this.authenticatedUser = authenticatedUser;
         authUser = authenticatedUser.get().orElseThrow();
         createUI();
     }
@@ -207,6 +208,7 @@ public class UsersView extends Composite<VerticalLayout> {
     }
 
     private void resetPasswordUser(UserDto userDto) {
+        userDto.setPassword(hashedPassword);
         userService.update(userDto);
         Notifications.successNotification("Password are successfully reset!").open();
         usersGrid.getDataProvider().refreshAll();

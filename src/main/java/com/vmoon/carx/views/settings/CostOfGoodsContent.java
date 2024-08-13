@@ -19,10 +19,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vmoon.carx.dto.*;
 import com.vmoon.carx.mappers.GoodsMapper;
-import com.vmoon.carx.services.AcquisitionService;
-import com.vmoon.carx.services.CarBrandService;
-import com.vmoon.carx.services.GoodsCategoryService;
-import com.vmoon.carx.services.GoodsService;
+import com.vmoon.carx.services.*;
 import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.views.goods.GoodsRegistrationView;
 import jakarta.annotation.security.RolesAllowed;
@@ -44,7 +41,7 @@ public class CostOfGoodsContent extends Composite<VerticalLayout> {
 
     private final GoodsService goodsService;
     private final AcquisitionService acquisitionService;
-    private final GoodsCategoryService goodsCategoryService;
+    private final CategoriesService goodsCategoryService;
     private final CarBrandService carBrandService;
     Grid<GoodsDto> goodsDtoGrid;
     Dialog dialog;
@@ -56,7 +53,7 @@ public class CostOfGoodsContent extends Composite<VerticalLayout> {
 
     public CostOfGoodsContent(GoodsService goodsService,
                               AcquisitionService acquisitionService,
-                              GoodsCategoryService goodsCategoryService,
+                              CategoriesService goodsCategoryService,
                               CarBrandService carBrandService) {
 
         this.goodsService = goodsService;

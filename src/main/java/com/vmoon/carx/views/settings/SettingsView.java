@@ -22,29 +22,32 @@ public class SettingsView extends Composite<VerticalLayout> {
     private final VerticalLayout companyDataContent;
     private final VerticalLayout goodsDataContent;
     private final VerticalLayout brandManagementContent;
+    private final VerticalLayout goodsCategoriesContent;
 
 
     public SettingsView(CompanyDataContent companyDataContentBean,
                         CostOfGoodsContent costOfGoodsContentBean,
-                        BrandsView brandsViewBean) {
+                        BrandsView brandsViewBean, GoodsCategoryContent goodsCategoriesContent) {
 
         this.companyDataContent = companyDataContentBean.getContent();
         this.goodsDataContent = costOfGoodsContentBean.getContent();
         this.brandManagementContent = brandsViewBean.getContent();
+        this.goodsCategoriesContent = goodsCategoriesContent.getContent();
 
         Tabs tabs = new Tabs();
         Tab tabCostOfGoods = new Tab("Cost of goods");
         Tab tabBrandData = new Tab("Brand management");
         Tab tabCompanyData = new Tab("Company data");
+        Tab tabGoodsCategories = new Tab("Goods Categories");
 
         if (SecurityUtils.isUserAdmin()) {
-            tabs.add(tabCostOfGoods, tabCompanyData, tabBrandData);
+            tabs.add(tabCostOfGoods, tabCompanyData, tabBrandData,tabGoodsCategories);
         } else if (SecurityUtils.isUserManager()) {
             tabs.add(tabCostOfGoods, tabBrandData);
         }
 
         tabs.addSelectedChangeListener(event -> updateVisibleContent(tabs.getSelectedTab()));
-        getContent().add(tabs, goodsDataContent, companyDataContent, brandManagementContent);
+        getContent().add(tabs, goodsDataContent, companyDataContent, brandManagementContent,goodsCategoriesContent);
         updateVisibleContent(tabCostOfGoods);
     }
 
@@ -52,6 +55,7 @@ public class SettingsView extends Composite<VerticalLayout> {
         goodsDataContent.setVisible(false);
         brandManagementContent.setVisible(false);
         companyDataContent.setVisible(false);
+        goodsCategoriesContent.setVisible(false);
         companyDataContent.setAlignItems(FlexComponent.Alignment.CENTER);
 
         if ("Cost of goods".equals(selectedTab.getLabel())) {
@@ -60,6 +64,8 @@ public class SettingsView extends Composite<VerticalLayout> {
             companyDataContent.setVisible(true);
         } else if ("Brand management".equals(selectedTab.getLabel())) {
             brandManagementContent.setVisible(true);
+        } else if ("Goods Categories".equals(selectedTab.getLabel())) {
+            goodsCategoriesContent.setVisible(true);
         }
     }
 }

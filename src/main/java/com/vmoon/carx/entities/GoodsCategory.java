@@ -18,6 +18,7 @@ public class GoodsCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
+    private Boolean isDeleted;
 
     @OneToMany(mappedBy = "category")
     private List<Goods> goods;

@@ -23,10 +23,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import com.vmoon.carx.dto.*;
 import com.vmoon.carx.mappers.GoodsMapper;
-import com.vmoon.carx.services.AcquisitionService;
-import com.vmoon.carx.services.CarBrandService;
-import com.vmoon.carx.services.GoodsCategoryService;
-import com.vmoon.carx.services.GoodsService;
+import com.vmoon.carx.services.*;
 import com.vmoon.carx.utils.Notifications;
 import com.vmoon.carx.views.MainLayout;
 import jakarta.annotation.security.RolesAllowed;
@@ -44,7 +41,7 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
 
     private final GoodsService goodsService;
     private final AcquisitionService acquisitionService;
-    private final GoodsCategoryService categoryService;
+    private final CategoriesService categoryService;
     private final CarBrandService carBrandService;
     @Getter
     private final Button saveButton;
@@ -72,7 +69,7 @@ public class GoodsRegistrationView extends Composite<VerticalLayout> {
     @Setter
     private boolean updateFlag;
 
-    public GoodsRegistrationView(GoodsService goodsService, AcquisitionService acquisitionService, GoodsCategoryService categoryService, CarBrandService carBrandService) {
+    public GoodsRegistrationView(GoodsService goodsService, AcquisitionService acquisitionService, CategoriesService categoryService, CarBrandService carBrandService) {
         this.goodsService = goodsService;
         this.acquisitionService = acquisitionService;
         this.categoryService = categoryService;

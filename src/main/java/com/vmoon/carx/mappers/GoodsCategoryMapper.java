@@ -12,5 +12,5 @@ public interface GoodsCategoryMapper {
 
     GoodsCategoryDto toGoodsCategoryDto(GoodsCategory goodsCategory);
 
-    GoodsCategory toGoods(GoodsCategoryDto category);
+    GoodsCategory toGoodsCategory(GoodsCategoryDto category);
 }

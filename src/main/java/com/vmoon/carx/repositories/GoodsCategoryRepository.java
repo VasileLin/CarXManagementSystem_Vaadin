@@ -1,7 +1,5 @@
 package com.vmoon.carx.repositories;
 
-import com.vmoon.carx.dto.GoodsCategoryDto;
-import com.vmoon.carx.entities.Employer;
 import com.vmoon.carx.entities.GoodsCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

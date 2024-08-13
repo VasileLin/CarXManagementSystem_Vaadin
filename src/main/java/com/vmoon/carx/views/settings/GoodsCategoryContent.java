@@ -33,13 +33,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
 
 @PageTitle("Goods Categories")
 @Uses(Icon.class)
 @Route(value = "goods-categories", layout = MainLayout.class)
 @RolesAllowed({"ADMIN", "MANAGER"})
-@Component
 @Scope("prototype")
 public class GoodsCategoryContent extends Composite<VerticalLayout> {
 

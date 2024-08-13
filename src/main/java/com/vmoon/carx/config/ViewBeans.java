@@ -18,7 +18,7 @@ public class ViewBeans {
 
     @Bean(name = "addGoodsView")
     @Scope("prototype")
-    public GoodsRegistrationView goodsRegistrationView(GoodsService goodsService, AcquisitionService acquisitionService, GoodsCategoryService goodsCategoryService,CarBrandService carBrandService) {
+    public GoodsRegistrationView goodsRegistrationView(GoodsService goodsService, AcquisitionService acquisitionService, CategoriesService goodsCategoryService,CarBrandService carBrandService) {
         return new GoodsRegistrationView(goodsService,acquisitionService,goodsCategoryService,carBrandService);
     }
 

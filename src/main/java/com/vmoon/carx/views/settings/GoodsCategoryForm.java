@@ -109,6 +109,7 @@ public class GoodsCategoryForm extends Composite<VerticalLayout> {
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         cancelButton.setText("Cancel");
         cancelButton.setWidth("min-content");
+        cancelButton.addClickListener(e -> UI.getCurrent().navigate("goods-categories"));
 
         getContent().add(layoutColumn2);
         layoutColumn2.add(h3);

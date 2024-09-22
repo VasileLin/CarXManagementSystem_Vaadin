@@ -83,7 +83,7 @@ public class EmployersView extends Composite<VerticalLayout> {
         addButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addButton.setPrefixComponent(new Icon(VaadinIcon.PLUS));
         addButton.addClickListener(e -> UI.getCurrent().navigate("employer-form"));
-        HorizontalLayout layoutRow2 = new HorizontalLayout();
+
 
         exportButton = new Button();
         exportButton.setPrefixComponent(new Icon(VaadinIcon.FILE_TEXT));
@@ -99,6 +99,7 @@ public class EmployersView extends Composite<VerticalLayout> {
         layoutRow.addClassName(Padding.LARGE);
         layoutRow.setWidth("100%");
         layoutRow.getStyle().set("flex-grow", "1");
+        HorizontalLayout layoutRow2 = new HorizontalLayout();
         layoutRow2.setHeightFull();
         layoutRow.setFlexGrow(1.0, layoutRow2);
         layoutRow2.setWidth("100%");
@@ -111,9 +112,24 @@ public class EmployersView extends Composite<VerticalLayout> {
         searchEmployersField.setPlaceholder("Search Employers ...");
         searchEmployersField.setWidth("100%");
         searchEmployersField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
-        searchEmployersField.addValueChangeListener(e -> searchEmployers(e.getValue().trim()));
 
-        getContent().add(searchEmployersField);
+        Button searchButton = new Button();
+        searchButton.setText("Search");
+        searchButton.setWidth("min-content");
+        searchButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        searchButton.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
+        searchButton.addClickListener(e -> searchEmployers(searchEmployersField.getValue().trim()));
+
+        HorizontalLayout layoutRow3 = new HorizontalLayout();
+        layoutRow3.setHeightFull();
+        layoutRow3.setWidth("100%");
+        layoutRow3.setHeight("50px");
+        layoutRow3.setAlignItems(Alignment.CENTER);
+        layoutRow3.setJustifyContentMode(JustifyContentMode.CENTER);
+
+        layoutRow3.add(searchEmployersField);
+        layoutRow3.add(searchButton);
+        getContent().add(layoutRow3);
         getContent().add(employersGrid);
         getContent().add(hr);
         getContent().add(layoutRow);
@@ -127,7 +143,6 @@ public class EmployersView extends Composite<VerticalLayout> {
 
     private void searchEmployers(String value) {
         if (value.isEmpty()) {
-            Notifications.warningNotification("Search bar is empty!").open();
             employersGrid.setDataProvider(employersDataProvider);
             employersGrid.getDataProvider().refreshAll();
         } else {

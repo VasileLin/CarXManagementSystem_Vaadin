@@ -91,7 +91,16 @@ public class RevenuesView extends Composite<VerticalLayout> {
         searchTransactionsTextBox.setWidth("80%");
         searchTransactionsTextBox.setTooltipText("Search by transaction number from receipt");
         searchTransactionsTextBox.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
-        searchTransactionsTextBox.addValueChangeListener(e -> searchCash(e.getValue().trim()));
+
+        Button searchButton = new Button();
+        //<theme-editor-local-classname>
+        searchButton.addClassName("revenues-view-button-1");
+        searchButton.setWidth("20px");
+        searchButton.getStyle().set("margin-top","20px");
+        searchButton.getStyle().set("right","40px");
+        searchButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        searchButton.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
+        searchButton.addClickListener(e -> searchCash(searchTransactionsTextBox.getValue().trim()));
 
         Button exportButton = new Button();
         exportButton.setText("Export");
@@ -119,6 +128,7 @@ public class RevenuesView extends Composite<VerticalLayout> {
         layoutRow.add(fromDatePicker);
         layoutRow.add(toDatePicker);
         layoutRow.add(searchTransactionsTextBox);
+        layoutColumn2.add(searchButton);
         layoutRow.add(layoutColumn2);
         layoutRow.add(exportButton);
     }

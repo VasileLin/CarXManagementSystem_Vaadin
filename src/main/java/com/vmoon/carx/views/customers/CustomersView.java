@@ -66,7 +66,6 @@ public class CustomersView extends Composite<VerticalLayout> {
     public CustomersView(CustomerService customerService, CustomerFormView customerFormView) {
         this.customerService = customerService;
         this.customerFormView = customerFormView;
-        VerticalLayout layoutColumn2 = new VerticalLayout();
         customersGrid = new Grid<>(CustomerDto.class, false);
         customersGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         customersGrid.setWidth("100%");
@@ -99,9 +98,6 @@ public class CustomersView extends Composite<VerticalLayout> {
         getContent().setWidthFull();
         getContent().setSpacing(false);
         getContent().addClassName(Padding.SMALL);
-        layoutColumn2.setWidth("100%");
-        layoutColumn2.getStyle().set("flex-grow", "1");
-        layoutColumn2.setFlexGrow(1.0, layoutColumn3);
         layoutColumn3.setWidthFull();
         layoutColumn3.setSpacing(false);
         layoutColumn3.setPadding(false);
@@ -124,13 +120,26 @@ public class CustomersView extends Composite<VerticalLayout> {
         searchCustomersField.setPlaceholder("Search Customers ...");
         searchCustomersField.setWidth("100%");
         searchCustomersField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
-        searchCustomersField.addValueChangeListener(e -> searchCustomers(e.getValue().trim()));
 
+        Button searchButton = new Button();
+        searchButton.setText("Search");
+        searchButton.setWidth("min-content");
+        searchButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        searchButton.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
+        searchButton.addClickListener(e -> searchCustomers(searchCustomersField.getValue().trim()));
 
-        getContent().add(layoutColumn2);
+        HorizontalLayout layoutRow3 = new HorizontalLayout();
+        layoutRow3.setHeightFull();
+        layoutRow3.setWidth("100%");
+        layoutRow3.setHeight("50px");
+        layoutRow3.setAlignItems(Alignment.CENTER);
+        layoutRow3.setJustifyContentMode(JustifyContentMode.CENTER);
+
+        layoutRow3.add(searchCustomersField);
+        layoutRow3.add(searchButton);
         getContent().add(layoutColumn4);
-        layoutColumn2.add(searchCustomersField);
-        layoutColumn2.add(customersGrid);
+        layoutColumn4.add(layoutRow3);
+        layoutColumn4.add(customersGrid);
         layoutColumn4.add(hr);
         layoutColumn4.add(layoutRow);
         layoutRow.add(addButton);
@@ -140,7 +149,6 @@ public class CustomersView extends Composite<VerticalLayout> {
 
     private void searchCustomers(String value) {
         if (value.isEmpty()) {
-            Notifications.warningNotification("Search bar is empty!").open();
             customersGrid.setDataProvider(customerDataProvider);
             customersGrid.getDataProvider().refreshAll();
         } else {

@@ -95,6 +95,29 @@ public class ServiceView extends Composite<VerticalLayout> {
         exportButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         configureExportButton(exportButton);
 
+        searchServicesField = new TextField();
+        searchServicesField.setPlaceholder("Search Services ...");
+        searchServicesField.setWidth("100%");
+        searchServicesField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
+
+        Button searchButton = new Button();
+        searchButton.setText("Search");
+        searchButton.setWidth("min-content");
+        searchButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        searchButton.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
+        searchButton.addClickListener(e -> searchService(searchServicesField.getValue().trim()));
+
+        HorizontalLayout layoutRow3 = new HorizontalLayout();
+        layoutRow3.setHeightFull();
+        layoutRow3.setWidth("100%");
+        layoutRow3.setHeight("50px");
+        layoutRow3.setAlignItems(Alignment.CENTER);
+        layoutRow3.setJustifyContentMode(JustifyContentMode.CENTER);
+
+        layoutRow3.add(searchServicesField);
+        layoutRow3.add(searchButton);
+        getContent().add(layoutRow3);
+
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
         getContent().setFlexGrow(1.0, layoutColumn2);
@@ -113,14 +136,7 @@ public class ServiceView extends Composite<VerticalLayout> {
         layoutRow2.setHeight("50px");
         layoutRow2.setAlignItems(Alignment.CENTER);
         layoutRow2.setJustifyContentMode(JustifyContentMode.CENTER);
-
-        searchServicesField = new TextField();
-        searchServicesField.setPlaceholder("Search Services ...");
-        searchServicesField.setWidth("100%");
-        searchServicesField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
-        searchServicesField.addValueChangeListener(e -> searchService(e.getValue().trim()));
-
-        layoutColumn2.add(searchServicesField);
+        layoutColumn2.add(layoutRow3);
         getContent().add(layoutColumn2);
         layoutColumn2.add(servicesGrid);
         layoutColumn2.add(layoutColumn3);
